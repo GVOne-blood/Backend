@@ -52,17 +52,18 @@ Primitive DT được chia thành 4 kiểu cơ bản:
 
 ## Phân biệt kiểu nguyên thủy và tham chiếu 
 
-![Sơ đồ minh họa](https://github.com/GVOne-blood/Backend/blob/main/demo/src/main/resources/local/Screenshot%202025-08-25%20140103.png)
 
   |                      |                                                              Primitive Data Type                                                               |                                                        Object Data Type                                                         |
   |:--------------------:|:----------------------------------------------------------------------------------------------------------------------------------------------:|:-------------------------------------------------------------------------------------------------------------------------------:|
   |    **Nguồn gốc**     |                                              Được định nghĩa sẵn thông qua các từ khóa trong Java                                              |                                             User tự custom hoặc đến từ API của Java                                             |
   |     **Lưu trữ**      |                                                           Giá trị dưới dạng nhị phân                                                           |                                        Lưu trữ 1 tham chiếu trỏ đến vị trí của đối tượng                                        |
   | **Giá trị mặc định** |                                             0 cho kiểu number, false cho boolean, \u0000 cho char                                              |                            null - đồng nghĩa khi gọi các phương thức sẽ nhả ra NullPointerException                             |
-  | **Truyền tham số **  | pass-by-value: tạo một bản sao của giá trị để truyền vào tham số, giá trị của đối số không thay đổi trong suốt quá trình thực hiện phương thức | Truyền bản sao của tham chiếu, phương thức có thể thay đổi trạng thái của đối tượng gốc nhưng không làm thay đổi tham chiếu gốc |
+  |  **Truyền tham số**  | pass-by-value: tạo một bản sao của giá trị để truyền vào tham số, giá trị của đối số không thay đổi trong suốt quá trình thực hiện phương thức | Truyền bản sao của tham chiếu, phương thức có thể thay đổi trạng thái của đối tượng gốc nhưng không làm thay đổi tham chiếu gốc |
   |      **Bộ nhớ**      |                                                                     Stack                                                                      |                         Heap để lưu trữ đối tượng, Stack để lưu trữ tham chiếu (con trỏ) của đối tượng                          |
   | **Hướng đối tượng**  |                                                                     Không                                                                      |              Kế thừa từ Object, có các phương thức, có thể kế thừa, triển khai interface và thể hiện tính đa hình               |
 
+Khởi tạo
+![Sơ đồ minh họa](https://github.com/GVOne-blood/Backend/blob/main/demo/src/main/resources/local/Screenshot%202025-08-25%20140103.png)
 ### Chú thích
 
 1. **Bộ nhớ Stack**: Là vùng nhớ được quản lý tự động, có tốc độ truy xuất rất cao. Nó được sử dụng để lưu trữ các biến cục bộ (local variables) của phương thức và các tham chiếu đến đối tượng. Khi một phương thức kết thúc, toàn bộ khung bộ nhớ (stack frame) của nó sẽ được giải phóng. Biến kiểu nguyên thủy được lưu trữ hoàn toàn trên Stack. Đối với kiểu Object, biến tham chiếu (con trỏ) được lưu trên Stack.
