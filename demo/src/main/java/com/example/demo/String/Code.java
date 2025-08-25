@@ -25,6 +25,14 @@ public class Code {
         String s3 = new String("Java"); // tạo trong heap memory
         System.out.println(s1 == s2); // true
         System.out.println(s1 == s3); // false
+
+        // Compare
+        String a = "hello";
+        String b = "hello";
+        String c = new String("hello");
+        System.out.println(a == b); // true, cùng tham chiếu trong String pool
+        System.out.println(a == c); // false, khác tham chiếu
+        System.out.println(a.equals(c)); // true, cùng giá trị
     
     }
 

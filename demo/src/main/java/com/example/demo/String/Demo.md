@@ -1,9 +1,12 @@
 # String
 
 ## [1. Tìm hiểu về các đặc điểm và tính chất của String trong java](#đặc-điểm-và-tính-chất)
+
 ## [2. Có bao nhiêu cách để tạo 1 biến String](#khởi-tạo)
-## [3. Tìm hiểu về String pool?](#)
-## [4. Làm sao để so sánh hai chuỗi trong java](#)
+
+## [3. Tìm hiểu về String pool?](#string-pool)
+
+## [4. Làm sao để so sánh hai chuỗi trong java](#so-sánh-chuỗi)
 
 ---
 
@@ -15,14 +18,13 @@ Lớp **java.lang.String** là một trong những kiểu dữ liệu tham chi�
 
 ## Khởi tạo
 
->String có 2 cách khởi tạo trực tiếp  
+> String có 2 cách khởi tạo trực tiếp
 
-![init](https://github.com/GVOne-blood/Backend/blob/main/demo/src/main/resources/local/Screenshot%202025-08-25%20170438.png
-)
-
+![init](https://github.com/GVOne-blood/Backend/blob/main/demo/src/main/resources/local/Screenshot%202025-08-25%20170438.png)
 
 ## Đặc điểm và tính chất
-> Tính bất biến: Khi một đối tượng String được khởi tạo, trạng thái nội tại của nó không thể  bị thay đổi trong suốt vòng đời của đối tượng trong Heap
+
+> Tính bất biến: Khi một đối tượng String được khởi tạo, trạng thái nội tại của nó không thể bị thay đổi trong suốt vòng đời của đối tượng trong Heap
 
 Tất cả các phương thức của String (concat(), substring(),...) về bản chất đều không làm thay đổi đối tượng String đó mà trả về một đối tượng String mới
 
@@ -35,7 +37,7 @@ public final class String
     implements java.io.Serializable, Comparable<String>, CharSequence,
                Constable, ConstantDesc {
 
-   
+
     private final byte[] value;
 
     private int hash; // Default to 0
@@ -45,20 +47,30 @@ public final class String
                }
 
 ```
+
 Hệ quả của tính chất này là then chốt trong:
+
 - **Đảm bảo an toàn đa luồng (Thread Safety)**: String có thể được chia sẻ giữa nhiều luồng mà không cần bất kỳ cơ chế đồng bộ hóa nào
 - **Bảo mật**: Bảo vệ các dữ liệu nhảy cảm (password, url,...) trước các lỗ hổng bảo mật
 - **Hiệu suất & Caching**: Immutable là điều kiện kiên quyết cho sự tồn tại của String Constant Pool(SCP). Ngoài ra vì giá trị không bị thay đổi, hashcode của String value chỉ được tính toán 1 lần duy nhất và lưu trong môi trường nội tại -> hoạt động rất hiệu quả khi được dùng làm key trong các cấu trúc dữ liệu băm như HashMap
 
->String pool: Một vùng nhớ đặc biệt trong Heap, được sử dụng để lưu trữ các chuỗi hằng (String literals) và các chuỗi nội bộ hóa (interned string)
+### String pool
+>Spring pool: Một vùng nhớ đặc biệt trong Heap, được sử dụng để lưu trữ các chuỗi hằng (String literals) và các chuỗi nội bộ hóa (interned string)
 
 Cơ chế SCP: Khi trình biên dịch gặp phải một hằng chuỗi, JVM sẽ kiểm tra trong SCP, nếu chuỗi đó đã tồn tại trong SCP, biến tham chiếu sẽ lập tức được trỏ đến đối tượng đó thay vì tạo một đối tượng mới, nếu chuỗi đó chưa tồn tại, Java sẽ tạo ra một đối tượng mới trong SCP và biến tham chiếu sẽ được trỏ đến đó
 
 ![SCP](https://github.com/GVOne-blood/Backend/blob/main/demo/src/main/resources/local/Screenshot%202025-08-25%20165551.png)
 
+> Khả năng nối chuỗi: Nối chuỗi bằng toán tử + (Không như Python, Java không cho phép người dùng được nạp chồng toán tử, String là ngoại lệ trong thiết kế ngôn ngữ duy nhất)
+>>Nhược điểm: Mỗi lần nối chuỗi từ chuỗi ban đầu, String "vứt bỏ" đối tượng cũ để tạo ra đối tượng mới, nối chuỗi n lần sẽ tạo ra n - 1 chuỗi "rác" dẫn đến tốn bộ nhớ và hiệu suất kém
+>>> **StringBuilder** và **StringBuffer** ra đời để giải quyết vấn đề này
 
+## So sánh chuỗi
 
+String hỗ trợ phương thức equals() để so sánh giá trị 2 chuỗi. Ngoài ra, toán tử == cũng để so sánh nhưng phụ thuộc vào cách khai báo các đối tượng String.
 
->Khả năng nối chuỗi: Nối chuỗi bằng toán tử + (Không như Python, Java không cho phép người dùng được nạp chồng toán tử, String là ngoại lệ trong thiết kế ngôn ngữ duy nhất)
+![compare](https://github.com/GVOne-blood/Backend/blob/main/demo/src/main/resources/local/Screenshot%202025-08-25%20224359.png)
 
 ### Chú thích
+1. **StringBuilder** : Một class hiệu suất cao với khả năng xử lý bất đồng bộ và đa luồng, cho phép nối chuỗi và thao tác với chuỗi bằng các phương thức append(), insert(),...và giảm chuỗi "rác" khi nó lưu các chuỗi được append vào bộ nhớ đệm và khởi tạo đối tượng String khi gọi đến phương thức toString()
+2. **StringBuffer** : Tương tự như StringBuilder nhưng hỗ trợ xử lý đồng bộ hóa và an toàn cho luồng  
