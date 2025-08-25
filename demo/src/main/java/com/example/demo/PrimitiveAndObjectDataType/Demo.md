@@ -1,6 +1,6 @@
 # Primitive & Object Data Tpye
 
-## [1. Phân biệt kiểu dữ liệu nguyên thủy và kiểu dữ liệu object.](#1-phân-biệt-kiểu-nguyên-thủy-và-tham-chiếu)
+## [1. Phân biệt kiểu dữ liệu nguyên thủy và kiểu dữ liệu object.](#phân-biệt-kiểu-nguyên-thủy-và-tham-chiếu)
 
 ## 2. Có thể chuyển đổi giữa hai kiểu dữ liệu này không ?
 
@@ -62,9 +62,62 @@ Primitive DT được chia thành 4 kiểu cơ bản:
   |      **Bộ nhớ**      |                                                                     Stack                                                                      |                         Heap để lưu trữ đối tượng, Stack để lưu trữ tham chiếu (con trỏ) của đối tượng                          |
   | **Hướng đối tượng**  |                                                                     Không                                                                      |              Kế thừa từ Object, có các phương thức, có thể kế thừa, triển khai interface và thể hiện tính đa hình               |
 
-Khởi tạo
+>Khởi tạo
+
 ![Sơ đồ minh họa](https://github.com/GVOne-blood/Backend/blob/main/demo/src/main/resources/local/Screenshot%202025-08-25%20140103.png)
+
+>Giá trị mặc định 
+
+![md](https://github.com/GVOne-blood/Backend/blob/main/demo/src/main/resources/local/Screenshot%202025-08-25%20142139.png)
+
+>Tham chiếu trong hàm
+
+![reference](https://github.com/GVOne-blood/Backend/blob/main/demo/src/main/resources/local/Screenshot%202025-08-25%20144423.png)
+
+---
+## Chuyển đổi giữa 2 loại dữ liệu
+
+> Java hỗ trợ chuyển đổi từ primitive sang object (Boxing) và ngược lại (Unboxing) bằng lớp bao bọc (Wrapper Classes)
+
+- Cơ chế Boxing và Unboxing: Bản chất của boxing là việc thay đổi giá trị của biến value trong đối tượng bao bọc nó, ví dụ:
+  ```
+  public final class Integer extends Number implements Comparable<Integer> {
+
+    
+      private final int value;
+      ... other attributes 
+    
+      public Integer(int value) {
+          this.value = value;
+      }
+
+    
+      public int intValue() {
+          return this.value;
+      }
+
+    
+      @Override
+      public boolean equals(Object obj) {
+          if (obj instanceof Integer) {
+              return this.value == ((Integer)obj).intValue();
+          }
+          return false;
+      }
+
+      @Override
+      public String toString() {
+          return Integer.toString(this.value);
+      }
+  }
+  ```
+  một lớp wrapper thực chất chứa một biến private final + kiểu nguyên thủy tương ứng. Vì vậy muốn boxing một biến primitive ta có thể gọi constructor, method valueOf(), mục đích cuối cùng để gán giá trị cho biến value:
+
+  ![box](https://github.com/GVOne-blood/Backend/blob/main/demo/src/main/resources/local/Screenshot%202025-08-25%20151007.png)
+
+
 ### Chú thích
 
 1. **Bộ nhớ Stack**: Là vùng nhớ được quản lý tự động, có tốc độ truy xuất rất cao. Nó được sử dụng để lưu trữ các biến cục bộ (local variables) của phương thức và các tham chiếu đến đối tượng. Khi một phương thức kết thúc, toàn bộ khung bộ nhớ (stack frame) của nó sẽ được giải phóng. Biến kiểu nguyên thủy được lưu trữ hoàn toàn trên Stack. Đối với kiểu Object, biến tham chiếu (con trỏ) được lưu trên Stack.
 2. **Bộ nhớ Heap**: Là vùng nhớ động, được sử dụng để cấp phát bộ nhớ cho tất cả các đối tượng được tạo ra thông qua từ khóa new. Việc quản lý bộ nhớ trên Heap phức tạp hơn và được thực hiện bởi Garbage Collector (GC) của Java. Đối tượng thực sự (với tất cả các thuộc tính và dữ liệu của nó) nằm trên Heap.
+3. **Autoboxing và Auto-unboxing** bản chất chỉ là cách viết gọn hơn của việc gọi các phương thức valueOf() hay intValue(), khi Java compile chương trình chúng vẫn gọi các phương thức trên như thường 
