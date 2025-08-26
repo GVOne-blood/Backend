@@ -2,8 +2,8 @@
 
 ## [1. Phân biệt throw và throws](#throw-vs-throws)
 ## [2. Thế nào là checked và unchecked exception](#checked-exception)
-## 3. try catch , try with resource khác nhau như thế nào ?
-## 4. Làm thế nào để tạo được 1 custom exception ?
+## [3. try catch , try with resource khác nhau như thế nào ?](#try-catch-vs-try-with-resources)
+## [4. Làm thế nào để tạo được 1 custom exception ?](#custom-exception)
 
 [Chú thích](#chú-thích)
 
@@ -186,16 +186,82 @@ public void readFile(String path) throws IOException {
 }
 ```
 
+#### Try-with-resources
+
+Java 7 cho ra đời try-with-resources trong bối cảnh try-catch-finally gặp một số nhược điểm, xét ví dụ sau:
+
+![cons](https://github.com/GVOne-blood/Backend/blob/main/demo/src/main/resources/local/Screenshot%202025-08-26%20151147.png)
+
+- Trong finally lại có try catch để kiểm tra null
+- Giả sử có lỗi xảy ra trong khối try (ví dụ, br.readLine() ném IOException). Sau đó, khi thực thi khối finally, lời gọi br.close() cũng ném một IOException khác. Ngoại lệ từ khối finally sẽ được ném ra ngoài, và ngoại lệ gốc từ khối try sẽ bị mất hoàn toàn. Điều này làm cho việc gỡ lỗi (debug) trở nên cực kỳ khó khăn vì bạn không thấy được nguyên nhân gốc rễ của vấn đề.
+
+Để giải quyết, try-with-resources ra đời
+>try-with-resources là một câu lệnh try khai báo một hoặc nhiều tài nguyên. Một tài nguyên là một đối tượng phải được đóng lại sau khi chương trình sử dụng xong.
+
+Đoạn code bên trên có thể được viết lại thành : 
+
+![pros](https://github.com/GVOne-blood/Backend/blob/main/demo/src/main/resources/local/Screenshot%202025-08-26%20151724.png)
+
+Cơ chế: **AutoCloseable** interface. Bất kỳ lớp nào muốn dùng try-with-resources đều phải implements AutoCloseable và thực thi phương thức *void close()  throw Exception*. Khi thực hiện xong khối try, Java chèn mã lệnh để gọi method close(), nó tương đương việc gọi close() vào trong khối finally. Điều này giúp:
+- Code ngắn gọn
+- Ngăn rủi ro về việc đóng tài nguyên
+- Xử lý vấn đề ngoại lệ bị che khuất đã đặt ra với try-catch-finally
+
+#### Try-catch vs Try-with-resources
+
+
+  |   | Try-catch |   Try-with-resources    |
+  | :---: | :--------: | :---------------: |
+  | **Mục đích**  |  Xử lý ngoại lệ chung và thực thi mã lệnh dọn dẹp bất kỳ.   |    Chuyên dụng cho việc quản lý và tự động đóng các tài nguyên    |
+  | **Quản lý tài nguyên**  |   	Thủ công. Lập trình viên phải tự viết mã lệnh gọi close() trong khối finally   |  Tự động. JVM tự động gọi close() trên các tài nguyên đã khai báo  |
+  |  **Điều kiện sử dụng**  |   Hầu hết mọi trường hợp   | Chỉ áp dụng cho các đối tượng có thể implements AutoCloseable interface |
+  | **Clean code**  |   Dài dòng   | Clean hơn |
+  | **Mất mát ngoại lệ** | Ngoại lệ gốc bị mất nhiều nếu finally cũng ném ra ngoại lệ | Ngoại lệ gốc được giữ lại |
+
 #### Throw vs Throws
 
 
   |   | Throw |   Throws    |
   | :---: | :--------: | :---------------: |
   | **Mục đích**  |  Ném ra một thể hiện cụ thể của ngoại lệ    |    Khai báo rằng phương thức có thể ném ra một hoặc nhiều ngoại lệ    |
-  | Vị trí  |   Trong thân phương thức   |  Signature của phương thức  |
-  |  Đối tượng theo sau  |   Một instance của lớp Throwable   | Một hoặc nhiều exception của Throwable |
-  | Số lượng  |   Chỉ ném được một ngoại lệ mỗi lần   | Có thể khai báo nhiều ngoại lệ cần nhả |
-  | Chức năng | Gây ra sự gián đoạn trong luồng thực thi | Được trình biên dịch sử dụng để kiểm tra các Checked Exception |
+  | **Vị trí**  |   Trong thân phương thức   |  Signature của phương thức  |
+  |  **Đối tượng theo sau**  |   Một instance của lớp Throwable   | Một hoặc nhiều exception của Throwable |
+  | **Số lượng**  |   Chỉ ném được một ngoại lệ mỗi lần   | Có thể khai báo nhiều ngoại lệ cần nhả |
+  | **Chức năng** | Gây ra sự gián đoạn trong luồng thực thi | Được trình biên dịch sử dụng để kiểm tra các Checked Exception |
+
+### Custom Exception
+>Ngoại lệ tùy chỉnh (Custom Exception hoặc User-Defined Exception) là các lớp do lập trình viên định nghĩa, kế thừa từ một trong các lớp ngoại lệ có sẵn trong Java API (thường là java.lang.Exception hoặc java.lang.RuntimeException).
+
+Mục đích của việc tạo ra các custom ex:
+- Bắt các ex không đươc Java định nghĩa
+- Phân loại lỗi ngữ nghĩa theo nghiệp vụ dự án
+- Hỗ trợ logging tốt
+
+Bản chất Custom Exception cũng có Checked và Unchecked Exception
+
+```
+// Ví dụ về một Checked Custom Exception
+public class InsufficientFundsException extends Exception {
+    // ...
+}
+
+// Ví dụ về một Unchecked Custom Exception
+public class InvalidConfigurationException extends RuntimeException {
+    // ...
+}
+```
+Tạo custom exception
+
+![example](https://github.com/GVOne-blood/Backend/blob/main/demo/src/main/resources/local/Screenshot%202025-08-26%20154152.png)
+
+
+Method nhả exception
+![met](https://github.com/GVOne-blood/Backend/blob/main/demo/src/main/resources/local/Screenshot%202025-08-26%20154734.png)
+
+
+Handle
+![handle](https://github.com/GVOne-blood/Backend/blob/main/demo/src/main/resources/local/Screenshot%202025-08-26%20154551.png)
+
 
 
 ### Chú thích
