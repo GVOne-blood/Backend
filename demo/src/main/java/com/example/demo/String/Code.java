@@ -33,6 +33,25 @@ public class Code {
         System.out.println(a == b); // true, cùng tham chiếu trong String pool
         System.out.println(a == c); // false, khác tham chiếu
         System.out.println(a.equals(c)); // true, cùng giá trị
+
+        // method
+        String s = "  Hello World  ";
+        System.out.println(s.length()); // 15
+        System.out.println(s.charAt(0)); // ' '
+        System.out.println(s.indexOf("o")); // 4
+        System.out.println(s.lastIndexOf("o")); // 7
+        System.out.println(s.substring(2, 7)); // "Hello"
+        System.out.println(s.toLowerCase()); // "  hello world  "
+        System.out.println(s.toUpperCase()); // "  HELLO WORLD  "
+        System.out.println(s.trim()); // "Hello World"
+        System.out.println(s.replace("l", "x")); // "  Hexxo Worxd
+        String[] parts = s.trim().split(" "); // ["Hello", "World"]
+        for (String part : parts) {
+            System.out.println(part);
+        }
+        System.out.println(String.join("-", parts)); // "Hello-World"
+
+
     
     }
 
