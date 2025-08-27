@@ -1,6 +1,6 @@
 # List
 
-## 1. Nêu ra các đặc điểm List Interface
+## [1. Nêu ra các đặc điểm List Interface](#list-interface)
 
 ## 2. Kể ra các class triển khai từ List Interface
 
@@ -50,5 +50,22 @@ Các phương thức của List (So sánh với LinkedList)
 | `boolean isEmpty()`                                    | Trả về `true` nếu danh sách không có phần tử nào. Kế thừa từ `Collection`.                                                                                      | O(1)                      | O(1)                       |
 | `Object[] toArray()`                                   | Trả về một mảng chứa tất cả các phần tử trong danh sách.                                                                                                        | O(n)                      | O(n)                       |
 | `<T> T[] toArray(T[] a)`                               | Trả về một mảng chứa tất cả các phần tử; kiểu runtime của mảng trả về là của mảng được chỉ định.                                                                | O(n)                      | O(n)                       |
+
+---
+
+### Các triển khai của List
+
+
+
+| Tiêu chí                 | `ArrayList`                                                                                                      | `LinkedList`                                                                                                     | `Vector` / `Stack`                                                                                                                                |
+| :------------------------ | :--------------------------------------------------------------------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Cấu trúc dữ liệu**     | Mảng động (Dynamic Array)                                                                                        | Danh sách liên kết đôi (Doubly Linked List)                                                                      | Mảng động (Dynamic Array)                                                                                                                       |
+| **Truy cập ngẫu nhiên (`get(i)`)** | <span style="color:green">**Rất nhanh (O(1))**</span>                                                      | <span style="color:red">Chậm (O(n))</span>                                                                       | <span style="color:orange">Nhanh (O(1))</span>, nhưng chậm hơn `ArrayList` do đồng bộ hóa.                                                          |
+| **Thêm/Xóa ở cuối**      | <span style="color:green">Nhanh (O(1) trung bình)</span>                                                          | <span style="color:green">**Rất nhanh (O(1))**</span>                                                      | <span style="color:orange">Nhanh (O(1) trung bình)</span>                                                                                          |
+| **Thêm/Xóa ở đầu/giữa**  | <span style="color:red">Chậm (O(n))</span> do phải dịch chuyển phần tử.                                            | <span style="color:green">**Nhanh (O(1))**</span> (nếu đã có iterator), chỉ cần thay đổi con trỏ.                    | <span style="color:red">Chậm (O(n))</span>, tương tự `ArrayList`.                                                                                  |
+| **Đồng bộ hóa (Thread-safe)** | **Không** (Non-synchronized). Nhanh hơn trong môi trường đơn luồng.                                              | **Không** (Non-synchronized).                                                                                    | **Có** (Synchronized). Mọi phương thức đều được đồng bộ hóa, gây ra chi phí hiệu năng.                                                            |
+| **Sử dụng bộ nhớ**       | Hiệu quả hơn. Chỉ có overhead của mảng.                                                                          | Tốn nhiều bộ nhớ hơn. Mỗi phần tử (Node) cần thêm 2 tham chiếu (`next`, `prev`).                                    | Tương tự `ArrayList`, nhưng có thể lãng phí hơn do chiến lược tăng gấp đôi kích thước.                                                           |
+| **Trường hợp sử dụng tối ưu** | ✅ **Lựa chọn mặc định cho hầu hết các trường hợp.**<br>✅ Thường xuyên đọc và truy cập ngẫu nhiên.<br>✅ Ít thao tác chèn/xóa ở giữa. | ✅ Thường xuyên thêm/xóa ở **đầu hoặc cuối** danh sách.<br>✅ Dùng để triển khai **Stack** hoặc **Queue** (thông qua `Deque` interface). | ❌ **Không khuyến khích (Legacy).**<br>• Thay thế `Stack` bằng `java.util.ArrayDeque`.<br>• Nếu cần thread-safe, dùng `Collections.synchronizedList()` hoặc `CopyOnWriteArrayList`. |
+
 
 ### Chú thích
