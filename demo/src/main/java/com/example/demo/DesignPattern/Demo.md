@@ -38,5 +38,21 @@ Triển khai Singleton trong Java:
 - Tối ưu hóa tài nguyên và hiệu năng: Cũng chính vì chỉ có 1 instance nên singleton đảm bảo các đối tượng nặng (file config, connection,...) chỉ khởi tạo 1 lần duy nhất. Ngoài ra việc hỗ trợ Lazy Init - đối tượng chỉ được khởi tạo khi được yêu cầu nên thời gian khởi động ứng dụng cũng được cải thiện
 - Truy cập toàn cục: Vì cung cấp 1 public static method nên singleton có thể được truy cập ở bất kỳ đâu trong ứng dụng
 ## Factory method
+>Factory Method là một mẫu thiết kế thuộc nhóm Creational Patterns. Nó định nghĩa một interface để tạo ra các đối tượng, nhưng để các lớp con quyết định lớp cụ thể nào sẽ được khởi tạo. Factory Method cho phép một lớp ủy thác việc khởi tạo đối tượng cho các lớp con của nó.
+>> Nguyên tắc triển khai:
+>>> - Một interface hoặc abstract class cho các đối tượng mà factory method sẽ tạo ra (Product)
+>>> - Các class là thể hiện của các đối tượng sẽ implements interface hoặc abstract (Concrete Product)
+>>> - Khai báo 1 phương thức trừu tượng trả về 1 đối tượng kiểu Product (Creator)
+>>> - Method ghi đè factory method để trả về 1 thể hiện của 1 ConcreteProduct cụ thể (Concrete Creator)
+
+Mục đích
 
 
+
+![eg](https://github.com/GVOne-blood/Backend/blob/main/demo/src/main/resources/local/407.png)
+
+Ưu điểm
+- Tăng tính mở rộng: Đôi khi ta không biết một lớp cha có thể có thêm lớp con hay không, khi mở rộng chỉ cần thêm class implements product và thêm case 1 lần duy nhất
+- Giảm sự phụ thuộc giữa các module: bản chất Factory là cô lập sự phụ thuộc vào một chỗ, là loose coupling
+- Che giấu thông tin khởi tạo
+- Dễ quản lý 
