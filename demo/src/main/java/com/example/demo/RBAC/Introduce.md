@@ -5,6 +5,7 @@
 > RBAC là một mô hình kiểm soát truy cập nơi quyền hạn được gán cho các roles (vai trò), và người dùng được gán vào các
 > vai trò đó
 
+
 Luồng logic : `User` => Gán `Roles` => `Roles` đã chứa sẵn `Permission`
 
 RBAC giải quyết các vấn đề thực tế phát sinh :

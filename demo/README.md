@@ -37,6 +37,72 @@ This project contains various Java programming concepts and examples organized b
   - String manipulation and methods
   - String immutability and String pool
 
+### Collections Framework
+
+#### 7. Arrays
+- [Array Operations Demo](./src/main/java/com/example/demo/Array/Demo.md)
+  - Array declaration, initialization, and manipulation
+  - Multi-dimensional arrays and common operations
+
+#### 8. List
+- [List Collections Demo](./src/main/java/com/example/demo/List/Demo.md)
+  - ArrayList, LinkedList, and Vector
+  - List operations and performance considerations
+
+#### 9. Set
+- [Set Collections Demo](./src/main/java/com/example/demo/Set/Demo.md)
+  - HashSet, TreeSet, and LinkedHashSet
+  - Uniqueness and ordering in Sets
+
+#### 10. Map
+- [Map Collections Demo](./src/main/java/com/example/demo/Map/Demo.md)
+  - HashMap, TreeMap, and LinkedHashMap
+  - Key-value pair operations and use cases
+
+#### 11. Queue
+- [Queue Collections Demo](./src/main/java/com/example/demo/Queue/Demo.md)
+  - Queue and Deque interfaces
+  - Priority Queue and blocking queues
+
+### Advanced Java Concepts
+
+#### 12. Threading and Concurrency
+- [Thread Management Demo](./src/main/java/com/example/demo/Thread/Demo.md)
+  - Creating and managing threads
+  - Thread synchronization and thread safety
+
+#### 13. Synchronous and Asynchronous Programming
+- [Sync and Async Demo](./src/main/java/com/example/demo/SyncAndAsync/Demo.md)
+  - Synchronous vs Asynchronous execution
+  - CompletableFuture and async programming patterns
+
+#### 14. Design Patterns
+- [Design Patterns Demo](./src/main/java/com/example/demo/DesignPattern/Demo.md)
+  - Common design patterns in Java
+  - Singleton, Factory, and other patterns
+
+#### 15. Regular Expressions
+- [Regex Demo](./src/main/java/com/example/demo/RegularExpression/Demo.md)
+  - Pattern matching with regular expressions
+  - Common regex patterns and use cases
+
+### Database and Data Management
+
+#### 16. Database Indexing
+- [Index Concepts Demo](./src/main/java/com/example/demo/Index/Demo.md)
+  - Understanding database indexes
+  - Index types and optimization strategies
+
+#### 17. Database Queries
+- [Query Optimization Demo](./src/main/java/com/example/demo/Query/Demo.md)
+  - SQL query best practices
+  - Query optimization techniques
+
+#### 18. Database Partitioning
+- [Partition Strategies Demo](./src/main/java/com/example/demo/Partition/Demo.md)
+  - Table partitioning concepts
+  - Horizontal and vertical partitioning
+
 ## 🛠️ Additional Resources
 
 ### Syntax Reference
@@ -67,4 +133,4 @@ Click on any of the links above to navigate to the specific topic documentation.
 Feel free to add more examples or improve existing documentation by creating new Demo.md files in appropriate module directories.
 
 ---
-*Last updated: 2025*
+*Last updated: Tháng 9, 2025*

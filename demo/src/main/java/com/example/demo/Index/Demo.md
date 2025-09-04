@@ -32,6 +32,20 @@ Nhược điểm:
 
 ### Non-cluster Index
 
+> Một Non-Clustered Index là một cấu trúc dữ liệu tách biệt với dữ liệu của bảng. Nó chứa các giá trị của các cột được
+> đánh index và một "con trỏ" (pointer) cho mỗi giá trị. Con trỏ này trỏ đến vị trí của hàng dữ liệu tương ứng trong
+> bảng.
+> Dữ liệu trong bảng không được sắp xếp theo thứ tự của Non-Clustered Index.
+
 ### Cluster Index
 
+> một clustered index là cấu trúc dữ liệu được sắp xếp theo thứ tự tăng dần hoặc giảm dần của các giá trị trên một hoặc
+> nhiều cột trong bảng. Dữ liệu trong bảng được lưu trữ thực sự theo thứ tự này dựa trên khóa của clustered index.
+
+Nói chung Cluster index là một dải các index duy nhất trong 1 bảng, nó thực hiện sort các bản ghi trong bảng đó theo giá
+trị của index. Gần như khi chọn trường nào để gán index, nó sẽ sort trường đó tồi Index Scan theo nó
+
+Vì là gán indẽ bằng việc sort theo field được gán nên có thể hiểu tại sao 1 table chỉ được có 1 cluster index
+
 ### Chú thích
+
