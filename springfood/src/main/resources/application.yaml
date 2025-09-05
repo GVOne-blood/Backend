@@ -1,0 +1,55 @@
+server:
+  port: 8081
+spring:
+  security:
+    debug: true
+  devtools:
+    restart:
+      enabled: true
+      additional-paths: src/main/java
+      exclude: static/**,public/**
+    livereload:
+      enabled: true
+      port: 35729
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/food_app
+    username: postgres
+    password: 123456
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+jwt:
+  accessTokenExpiration: 900000
+  refreshTokenExpiration: 604800000
+  resetTokenExpiration: 300000
+  secretKey: ${JWT_SECRET_KEY:default-secret-key-change-in-production}
+  resetKey: ${JWT_RESET_KEY:default-reset-key-change-in-production}
+  refreshKey: ${JWT_REFRESH_KEY:default-refresh-key-change-in-production}
+
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+  sendgrid:
+    api-key: ${SENDGRID_API_KEY:your-sendgrid-api-key-here}
+    from-email: ${SENDGRID_FROM_EMAIL:blandboy2023@gmail.com}
+open-api:
+  service:
+    api-doc: spring-food
+    server:  http://localhost:8081
+    title: Spring Food - Food For Spring
+    version: 1.0.0
+
+logging:
+  level:
+    org.springframework.security: DEBUG
+    org.springframework.security.web.FilterChainProxy: DEBUG
+    org.springframework.security.web.access.ExceptionTranslationFilter: DEBUG
+    org.springframework.security.authentication: DEBUG
