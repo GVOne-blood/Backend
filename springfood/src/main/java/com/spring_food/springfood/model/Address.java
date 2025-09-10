@@ -7,8 +7,8 @@ import lombok.Setter;
 @Entity
 @Getter
 @Setter
-@Table(name = "shipping")
-@AttributeOverride(name = "id", column = @Column(name = "shipping_id"))
+@Table(name = "address")
+@AttributeOverride(name = "id", column = @Column(name = "address_id"))
 public class Address extends AbstractEntity {
 
     private String ward;
@@ -25,5 +25,5 @@ public class Address extends AbstractEntity {
     private User user;
 
     @OneToOne(mappedBy = "address")
-    private Booking booking;
+    private Order order;
 }

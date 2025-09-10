@@ -9,13 +9,13 @@ import java.math.BigDecimal;
 @Entity
 @Getter
 @Setter
-@Table(name = "booking_item")
+@Table(name = "order_item")
 @AttributeOverride(name = "id", column = @Column(name = "bill_id"))
-public class BookingItem extends AbstractEntity{
+public class OrderItem extends AbstractEntity{
 
     @ManyToOne
-    @JoinColumn(name = "booking_id", nullable = false)
-    private Booking booking;
+    @JoinColumn(name = "order_id", nullable = false)
+    private Order order;
 
     @ManyToOne
     @JoinColumn(name = "product_id", nullable = false)

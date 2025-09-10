@@ -1,8 +1,12 @@
 package com.spring_food.springfood.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.spring_food.springfood.model.ENUM.TokenType;
 import com.spring_food.springfood.service.JwtService;
 import com.spring_food.springfood.service.UserService;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -11,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,15 +24,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-
-import static org.springframework.http.HttpHeaders.AUTHORIZATION;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.MalformedJwtException;
-import io.jsonwebtoken.security.SignatureException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.HashMap;
 import java.util.Map;
-import org.springframework.http.MediaType;
+
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
 @Component
 @Slf4j
@@ -52,10 +52,10 @@ public class PreFilter extends OncePerRequestFilter {
         log.info("Authentication header: {}", authHeader);
         
         try {
-            final String username = jwtService.extractUsername(token, TokenType.ACCESS_TOKEN);
+            final String username = jwtService.extractUsername(token, TokenType.ACCESS);
             if (StringUtils.isNotEmpty(username) && SecurityContextHolder.getContext().getAuthentication() == null){
                 UserDetails userDetails = userService.userDetailsService().loadUserByUsername(username);
-                if (jwtService.isValid(token, userDetails, TokenType.ACCESS_TOKEN)){
+                if (jwtService.isValid(token, userDetails, TokenType.ACCESS)){
                     SecurityContext context = SecurityContextHolder.createEmptyContext();
                     UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                     authentication.setDetails(userDetails);
@@ -75,11 +75,12 @@ public class PreFilter extends OncePerRequestFilter {
             log.error("Invalid JWT signature: {}", e.getMessage());
             sendErrorResponse(response, HttpServletResponse.SC_UNAUTHORIZED, "Chữ ký token không hợp lệ.");
             return;
-        } catch (Exception e) {
-            log.error("Cannot set user authentication: {}", e.getMessage());
-            sendErrorResponse(response, HttpServletResponse.SC_UNAUTHORIZED, "Lỗi xác thực. Vui lòng thử lại.");
-            return;
         }
+//        catch (Exception e) {
+//            log.error("Cannot set user authentication: {}", e.getMessage());
+//            sendErrorResponse(response, HttpServletResponse.SC_UNAUTHORIZED, "Lỗi xác thực. Vui lòng thử lại.");
+//            return;
+//        }
         
         filterChain.doFilter(request,response);
     }

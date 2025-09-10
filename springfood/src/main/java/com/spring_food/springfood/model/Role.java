@@ -22,4 +22,8 @@ public class Role extends AbstractEntity {
 
     @OneToMany(mappedBy = "role", cascade = CascadeType.ALL)
     private List<RoleHasPermission> rolePermissions = new ArrayList<>();
+
+    @OneToMany(mappedBy = "role", cascade = CascadeType.ALL)
+    private List<ShopMember> shopMembers = new ArrayList<>();
+
 }

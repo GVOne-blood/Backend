@@ -1,19 +1,18 @@
 package com.spring_food.springfood.dto.response;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class TokenResponse {
-    private String userId;
-    private String username;
-    private String accessToken;
-    private String refreshToken;
-    private String tokenType = "Bearer";
-    private Long expiresIn;
+     String userId;
+     String username;
+     String accessToken;
+     String refreshToken;
+     String tokenType = "Bearer";
+     Long expiresIn;
 }

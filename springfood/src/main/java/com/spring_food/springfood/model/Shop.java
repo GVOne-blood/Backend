@@ -15,9 +15,6 @@ import java.util.List;
 @AttributeOverride(name = "id", column = @Column(name = "shop_id"))
 public class Shop extends AbstractEntity {
 
-    @OneToOne
-    @JoinColumn(name = "owner_id", unique = true, nullable = false)
-    private User owner;
 
     @Column(name = "shop_name", nullable = false)
     private String shopName;
@@ -38,5 +35,14 @@ public class Shop extends AbstractEntity {
     private ShopStatus shopStatus;
 
     @OneToMany(mappedBy = "shop", cascade = CascadeType.ALL)
+    private List<ShopMember> shopMembers  = new ArrayList<>();
+
+    @OneToMany(mappedBy = "shop", cascade = CascadeType.ALL)
     private List<Product> products = new ArrayList<>();
+
+    @OneToOne(mappedBy = "shop", cascade = CascadeType.ALL)
+    private ShopWallet shopWallet;
+
+    @OneToMany(cascade = CascadeType.ALL)
+    private List<BankAccount> bankAccounts = new ArrayList<>();
 }

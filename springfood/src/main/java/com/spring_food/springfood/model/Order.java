@@ -1,6 +1,6 @@
 package com.spring_food.springfood.model;
 
-import com.spring_food.springfood.model.ENUM.BookingStatus;
+import com.spring_food.springfood.model.ENUM.OrderStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -12,9 +12,9 @@ import java.util.List;
 @Entity
 @Getter
 @Setter
-@Table(name = "booking")
+@Table(name = "orders")
 @AttributeOverride(name = "id", column = @Column(name = "booking_id"))
-public class Booking extends AbstractEntity {
+public class Order extends AbstractEntity {
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
@@ -22,10 +22,10 @@ public class Booking extends AbstractEntity {
 
     @Column(name = "booking_status")
     @Enumerated(EnumType.STRING)
-    private BookingStatus bookingStatus;
+    private OrderStatus orderStatus;
 
     @Column(name = "final_price", nullable = false, precision = 15, scale = 2)
-    private BigDecimal totalPrice;
+    private BigDecimal finalPrice;
 
     @ManyToOne
     @JoinColumn(name = "payment_method_name")
@@ -38,17 +38,17 @@ public class Booking extends AbstractEntity {
     @Column(name = "customer_notes", columnDefinition = "TEXT")
     private String customerNotes;
 
-    @OneToMany(mappedBy = "booking", cascade = CascadeType.ALL)
-    private List<BookingItem> bookingItems = new ArrayList<>();
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+    private List<OrderItem> bookingItems = new ArrayList<>();
 
     // Gán giá trị mặc định trước khi lưu vào database
     @PrePersist
     public void prePersist() {
-        if (bookingStatus == null) {
-            bookingStatus = BookingStatus.PENDING;
+        if (orderStatus == null) {
+            orderStatus = OrderStatus.PENDING;
         }
-        if (totalPrice == null) {
-            totalPrice = BigDecimal.ZERO;
+        if (finalPrice == null) {
+            finalPrice = BigDecimal.ZERO;
         }
     }
 }

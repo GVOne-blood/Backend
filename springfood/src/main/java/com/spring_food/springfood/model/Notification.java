@@ -7,7 +7,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.GenericGenerator;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
@@ -17,13 +19,18 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Entity
 @Table(name = "notification")
+@EntityListeners(AuditingEntityListener.class)
 public class Notification {
 
     @Id
     @GeneratedValue(generator = "objectid-generator")
+    @GenericGenerator(name = "objectid-generator", 
+                     strategy = "com.spring_food.springfood.common.generator.ObjectIdGenerator")
+    @Column(name = "notification_id")
     private String notificationId;
 
     @Column(name = "notify_type")
+    @Enumerated(EnumType.STRING)
     private NotificationType notifyType;
 
     @Column(name = "title")
@@ -41,4 +48,9 @@ public class Notification {
     @CreatedDate
     @Column(name = "created_at")
     private LocalDateTime createdAt;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+
 }

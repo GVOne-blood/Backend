@@ -4,9 +4,11 @@ import com.spring_food.springfood.model.ENUM.ProductStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -26,13 +28,16 @@ public class Product extends AbstractEntity {
     @Column(nullable = false)
     private String name;
 
+    @Column(name = "sku", unique = true)
+    private String sku;
+
     private String description;
 
     @Column(name = "MSG")
-    private LocalDateTime msg;
+    private LocalDate msg;
 
     @Column(name = "EXP")
-    private LocalDateTime exp;
+    private LocalDate exp;
 
     @Column(name = "product_status")
     @Enumerated(EnumType.STRING)
@@ -50,18 +55,22 @@ public class Product extends AbstractEntity {
     @Column(nullable = false)
     private Integer quantity = 0;
 
-    @Column(name = "images")
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "images", columnDefinition = "jsonb")
     private String images;
 
     @OneToMany(mappedBy = "product")
-    private List<BookingItem> bookingItems = new ArrayList<>();
+    private List<OrderItem> orderItems = new ArrayList<>();
 
     @OneToMany(mappedBy = "product")
     private List<Feedback> feedbacks = new ArrayList<>();
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
-    private Set<ProductTag> productTags = new HashSet<>();
+    private Set<ProductCategory> productCategory = new HashSet<>();
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
     private Set<ProductSale> productSales = new HashSet<>();
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+    private Set<ProductCategory> productCategories = new HashSet<>();
 }

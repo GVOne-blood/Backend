@@ -73,11 +73,11 @@ public class JwtServiceImpl implements JwtService {
     @Override
     public Long getTokenExpiration(TokenType tokenType) {
         switch (tokenType) {
-            case ACCESS_TOKEN:
+            case ACCESS:
                 return accessTokenExpiration;
-            case REFRESH_TOKEN:
+            case REFRESH:
                 return refreshTokenExpiration;
-            case RESET_TOKEN:
+            case RESET:
                 return resetTokenExpiration;
             default:
                 throw new IllegalArgumentException("Unknown token type: " + tokenType);
@@ -98,28 +98,24 @@ public class JwtServiceImpl implements JwtService {
     }
     
     private SignatureAlgorithm getSignatureAlgorithm(TokenType tokenType) {
-        switch (tokenType) {
-            case ACCESS_TOKEN:
-            case REFRESH_TOKEN:
-                return SignatureAlgorithm.HS256;
-            case RESET_TOKEN:
-                return SignatureAlgorithm.HS512;
-            default:
-                return SignatureAlgorithm.HS256;
-        }
+        return switch (tokenType) {
+            case ACCESS, REFRESH -> SignatureAlgorithm.HS256;
+            case RESET -> SignatureAlgorithm.HS512;
+            default -> SignatureAlgorithm.HS256;
+        };
     }
 
     private Key getSigningKey(TokenType tokenType) {
         byte[] keyBytes;
         
         switch (tokenType) {
-            case ACCESS_TOKEN:
+            case ACCESS:
                 keyBytes = Decoders.BASE64.decode(secretKey);
                 break;
-            case REFRESH_TOKEN:
+            case REFRESH:
                 keyBytes = Decoders.BASE64.decode(refreshKey);
                 break;
-            case RESET_TOKEN:
+            case RESET:
                 keyBytes = Decoders.BASE64.decode(resetKey);
                 break;
             default:

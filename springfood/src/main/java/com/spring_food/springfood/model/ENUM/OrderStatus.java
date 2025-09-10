@@ -1,6 +1,6 @@
 package com.spring_food.springfood.model.ENUM;
 
-public enum BookingStatus {
+public enum OrderStatus {
     PENDING,      // Đơn hàng đang chờ xử lý
     PROCESSING,   // Đơn hàng đang được xử lý
     SHIPPED,      // Đơn hàng đã được giao đi

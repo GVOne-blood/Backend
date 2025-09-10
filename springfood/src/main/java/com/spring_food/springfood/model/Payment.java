@@ -11,7 +11,7 @@ import java.util.List;
 @Getter
 @Setter
 @Table(name = "payment")
-@AttributeOverride(name = "id", column = @Column(name = "payment_name"))
+@AttributeOverride(name = "id", column = @Column(name = "payment_method_name", nullable = true))
 public class Payment extends AbstractEntity {
 
     private String description;
@@ -20,5 +20,5 @@ public class Payment extends AbstractEntity {
     private Boolean isActive = true;
 
     @OneToMany(mappedBy = "paymentMethod")
-    private List<Booking> bookings = new ArrayList<>();
+    private List<Order> orders = new ArrayList<>();
 }
