@@ -57,7 +57,7 @@ Nhìn thì đơn giản nhưng nó đang ẩn chứa những lỗi nghiêm trọ
 - Với 1 thay đổi khi chuyển MySQL sang PostgreSQL thì ta phải thay đổi code trong Service, điều này sẽ rất khó khăn khi
   có hàng trăm Service cùng dùng Repo đó
 - Khó kiểm thử, bắt buộc phải kết nối đến MySQLRepo nếu muốn test Service
-  -Vi phạm nguyên tắc D trong SOLID: Các module cấp cao (Service) không nên phụ thuộc vào các module cấp thấp (Repo)
+- Vi phạm nguyên tắc D trong SOLID: Các module cấp cao (Service) không nên phụ thuộc vào các module cấp thấp (Repo)
 
 ### IoC (Inversion of Control) - Đảo ngược điều khiển
 
@@ -83,6 +83,17 @@ Cụ thể, Container nắm quyền kiểm soát các khía cạnh sau :
 
 Trong Spring, thực thể thực hiện hóa IoC Container chính là **BeanFactory** (cấp thấp) và **ApplicationContext** (cấp
 cao)
+
+```
+@SpringBootApplication
+public class BackendApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(BackendApplication.class, args); // <--- Thằng này tạo ra ApplicationContext, nó sẽ scan các class có annotation @Component, @Service, @Repository, @Controller, @RestController, @Configuration
+	}
+
+}
+```
 
 ### Bean
 
@@ -355,7 +366,164 @@ public class ProductService {
 }
 ```
 
-Tuy nó gọn gàng nhất trong 3 kiểu nhưng nó phụ thuộc chạt chẽ vào container, gay khó khăn cho kiểm thử, nó che giấu
+Tuy nó gọn gàng nhất trong 3 kiểu nhưng nó phụ thuộc chặt chẽ vào container, gây khó khăn cho kiểm thử, nó che giấu
 dependency và không thể bất biến
+
+## Maven
+
+Trước khi có Maven trong Java, Dev khi khởi tạo 1 project sẽ phải đi tìm các file JAR của các thư viện (
+sql-connector,...) để tải và import vào project, hơn nữa, việc này đôi khi gây ra xung đột version giữa các phiên bản
+rất khó chịu
+
+> Maven là một công cụ quản lý và thấu hiểu dự án. Meven hoạt động với triết lý Quy ước hơn Cấu hình (Convention over
+> Configuation)
+
+Maven giải quyết các vấn đề nhưu quản lý phụ thuộc hay tiêu chuẩn hóa quy trình build project như đã nêu ở trên
+
+Maven định nghĩa file `pom.xml` - là trái tim của project và là một mô hình đối tượng trong bộ nhớ mà Maven xây dựng khi
+thực thi. Bản chất file pom là một file khai báo, không phải là 1 file kịch bản
+
+Các thẻ trong pom:
+
+- `<parent>` : Khai báo kế thừa
+- `<groupId>`, `<artifactId>`, `<version>` :Xác định chính xác lib
+- `<packaing>` :Xác định kết quả cảu việc parse package
+- `<properties>` : Định nghĩa các biến toàn cục
+- `<dependencies>` : Thẻ cha chứa các thư viện
+- `<dependency>` : Thẻ con khai báo 1 thư viện cụ thể
+    - `<scope>` : Xác định phạm vi sử dụng của dependency
+    - `<optional>` : Nếu là `true` , các dự án phụ thuộc vào dự án này sẽ không kế thừa lại dependency này
+- `<build>` : Chứa các cấu hình liên quan đến việc build dự án
+- `<plugin>` : Khai báo và cấu hình 1 plugin Maven
+
+Ví dụ
+
+```
+<dependency>
+    <groupId>com.google.guava</groupId>
+    <artifactId>guava</artifactId>
+    <version>31.1-jre</version>
+</dependency>
+```
+
+Sau khi Save, maven chạy lệnh `mvn compile` :
+
+1. Maven xây dựng 1 Effective POM bằng cách gộp thông tin các loại file :
+    - file pom mặc định có sẵn trong Maven, chứa các cấu hình cơ bản nhất, gồm
+      cả địa chỉ của Maven Central Repository
+    - Maven đi ngược lên `<parent>`, gộp các cấu hình từ pom cha
+    - File pom chính
+    - File cấu hình toán cục,...
+2. Maven kiểm tra Local Repository trước tiên (.m2)
+    - Convert GAV (group, artifact, version) thành đường dẫn thư mục và tìm trong m2. Nếu có maven lấy dependency ở đây,
+      không thì chuyển sang bước 3
+3. Tìm kiếm trong Remote Repository
+    - Maven lặp qua ds Remote Repo đã được định nghĩa trong Effective pom
+    - Với mỗi repo, nó sẽ tạo 1 url truy vấn từ cấu trúc của GAV
+    - Nếu tìm thấy file, tải về rồi lưu trong Local Repo, lần build sau, nó sẽ lấy lib từ Local ra
+    - Nếu không tìm thấy, báo lỗi
+      4.Xử lý phụ thuộc bắc cầu
+    - Maven lại đọc file pom của các file đã tải về và lặp lại cho đến khi toàn bộ artifact cần thiết đã có trong m2
+5. Xây dựng classpath
+    - Xây dựng các đường dẫn đầy đủ đến từng file trong m2, danh sách này sau đó được đưa cho JVM hoặc trình biên dịch
+      để chúng tìm kiếm và
+      truy cập khi chạy project
+
+Một số lệnh maven cơ bản
+
+- `mvn clean` : Xóa các sản phẩm được tạo ra từ lần build trườc đó, nói chung là xóa `target`
+- `mvn validate` : kiểm tra các thông tin cần về việc build có hợp lệ hay không, nói chung là kiểm tra file pom
+- `mvn compile` : Biên dịch mã nguồn ứng dụng (không bao gồm mã test), nó chạy 1 loạt các phase, nó copy toàn bộ
+  `src/main/resource` vào `target/classes`
+- `mvn package` : Lấy code đã biên dịch và đóng gói nó vào dạng file như JAR, WAR, nó lấy nội dung từ `target/classes`
+  và các tài nguyên rồi tạo file JAR trong `target`
+- `mvn test` : biên dịch và chạy các unit test, nó sao chép tài nguyên vào `target/test-classes`, biên dịch rồi test,
+  bất kỳ test nào sai đều báo lỗi
+- `mvn install` : Cài đặt artifact vào Local Repo, nó chạy hết các lệnh cho đến package rồi tải file JAR
+  và pom vào m2
+- `mvn deploy` : Đẩy project lên Remote Repo, nó chạy hết các lệnh đến install rồi tải nó lên Remote thôi
+
+## Spring MVC
+
+> Spring MVC là một module trong Spring framewor,được thiết kế để thực hiện hóa mô hình Model-View-Controller của ứng
+> dụng web. Nó sử dụng một mẫu thiết kế trung tâm là Front-Controller, để thực hiện hóa qua `DispatcherServlet`
+
+`DispatcherServlet` ủy quyền cho các component chuyên biệt có thể config và tự thay thế được
+
+Luồng xử lý request của Spring MVC là tiêu biểu cho việc sử dụng IoC:
+
+1. `DispatcherServlet` : Nhận mọi Http request và điều phối chúng
+2. `HandleMapping` : Tiếp nhận từ `DispatcherServlet`, tìm Controller method tương thích để xử lý request dựa vào url,
+   Http method, headers,...
+3. `HandlerAdapter` : `DispatcherServlet`tìm và yêu cầu nó thực thi method đã tìm thấy
+4. Thực thi Controller method, bản thân controller đã là 1 bean nên sẽ được inject dependency để gọi đến các logic trong
+   service,...
+5. Controller trả về kết quả, nếu kết quả là 1 View, `DispatcherServlet` sẽ hỏi `ViewResolver` dịch tên logic của view
+   thành 1 implements của `View` cụ thể
+6. View được, tạo ra response cuối cùng (HTML)
+
+## Spring boot
+
+## Client (Postman)
+
+### Request
+
+> Request là một thông điệp được gửi từ client đến server để yêu cầu thực hiện một hành động cụ thể trên tài nguyên (DB)
+> của server.
+
+Ví dụ về 1 request phía client điển hình :
+
+```
+POST /api/users HTTP/1.1                <-- Dòng yêu cầu (Request Line)
+Host: my-api.com                        <-- Header
+Content-Type: application/json          <-- Header
+Content-Length: 56                      <-- Header
+User-Agent: PostmanRuntime/7.29.2       <-- Header
+Accept: */*                             <-- Header
+
+{                                       <-- Dòng trống (CRLF) ngăn cách header và body
+  "username": "testuser",               <-- Body (Payload)
+  "email": "test@example.com"
+}
+```
+
+Trong đó :
+
+- **Request line** : Chứa 3 thông tin quan trọng : HTTP Method (GET, POST,...), URL (hoặc endpoint) và phiên bản giao
+  thức
+  HTTP
+- **Headers** : Một tập hợp các cặp key-value cung cấp thông tin bổ sung (metadata) về request. Ví dụ:
+    - `Content-Type` : Loại dữ liệu trong body
+    - `Authorization` : Thông tin xác thực
+    - `User-Agent` : Thông tin về client gửi request
+    - `Accept` : Loại dữ liệu mà client có thể xử lý
+- **Body** : Chứa data mà client gửi lên, phần này là tùy chọn, nó thường đi cùng với method POST, PUT, PATCH. Body có
+  thể ở nhiều định
+  dạng khác nhau như JSON, XML, form-data,...
+
+Request lúc này sẽ đi đến server, hứng nó phía server là **Servlet Container**
+Nhiệm vụ của nó là :
+
+- Lắng nghe các kết nối TCP/IP ở trên 1 port
+- Đọc data thô của HTTP request
+- Phân tích cú pháp (parse) request thành các thành phần có cấu trúc mà Java có thể hiểu được
+
+Request được phân tích và convert tự động giúp dev không phải nhúng tay
+
+Thực hiện hóa bằng các Servlet Container như Tomcat, Jetty, Undertow,...
+`ServletRequest` và `HttpServletRequest` là 2 interface quan trọng trong API Servlet, chúng đại diện cho request
+đến server :
+
+- `ServletRequest` : Interface gốc cấp thấp, cung cấp các phương thức để truy cập các thành phần cơ bản của request như
+  parameter, header, body,...
+- `HttpServletRequest` : Kế thừa và Mở rộng `ServletRequest`, thêm các phương thức đặc thù cho giao thức HTTP như
+  getMethod(),
+  getRequestURI(), getSession(),...
+
+Sau đó request đến các handler và filter khác trước khi đến Controller
+
+```
+HTTP Request -> Embedded Servlet Container (Tomcat) -> HttpServletRequest -> DispatcherServlet -> HandlerMapping -> Controller -> ...
+```
 
 ### Chú thích

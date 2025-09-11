@@ -12,7 +12,8 @@
 > lý. Các mảnh nhỏ này được gọi là các partitions
 
 Về mặt giao diện, bảng sau khi phân vùng vẫn không khác gì bảng thường, ta vẫn có thể CRUD bình thường, nhưng về mặt vật
-lý trên đĩa, SQL đã phân vùng và các query sẽ được định tuyến đến các phân vùng phù hợp
+lý trên đĩa, SQL đã phân vùng và các query sẽ được định tuyến đến các phân vùng phù hợp, nói cách khác là chia 1 table
+trên đĩa thành nhiều table vật lý nhỏ hơn
 
 Phân vùng trở nên vô nghĩa nếu không có khóa phân vùng (partition key)
 
@@ -63,3 +64,7 @@ nó khiến phân vùng này trở thành 1 bảng độc lập
 Tất nhiên nên dùng partition khi table quá lớn, nhiều data, thường xuyên xóa data theo khối (như log,...)
 
 ### Chú thích
+
+1. **Partition Pruning** : Khi phân vùng, SQl lưu thông tin về bảng cha, chiến lược phân vùng và key phân vùng, nó là
+   metadata của phân vùng. Sau đó, optimizer dựa vào điều kiện truy vấn (WHERE claude) và metadata để tìm đúng phân vùng và quét
+    phân vùng đó thay vì quét toàn bộ bảng

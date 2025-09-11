@@ -164,8 +164,7 @@ where exists (select s.shop_id, s.updated_at from shop s where s.shop_status lik
 ### Correlated & Non-correlated SubQuery
 
 - Non-Correlated : Sub query chạy độc lập, không phụ thuộc vào bất kỳ giá trị nào của query cha - là subquery được thực
-  hiện
-  1 lần duy nhất, kết quả của nó được cache lại để outer query sử dụng
+  hiện 1 lần duy nhất, kết quả của nó được cache lại để outer query sử dụng
 - Correlated : Sub query phụ thuộc vào một hoặc nhiều giá trị của outer query (thường là trong `WHERE`) - là subquery
   được thực hiện lặp đi lặp lại một lần cho mỗi hàng của outer
 
@@ -375,23 +374,90 @@ Nó tương tự như 1 phương thức trong lập trình
 
 Mục đích
 
-- Đóng gói logic nghiệp vụ : Gom nhóm 1 loạt các thao tác như chuyển tiền, tạo đơn hàng mới,... vào 1 đơn vị duy nhất -
-  nghiệp vụ được tập trung lại, dễ bảo trì
-- Giảm lưu lượng mạng : Thay vì phải gửi cả chục query qua lại giữa ứng dụng và CSDL, ta chỉ cần 1 lệnh gọi Procedure.
+- **Đóng gói logic nghiệp vụ** : Gom nhóm 1 loạt các thao tác như chuyển tiền, tạo đơn hàng mới,... vào 1 đơn vị duy
+  nhất - nghiệp vụ được tập trung lại, dễ bảo trì
+- **Giảm lưu lượng mạng** : Thay vì phải gửi cả chục query qua lại giữa ứng dụng và CSDL, ta chỉ cần 1 lệnh gọi
+  Procedure.
   Thêm vào đó, lần đầu gọi Procedure, SQl sẽ tạo ra 1 execution plan, các lần gọi tiếp theo có thể thực hiện theo plan
   này giúp tăng hiệu năng
-- Tăng cường bảo mật và tính tái sử dụng : Thay vì phải cấp quyền để CRUD trên nhiều bảng trong 1 nghiệp vụ, ta chỉ cần
-  cấp quyền thực thi 1 Procedure, giúp ngăn chặn SQL injection và truy cập trái phép dữ liệu
+- **Tăng cường bảo mật và tính tái sử dụng** : Thay vì phải cấp quyền để CRUD trên nhiều bảng trong 1 nghiệp vụ, ta chỉ
+  cần cấp quyền thực thi 1 Procedure, giúp ngăn chặn SQL injection và truy cập trái phép dữ liệu
 - Quản lý transaction : Procedure là 1 công cụ đóng gói hữu ích cho Transaction
 
 Cú pháp
 
+```
+CREATE [ OR REPLACE ] PROCEDURE procedure_name ( [ [ argmode ] [ argname ] argtype [ { DEFAULT | = } default_expr ] [, ...] ] )
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    -- (Tùy chọn) Khối khai báo biến
+    variable_name data_type;
+BEGIN
+    -- Thân của procedure: chứa logic và các câu lệnh SQL
+    -- ...
+
+    [ EXCEPTION
+        WHEN condition [ OR condition ... ] THEN
+            -- (Tùy chọn) Khối xử lý lỗi
+            -- ...
+    ]
+END;
+$$;
+```
+
 Ví dụ
+
+```
+CREATE OR REPLACE PROCEDURE process_order(p_order_id INT)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    -- Giảm số lượng tồn kho
+    UPDATE products
+    SET stock = stock - od.quantity
+    FROM order_details od
+    WHERE products.id = od.product_id AND od.order_id = p_order_id;
+
+    -- Cập nhật trạng thái đơn hàng
+    UPDATE orders
+    SET status = 'PROCESSED'
+    WHERE id = p_order_id;
+
+    -- Nếu mọi thứ thành công, commit giao dịch
+    COMMIT;
+
+EXCEPTION
+    -- Bắt bất kỳ lỗi nào xảy ra (ví dụ: số lượng tồn kho âm)
+    WHEN OTHERS THEN
+        RAISE NOTICE 'An error occurred processing order %. Rolling back.', p_order_id;
+        -- Hủy bỏ tất cả các thay đổi
+        ROLLBACK;
+END;
+$$;
+
+-- Cách gọi:
+CALL process_order(12345);
+```
+
+Sự khác biệt giữa query của procedure và query trên application:
+
+- Query trong procedure được biên dịch và tối ưu hóa trước khi lưu trữ nên nó có nhanh hơn 1 chút
+- Procedure kiểm soát nghiệp vụ tại một nơi duy nhất, ví dụ, thay vì phải vào các service để đổi code nghiệp vụ, ta chỉ
+  cần thay đổi procedure
+- Trong môi trường doanh nghiệp, 1 db có thể được truy cập bởi nhiều ứng dụng và module khác nhau, việc mỗi module triển
+  khai cùng 1 logic truy cập dữ liệu có thể dẫn đến sự trùng lặp và không nhất quán. Thay vào đó procedure sẽ tạo ra 1
+  lớp abstract, các ứng dụng kh cần biết rõ cấu trúc của bảng bên dưới, chỉ cần biết tên procedure và các tham số truyền
+  vào. Khi cấu trúc bảng thay đổi or logic thay đổi, ta sửa procedure mà các ứng dụng kh cần sửa gì
+- Nhược điểm của procedure là khó kiểm soát phiên bản, ngày nay, việc ra đời
+  flyway hay liquibase giúp điều này dễ dàng hơn
+- Phụ thuộc vào DB vendor(nhà cung cấp DB) nên khó di chuyển giữa các hệ quản trị CSDL
 
 ### Chú thích
 
-1. Execution plan: Một lộ trình chi tiết, từng bước một do Query Optimizer tạo ra, lộ trình này mô tả chuỗi các thao tác
-   mà CSDL sẽ thực hiện với data. Query Optimizer là hạt nhận trong Execution Plan khi nó tiến hành **Phân tích cú pháp
+1. **Execution plan**: Một lộ trình chi tiết, từng bước một do Query Optimizer tạo ra, lộ trình này mô tả chuỗi các thao
+   tác mà CSDL sẽ thực hiện với data. Query Optimizer là hạt nhận trong Execution Plan khi nó tiến hành **Phân tích cú
+   pháp
    **, **Tạo các kế hoạch thực thi khả dụng**, **Tính toán chi phí cho từng kế hoạch và chọn cái tốt nhất**
    Execution có dạng tree, mỗi node trong tree là 1 toán tử, một số toán tử phổ biến như:
     - `Sequential Scan` : Đọc toàn bộ bảng từ đầu đến cuối, hàng này qua hàng khác, kiểm tra xem mỗi hàng có thỏa mãn
