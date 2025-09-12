@@ -1,4 +1,4 @@
-package com.spring_food.springfood.model.ENUM;
+package com.spring_food.springfood.common.enums;
 
 public enum TokenType {
     ACCESS,    // Token xác thực chính

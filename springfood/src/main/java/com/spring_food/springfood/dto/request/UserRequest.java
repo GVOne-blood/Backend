@@ -2,7 +2,7 @@ package com.spring_food.springfood.dto.request;
 
 import com.spring_food.springfood.common.util.EnumPattern;
 import com.spring_food.springfood.common.util.PhoneNumber;
-import com.spring_food.springfood.model.ENUM.Gender;
+import com.spring_food.springfood.common.enums.Gender;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -45,7 +45,7 @@ public class UserRequest implements Serializable {
     @EnumPattern(name = "gender", regexp = ("MALE|FEMALE|OTHER"))
     Gender gender;
 
-    @Pattern(regexp = "^\\+?[1-9]\\d{1,14}$", message = "Phone number must be valid")
+  //  @Pattern(regexp = "^\\+?[1-9]\\d{1,14}$", message = "Phone number must be valid")
     @PhoneNumber(message = "Phone number must be valid")
     String phone;
     

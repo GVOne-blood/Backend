@@ -1,6 +1,6 @@
 package com.spring_food.springfood.model;
 
-import com.spring_food.springfood.model.ENUM.ShopStatus;
+import com.spring_food.springfood.common.enums.ShopStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;

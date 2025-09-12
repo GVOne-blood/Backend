@@ -40,7 +40,7 @@ DROP TABLE IF EXISTS "role";
 DROP TABLE IF EXISTS "category";
 DROP TABLE IF EXISTS "user";
 
--- Xóa các kiểu ENUM nếu đã tồn tại
+-- Xóa các kiểu enums nếu đã tồn tại
 DROP TYPE IF EXISTS user_status;
 DROP TYPE IF EXISTS post_status;
 DROP TYPE IF EXISTS shop_status;

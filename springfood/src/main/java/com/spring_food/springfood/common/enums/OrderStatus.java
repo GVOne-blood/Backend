@@ -1,4 +1,4 @@
-package com.spring_food.springfood.model.ENUM;
+package com.spring_food.springfood.common.enums;
 
 public enum OrderStatus {
     PENDING,      // Đơn hàng đang chờ xử lý

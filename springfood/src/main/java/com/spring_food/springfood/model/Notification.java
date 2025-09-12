@@ -1,7 +1,7 @@
 package com.spring_food.springfood.model;
 
 
-import com.spring_food.springfood.model.ENUM.NotificationType;
+import com.spring_food.springfood.common.enums.NotificationType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

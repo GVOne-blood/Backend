@@ -1,6 +1,6 @@
 package com.spring_food.springfood.service;
 
-import com.spring_food.springfood.model.ENUM.TokenType;
+import com.spring_food.springfood.common.enums.TokenType;
 import org.springframework.security.core.userdetails.UserDetails;
 
 public interface JwtService {

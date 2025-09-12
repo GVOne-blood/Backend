@@ -9,6 +9,7 @@ import com.spring_food.springfood.service.AuthService;
 import com.spring_food.springfood.service.JwtService;
 import com.spring_food.springfood.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -67,14 +68,21 @@ public class AuthController {
             return ResponseEntity.ok(new ResponseData<>(400, e.getMessage(), null));
         }
     }
-    
+
     @PostMapping("/login")
-    public ResponseEntity<ResponseData<TokenResponse>> login(@Valid @RequestBody LoginRequest loginRequest) {
-       TokenResponse tokenResponse = authService.login(loginRequest);
+    public ResponseEntity<ResponseData<TokenResponse>> login(@Valid @RequestBody LoginRequest loginRequest, HttpServletResponse response) {
+       TokenResponse tokenResponse = authService.login(loginRequest, response);
 
             return new ResponseEntity<>(
                     new ResponseData<>(200, "Login successful", tokenResponse),
                     HttpStatus.OK
             );
+        }
+
+        @GetMapping("/logout")
+    public ResponseEntity<ResponseData<?>> logout(HttpServletRequest request, HttpServletResponse response) {
+        // blacklist with redis
+            authService.logout(response);
+            return ResponseEntity.ok(new ResponseData<>(204, "Logout successful", null));
         }
 }

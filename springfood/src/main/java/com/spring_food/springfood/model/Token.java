@@ -1,6 +1,6 @@
 package com.spring_food.springfood.model;
 
-import com.spring_food.springfood.model.ENUM.TokenType;
+import com.spring_food.springfood.common.enums.TokenType;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;

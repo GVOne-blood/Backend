@@ -1,8 +1,8 @@
 package com.spring_food.springfood.model;
 
 
-import com.spring_food.springfood.model.ENUM.TransactionStatus;
-import com.spring_food.springfood.model.ENUM.TransactionType;
+import com.spring_food.springfood.common.enums.TransactionStatus;
+import com.spring_food.springfood.common.enums.TransactionType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

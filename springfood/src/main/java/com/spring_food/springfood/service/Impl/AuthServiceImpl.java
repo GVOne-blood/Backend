@@ -1,22 +1,24 @@
 package com.spring_food.springfood.service.Impl;
 
+import com.spring_food.springfood.common.enums.CookieKey;
+import com.spring_food.springfood.common.enums.TokenType;
+import com.spring_food.springfood.common.util.CookieUtil;
 import com.spring_food.springfood.dto.request.LoginRequest;
 import com.spring_food.springfood.dto.response.TokenResponse;
 import com.spring_food.springfood.exception.custom.InvalidDataException;
-import com.spring_food.springfood.model.ENUM.TokenType;
 import com.spring_food.springfood.model.User;
 import com.spring_food.springfood.repository.UserRepository;
 import com.spring_food.springfood.service.AuthService;
 import com.spring_food.springfood.service.JwtService;
 import com.spring_food.springfood.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Service;
 
@@ -32,26 +34,32 @@ public class AuthServiceImpl implements AuthService {
     UserService userService;
     AuthenticationManager authenticationManager;
     @Override
-    public TokenResponse login(LoginRequest loginRequest) {
+    public TokenResponse login(LoginRequest loginRequest, HttpServletResponse response) {
         try {
-            Authentication authentication = authenticationManager.authenticate(
+            authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword())
             );
         } catch (AuthenticationException e) {
-            throw new AuthenticationException("Invalid username or password") {
-            };
+            throw new InvalidDataException("Invalid username or password");
         }
 
-            User user = userService.findByUsername(loginRequest.getUsername());
-            String accessToken = jwtService.generateToken(TokenType.ACCESS, user);
-            String refreshToken = jwtService.generateToken(TokenType.REFRESH, user);
-            TokenResponse tokenResponse = new TokenResponse();
-            tokenResponse.setAccessToken(accessToken);
-            tokenResponse.setRefreshToken(refreshToken);
-            tokenResponse.setUserId(user.getId());
-            tokenResponse.setUsername(user.getUsername());
+        User user = userService.findByUsername(loginRequest.getUsername());
+        String accessToken = jwtService.generateToken(TokenType.ACCESS, user);
+        String refreshToken = jwtService.generateToken(TokenType.REFRESH, user);
 
-            return tokenResponse;
+        // Tạo Access Token Cookie
+        response.addCookie(CookieUtil.createCookie(CookieKey.ACCESS_TOKEN.name(), accessToken, 15 * 60));
+
+        // Tạo Refresh Token Cookie
+        response.addCookie(CookieUtil.createCookie(CookieKey.REFRESH_TOKEN.name(), refreshToken, 7 * 24 * 60 * 60));
+
+        TokenResponse tokenResponse = new TokenResponse();
+        tokenResponse.setAccessToken(accessToken);
+        tokenResponse.setRefreshToken(refreshToken);
+        tokenResponse.setUserId(user.getId());
+        tokenResponse.setUsername(user.getUsername());
+
+        return tokenResponse;
     }
 
     @Override
@@ -74,5 +82,13 @@ public class AuthServiceImpl implements AuthService {
        tokenResponse.setExpiresIn(jwtService.getTokenExpiration(TokenType.REFRESH));
 
         return tokenResponse;
+    }
+
+    @Override
+    public void logout(HttpServletResponse response) {
+
+        response.addCookie(CookieUtil.createCookie(CookieKey.ACCESS_TOKEN.name(), null, 0));
+        response.addCookie(CookieUtil.createCookie(CookieKey.REFRESH_TOKEN.name(), null, 0));
+
     }
 }

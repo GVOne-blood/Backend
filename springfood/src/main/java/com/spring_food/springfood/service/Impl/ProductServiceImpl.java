@@ -5,7 +5,7 @@ import com.spring_food.springfood.dto.response.ProductDetail;
 import com.spring_food.springfood.exception.custom.InvalidDataException;
 import com.spring_food.springfood.mapper.ProductMapper;
 import com.spring_food.springfood.model.Categories;
-import com.spring_food.springfood.model.ENUM.ShopStatus;
+import com.spring_food.springfood.common.enums.ShopStatus;
 import com.spring_food.springfood.model.Product;
 import com.spring_food.springfood.model.ProductCategory;
 import com.spring_food.springfood.model.Shop;
@@ -54,14 +54,14 @@ public class ProductServiceImpl implements ProductService {
     }
 
     private boolean isProductExist(String shopId, String sku) {
-        return productRepository.findProductBySku(shopId, sku).isPresent();
+        return productRepository.findProductBySku(shopId, sku).isEmpty();
     }
 
     @Override
     @Transactional
     public Product addProduct(ProductRequest productRequest) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentUser = authentication.getName();
+        String currentUser = authentication.getName(); // Lấy tên người dùng hiện tại
 
         Optional<List<String>> userShop = userRepository.findUsernamesByShopId(productRequest.getShopId());
 //        Optional<User> user =  userRepository.findByUsername(currentUser);
@@ -88,7 +88,15 @@ public class ProductServiceImpl implements ProductService {
         product.setShop(shop);
         // process categories
         //
-        List<String> categoriesNames = Arrays.stream(productRequest.getCategoryNames().split(",")).toList();
+        List<String> categoriesNames;
+        if (productRequest.getCategoryNames().contains(",")) {
+            categoriesNames = Arrays.stream(productRequest.getCategoryNames().split(","))
+                    .map(String::trim) // Loại bỏ khoảng trắng thừa
+                    .collect(Collectors.toList());
+        } else {
+            categoriesNames = List.of(productRequest.getCategoryNames().trim());
+        }
+
         List<Categories> categories = categoryRepository.findAllById(categoriesNames);
 
         if (categories.isEmpty()) throw
@@ -110,11 +118,54 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Transactional
     public Product updateProduct(String productId, ProductRequest productRequest) {
-        if(!isProductExist(productId)) throw new InvalidDataException("Product not found");
-        Product updatedProduct = productMapper.toProduct(productRequest);
-        return productRepository.save(updatedProduct);
-    }
+        Product productToUpdate = productRepository.findById(productId)
+                .orElseThrow(() -> new InvalidDataException("Product not found with ID: " + productId));
 
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentUsername = authentication.getName();
+
+        List<String> authorizedUsers = userRepository.findUsernamesByShopId(productToUpdate.getShop().getId())
+                .orElseThrow(() -> new InvalidDataException("Shop of the product not found or has no users"));
+
+        if (!authorizedUsers.contains(currentUsername)) {
+            throw new InvalidDataException("User is not authorized to update this product.");
+        }
+
+        productMapper.updateProductFromDto(productRequest, productToUpdate);
+
+        if (productRequest.getCategoryNames() != null && !productRequest.getCategoryNames().isBlank()) {
+            // XÓA CÁC LIÊN KẾT HIỆN TẠI
+            productToUpdate.getProductCategories().clear();
+
+            List<String> categoriesNames;
+            if (productRequest.getCategoryNames().contains(",")) {
+                categoriesNames = Arrays.stream(productRequest.getCategoryNames().split(","))
+                        .map(String::trim) // Loại bỏ khoảng trắng thừa
+                        .collect(Collectors.toList());
+            } else {
+                categoriesNames = List.of(productRequest.getCategoryNames().trim());
+            }
+
+
+            List<Categories> newCategories = categoryRepository.findAllById(categoriesNames);
+
+            if (newCategories.size() != categoriesNames.size()) {
+                throw new InvalidDataException("One or more categories not found.");
+            }
+            for (Categories cat : newCategories) {
+                ProductCategory pc = new ProductCategory();
+                pc.setCategories(cat);
+                pc.setProduct(productToUpdate);
+                productToUpdate.getProductCategories().add(pc);
+            }
+        }
+
+        if (productRequest.getStatus() != null) {
+            productToUpdate.setProductStatus(productRequest.getStatus());
+        }
+
+        return productRepository.save(productToUpdate);
+    }
     @Override
     @Transactional
     public void deleteProduct(String productId) {

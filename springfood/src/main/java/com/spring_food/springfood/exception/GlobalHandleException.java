@@ -9,6 +9,7 @@ import io.jsonwebtoken.security.SignatureException;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -24,7 +25,7 @@ import java.util.Date;
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class GlobalHandleException {
 
-    @ExceptionHandler(InvalidDataException.class)
+    @ExceptionHandler({InvalidDataException.class, DataIntegrityViolationException.class})
     @ResponseStatus(HttpStatus.CONFLICT)
     public ResponseError handleSqlException(Exception e, WebRequest request) {
         return ResponseError.builder()
@@ -61,6 +62,7 @@ public class GlobalHandleException {
         errorResponse.setPath(request.getDescription(false ).replace("url=", "")); // lấy ra đường dẫn request
         return errorResponse;
     }
+
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)

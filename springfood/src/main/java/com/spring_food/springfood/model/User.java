@@ -1,10 +1,11 @@
 package com.spring_food.springfood.model;
 
-import com.spring_food.springfood.model.ENUM.UserStatus;
+import com.spring_food.springfood.common.enums.UserStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDate;
@@ -12,6 +13,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -65,7 +67,7 @@ public class User extends AbstractEntity implements UserDetails {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<ShopMember> shopMembers = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<UserHasRole> userRoles = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -110,7 +112,19 @@ public class User extends AbstractEntity implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of();
+        List<GrantedAuthority> authorities = new ArrayList<>();
+        
+        // Thêm các Role với prefix ROLE_
+        this.userRoles.forEach(userRole -> {
+            authorities.add(new SimpleGrantedAuthority("ROLE_" + userRole.getRole().getId()));
+            
+            // Thêm các Permission từ Role (không cần prefix)
+            userRole.getRole().getRolePermissions().forEach(rolePermission -> {
+                authorities.add(new SimpleGrantedAuthority(rolePermission.getPermission().getId()));
+            });
+        });
+        
+        return authorities;
     }
 
     @Override

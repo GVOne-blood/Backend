@@ -1,4 +1,4 @@
-package com.spring_food.springfood.model.ENUM;
+package com.spring_food.springfood.common.enums;
 
 public enum ProductStatus {
     AVAILABLE, OUT_OF_STOCK, UNLISTED

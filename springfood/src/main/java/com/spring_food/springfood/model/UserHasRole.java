@@ -23,7 +23,7 @@ public class UserHasRole{
     private User user;
 
     @Id
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "role_name", referencedColumnName = "role_name")
     private Role role;
 

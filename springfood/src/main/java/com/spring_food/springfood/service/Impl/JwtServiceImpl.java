@@ -1,6 +1,6 @@
 package com.spring_food.springfood.service.Impl;
 
-import com.spring_food.springfood.model.ENUM.TokenType;
+import com.spring_food.springfood.common.enums.TokenType;
 import com.spring_food.springfood.service.JwtService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -44,9 +44,12 @@ public class JwtServiceImpl implements JwtService {
     @Override
     public String generateToken(TokenType tokenType, UserDetails user) {
         Map<String, Object> claims = new HashMap<>();
+
         claims.put("type", tokenType.name());
         claims.put("username", user.getUsername());
-        
+        claims.put("roles", user.getAuthorities());
+        claims.put("exp", getTokenExpiration(tokenType));
+
         return createToken(claims, user.getUsername(), tokenType);
     }
 

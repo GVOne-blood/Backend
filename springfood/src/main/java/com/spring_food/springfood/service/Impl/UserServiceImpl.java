@@ -1,17 +1,22 @@
 package com.spring_food.springfood.service.Impl;
 
-import com.spring_food.springfood.dto.response.UserDetail;
-import com.spring_food.springfood.exception.custom.InvalidDataException;
-import com.spring_food.springfood.model.ENUM.UserStatus;
+import com.spring_food.springfood.common.enums.TokenType;
+import com.spring_food.springfood.common.enums.UserStatus;
 import com.spring_food.springfood.common.util.PasswordEncoderUtil;
 import com.spring_food.springfood.dto.request.UserRequest;
 import com.spring_food.springfood.dto.response.RegisterResponse;
+import com.spring_food.springfood.dto.response.UserDetail;
+import com.spring_food.springfood.exception.custom.InvalidDataException;
 import com.spring_food.springfood.mapper.UserMapper;
+import com.spring_food.springfood.model.Role;
 import com.spring_food.springfood.model.User;
+import com.spring_food.springfood.model.UserHasRole;
+import com.spring_food.springfood.repository.RoleRepository;
 import com.spring_food.springfood.repository.UserRepository;
+import com.spring_food.springfood.service.AuthService;
 import com.spring_food.springfood.service.JwtService;
 import com.spring_food.springfood.service.UserService;
-import com.spring_food.springfood.model.ENUM.TokenType;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -22,6 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -29,8 +35,10 @@ import java.util.List;
 public class UserServiceImpl implements UserService {
 
     UserRepository userRepository;
+    RoleRepository roleRepository;
     PasswordEncoder passwordEncoder;
     JwtService jwtService;
+    AuthService authService;
     UserMapper userMapper;
     
     @Override
@@ -60,7 +68,16 @@ public class UserServiceImpl implements UserService {
         // Set default values
         user.setStatus(UserStatus.ACTIVE);
         user.setIsDeleted(false);
-        
+
+        UserHasRole userHasRole = new UserHasRole();
+        userHasRole.setUser(user);
+        Optional<Role> role = roleRepository.findById("CUSTOMER");
+        if (role.isEmpty()) throw new InvalidDataException("Role is empty!");
+        userHasRole.setRole(role.get());
+        userHasRole.setUser(user);
+        user.getUserRoles().add(userHasRole);
+
+
         // Save user to database
         User savedUser = userRepository.save(user);
 
@@ -92,7 +109,7 @@ public class UserServiceImpl implements UserService {
     public boolean existsByUsername(String username) {
         return userRepository.existsByUsername(username);
     }
-    
+
     @Override
     public boolean existsByEmail(String email) {
         return userRepository.existsByEmail(email);
@@ -112,10 +129,16 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void deleteUser(String id) {
+    public UserDetail updateUser(UserDetail userDetail) {
+        return null;
+    }
+
+    @Override
+    public void deleteUser(String id, HttpServletResponse response) {
         if (!userRepository.existsById(id)) {
             throw new InvalidDataException("User not found with id: " + id);
         }
+        authService.logout(response);
         userRepository.deleteById(id);
     }
 
