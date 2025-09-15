@@ -1,4 +1,4 @@
-package com.example.demo.Spring.ORM;
+package com.example.demo.Spring.ORM_JPA;
 
 import java.util.HashSet;
 import java.util.Set;
