@@ -42,7 +42,6 @@ public class SecurityConfig {
             "/webjars/**",
             "/actuator/**"
     };
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -52,6 +51,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
 
                         .requestMatchers(WHITE_LIST).permitAll()
+
                         
                         // Product endpoints - Phân quyền theo Permission
                         .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll() // Tất cả có thể xem (hoặc hasAuthority("VIEW_PRODUCT"))

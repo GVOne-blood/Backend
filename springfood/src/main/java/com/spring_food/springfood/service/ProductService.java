@@ -3,12 +3,14 @@ package com.spring_food.springfood.service;
 import com.spring_food.springfood.dto.request.ProductRequest;
 import com.spring_food.springfood.dto.response.ProductDetail;
 import com.spring_food.springfood.model.Product;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
-import java.util.List;
+import java.util.Map;
 
 public interface ProductService {
 
-    List<ProductDetail> getAllProductDetails();
+    Page<ProductDetail> getAllProductDetails(Pageable pageable);
 
     ProductDetail getProductDetailById(String productId);
 
@@ -18,5 +20,7 @@ public interface ProductService {
 
     void deleteProduct(String productId);
 
+    Page<ProductDetail> findByPrice(String from, String to, Pageable pageable);
 
+    Page<ProductDetail> search(Pageable pageable, Map<String, String> params);
 }

@@ -13,10 +13,8 @@ import com.spring_food.springfood.model.User;
 import com.spring_food.springfood.model.UserHasRole;
 import com.spring_food.springfood.repository.RoleRepository;
 import com.spring_food.springfood.repository.UserRepository;
-import com.spring_food.springfood.service.AuthService;
 import com.spring_food.springfood.service.JwtService;
 import com.spring_food.springfood.service.UserService;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -38,7 +36,6 @@ public class UserServiceImpl implements UserService {
     RoleRepository roleRepository;
     PasswordEncoder passwordEncoder;
     JwtService jwtService;
-    AuthService authService;
     UserMapper userMapper;
     
     @Override
@@ -106,6 +103,15 @@ public class UserServiceImpl implements UserService {
     }
     
     @Override
+    public User findById(String id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new InvalidDataException("User not found with id: " + id));
+    }
+
+    @Override
+    public boolean existsById(String id){return userRepository.existsById(id);}
+
+    @Override
     public boolean existsByUsername(String username) {
         return userRepository.existsByUsername(username);
     }
@@ -129,19 +135,39 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDetail updateUser(UserDetail userDetail) {
-        return null;
+    @Transactional
+    public UserDetail updateUser(String userId, UserRequest userRequest) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new InvalidDataException("User not found with id: " + userId));
+
+        if (userRequest.getEmail() != null && !userRequest.getEmail().equals(user.getEmail())) {
+            if (existsByEmail(userRequest.getEmail())) {
+                throw new InvalidDataException("Email is already in use by another user!");
+            }
+        }
+
+        // Sử dụng MapStruct để update, chỉ các field non-null sẽ được update, username và password are rejected
+        userMapper.toUser(user, userRequest);
+
+        User updatedUser = userRepository.save(user);
+
+        return userMapper.toUserDetail(updatedUser);
     }
 
     @Override
-    public void deleteUser(String id, HttpServletResponse response) {
-        if (!userRepository.existsById(id)) {
-            throw new InvalidDataException("User not found with id: " + id);
-        }
-        authService.logout(response);
-        userRepository.deleteById(id);
+    @Transactional
+    public void deleteUser(String id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new InvalidDataException("User not found with id: " + id));
+        
+        // Soft delete - chỉ set isDeleted = true
+        // Với @SQLDelete annotation, khi gọi delete sẽ tự động chạy UPDATE thay vì DELETE
+        userRepository.delete(user);
+        // Hoặc nếu muốn explicit hơn:
+        // user.setIsDeleted(true);
+        // user.setStatus(UserStatus.INACTIVE);
+        // userRepository.save(user);
     }
-
 
     @Override
     public void encodePassAllUsers(){

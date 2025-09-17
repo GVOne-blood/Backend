@@ -1,8 +1,10 @@
 package com.spring_food.springfood.controller;
 
+import com.spring_food.springfood.dto.request.UserRequest;
 import com.spring_food.springfood.dto.response.ResponseData;
 import com.spring_food.springfood.dto.response.UserDetail;
 import com.spring_food.springfood.model.User;
+import com.spring_food.springfood.service.AuthService;
 import com.spring_food.springfood.service.UserService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AccessLevel;
@@ -10,6 +12,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,6 +26,7 @@ import java.util.List;
 public class UserController {
 
     UserService userService;
+    AuthService authService;
 
     @GetMapping("/")
     public ResponseEntity<ResponseData<List<UserDetail>>> listUsers(){
@@ -44,20 +49,37 @@ public class UserController {
                         user), HttpStatus.OK);
     }
 
-    @PutMapping("/")
-    public ResponseEntity<ResponseData<UserDetail>> updateUser(@RequestBody UserDetail userDetail){
-        UserDetail user = userService.updateUser(userDetail);
+    @PutMapping("/{id}")
+    public ResponseEntity<ResponseData<UserDetail>> updateUser(@PathVariable(value = "id") String id, @RequestBody UserRequest userRequest){
+        UserDetail user = userService.updateUser(id, userRequest);
         return new ResponseEntity<>(new ResponseData<>(200, "User updated successfully", user), HttpStatus.OK);
 
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ResponseData<?>> deleteUserById(@PathVariable String id, HttpServletResponse response){
+    public ResponseEntity<ResponseData<?>> deleteUserById(
+            @PathVariable String id, 
+            HttpServletResponse response,
+            @AuthenticationPrincipal
+            UserDetails currentUser){
         try{
-            userService.deleteUser(id, response);
-            return new ResponseEntity<>(new ResponseData<>(204, "User deleted ", null), HttpStatus.OK);
+
+            User userToDelete = userService.findById(id);
+
+            boolean isSelfDelete = currentUser != null && 
+                                  currentUser.getUsername() != null && 
+                                  userToDelete.getUsername().equals(currentUser.getUsername());
+
+            userService.deleteUser(id);
+
+            if (isSelfDelete) {
+                authService.logout(response);
+                return new ResponseEntity<>(new ResponseData<>(204, "Your account has been deleted", null), HttpStatus.OK);
+            }
+
+            return new ResponseEntity<>(new ResponseData<>(204, "User deleted successfully", null), HttpStatus.OK);
         }catch (Exception e){
-            return new ResponseEntity<>(new ResponseData<>(500, "Error deleting user", null), HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(new ResponseData<>(500, "Error deleting user: " + e.getMessage(), null), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }

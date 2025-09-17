@@ -1,6 +1,7 @@
 package com.spring_food.springfood.mapper;
 
 import com.spring_food.springfood.dto.request.ProductRequest;
+import com.spring_food.springfood.dto.response.ProductDetail;
 import com.spring_food.springfood.model.Product;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -18,6 +19,7 @@ public interface ProductMapper {
     @Mapping(target = "id", ignore = true)
     Product toProduct(ProductRequest productRequest);
 
+    ProductDetail toProductDetail(Product product);
 
     void updateProductFromDto(ProductRequest productRequest, @MappingTarget Product product);
 

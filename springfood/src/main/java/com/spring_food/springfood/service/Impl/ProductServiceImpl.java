@@ -1,11 +1,13 @@
 package com.spring_food.springfood.service.Impl;
 
+import com.spring_food.springfood.common.enums.SearchKeyword;
+import com.spring_food.springfood.common.enums.ShopStatus;
 import com.spring_food.springfood.dto.request.ProductRequest;
+import com.spring_food.springfood.dto.request.SearchCriteria;
 import com.spring_food.springfood.dto.response.ProductDetail;
 import com.spring_food.springfood.exception.custom.InvalidDataException;
 import com.spring_food.springfood.mapper.ProductMapper;
 import com.spring_food.springfood.model.Categories;
-import com.spring_food.springfood.common.enums.ShopStatus;
 import com.spring_food.springfood.model.Product;
 import com.spring_food.springfood.model.ProductCategory;
 import com.spring_food.springfood.model.Shop;
@@ -13,18 +15,24 @@ import com.spring_food.springfood.repository.CategoryRepository;
 import com.spring_food.springfood.repository.ProductRepository;
 import com.spring_food.springfood.repository.ShopRepository;
 import com.spring_food.springfood.repository.UserRepository;
+import com.spring_food.springfood.repository.impl.ProductJDBCRepository;
 import com.spring_food.springfood.service.ProductService;
+import com.spring_food.springfood.specification.SearchSpecification;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.math.BigDecimal;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
@@ -38,15 +46,19 @@ public class ProductServiceImpl implements ProductService {
     ProductMapper productMapper;
     CategoryRepository categoryRepository;
 
+    ProductJDBCRepository productJDBCRepository;
+
     @Override
-    public List<ProductDetail> getAllProductDetails() {
-        List<ProductDetail> products = productRepository.findListProduct();
+    public Page<ProductDetail> getAllProductDetails(Pageable pageable) {
+        Page<ProductDetail> products = productRepository.findListProduct(pageable);
         return products;
     }
 
     @Override
     public ProductDetail getProductDetailById(String productId) {
-        return productRepository.findProductDetailById(productId).orElseThrow(() -> new InvalidDataException("Product not found"));
+
+        return productMapper.toProductDetail(productJDBCRepository.findById(productId).get()); // JDBC template
+       // return productRepository.findProductDetailById(productId).orElseThrow(() -> new InvalidDataException("Product not found"));
     }
 
     private boolean isProductExist(String productId) {
@@ -175,4 +187,110 @@ public class ProductServiceImpl implements ProductService {
             throw new InvalidDataException("Product not found");
         }
     }
+
+    @Override
+    public Page<ProductDetail> findByPrice(String from, String to, Pageable pageable) {
+
+        BigDecimal priceFrom;
+        BigDecimal priceTo;
+        try {
+             priceFrom = BigDecimal.valueOf(Double.parseDouble(from));
+             priceTo = BigDecimal.valueOf(Double.parseDouble(to));
+        }catch (NumberFormatException e){
+            throw new InvalidDataException("Data sai");
+        }
+        if (priceFrom.compareTo(priceTo) > 0) throw new InvalidDataException("From must be not greater than to");
+
+        //Criteria
+//        Page<Product> res = productRepository.findByPrice(priceFrom, priceTo, pageable);
+//
+//        return res.map(productMapper::toProductDetail);
+
+//        //Spec
+        Specification<Product> spec = SearchSpecification.between(SearchKeyword.price.name(), priceFrom, priceTo);
+        Page<Product> res = productRepository.findAll(spec, pageable);
+        return res.map(productMapper::toProductDetail);
+
+        //NamedJdbcTemplate
+//        Page<Product> res = productJDBCRepository.findByPrice(priceFrom, priceTo, pageable);
+//        return res.map(productMapper::toProductDetail);
+    }
+
+
+    /**
+     * Dynamic search method for products using flexible search criteria
+     * 
+     * @param pageable pagination information
+     * @param params varargs containing search criteria in format "field+operation+value"
+     *               Examples:
+     *               - "quantity>10" - find products with quantity greater than 10
+     *               - "price<=100" - find products with price less than or equal to 100
+     *               - "name:laptop" - find products with name containing "laptop"
+     *               - "status=ACTIVE" - find products with status equals to ACTIVE
+     *               - "price>=50", "quantity<100" - multiple criteria (AND condition)
+     *               
+     *               Supported operations:
+     *               - "=" : equals
+     *               - "!=" : not equals  
+     *               - ">" : greater than
+     *               - ">=" : greater than or equal
+     *               - "<" : less than
+     *               - "<=" : less than or equal
+     *               - ":" : contains (for string fields)
+     * @return Page of ProductDetail matching the search criteria
+     */
+    public Page<ProductDetail> search(Pageable pageable, Map<String, String> params){
+
+        if (params.isEmpty()) {
+            return productRepository.findAll(pageable).map(productMapper::toProductDetail);
+        }
+
+        // Regex pattern to parse search criteria: keyword = operation + value
+        // Examples: "quantity=>10", "price=<=100", "name=:laptop", "status==ACTIVE", "price=~50-200"
+        // Pattern breakdown:
+        // (!=|<=|>=|[:=<>~]) - captures operation (order matters for multi-char ops)
+        // (.+) - captures the value (any characters)
+
+        Pattern pattern = Pattern.compile("^(!=|<=|>=|[:=<>~])(.+)$");
+
+        List<SearchCriteria> searchParams = new ArrayList<>();
+        Specification<Product> spec = null;
+        for (Map.Entry<String, String> entry : params.entrySet()){
+
+            String key = entry.getKey();
+            String value = entry.getValue();
+
+            if (key.equals("page") || key.equals("size") || key.equals("sort")) continue;
+
+            Matcher matcher = pattern.matcher(value);
+            if (matcher.matches()) {
+                SearchCriteria searchParam = new SearchCriteria();
+                searchParam.setKeyword(key);
+                searchParam.setOperation(matcher.group(1));
+                searchParam.setValue(matcher.group(2));
+                searchParams.add(searchParam);
+            }
+        }
+
+        // Build specifications based on search parameters
+        
+        for (SearchCriteria searchParam : searchParams) {
+            Specification<Product> currentSpec = SearchSpecification.buildSpecification(searchParam);
+            if (spec == null) {
+                spec = currentSpec;
+            } else {
+                spec = spec.and(currentSpec);
+            }
+        }
+        
+        // If no valid search params, return all products
+        if (spec == null) {
+            return productRepository.findAll(pageable).map(productMapper::toProductDetail);
+        }
+
+        Page<Product> products = productRepository.findAll(spec, pageable);
+
+        return products.map(productMapper::toProductDetail);
+    }
+
 }

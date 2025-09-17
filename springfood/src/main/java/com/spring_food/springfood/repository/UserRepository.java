@@ -2,6 +2,7 @@ package com.spring_food.springfood.repository;
 
 import com.spring_food.springfood.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -11,15 +12,29 @@ import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, String> {
+    // Các method này tự động filter: is_deleted = false AND status != 'DELETED'
     Optional<User> findByUsername(String username);
     Optional<User> findByEmail(String email);
     boolean existsByUsername(String username);
     boolean existsByEmail(String email);
+    boolean existsByPhone(String phone);
     List<User> findAll();
-
+    
+    // Tìm cả user đã bị xóa (bypass @Where)
+    @Query("SELECT u FROM User u WHERE u.username = :username")
+    Optional<User> findByUsernameIncludingDeleted(@Param("username") String username);
+    
+    @Query("SELECT u FROM User u WHERE u.id = :id")
+    Optional<User> findByIdIncludingDeleted(@Param("id") String id);
+    
+    // Tìm user đã bị xóa
+    @Query("SELECT u FROM User u WHERE u.isDeleted = true OR u.status = 'DELETED'")
+    List<User> findAllDeleted();
+    
+    // Đếm số user active
+    @Query("SELECT COUNT(u) FROM User u WHERE u.isDeleted = false AND u.status = 'ACTIVE'")
+    long countActiveUsers();
 
     @Query("SELECT u.username FROM User u JOIN ShopMember sm ON sm.user.id = u.id WHERE sm.shop.id = :shopId")
     Optional<List<String>> findUsernamesByShopId(@Param(value = "shopId") String shopId);
-
-
 }

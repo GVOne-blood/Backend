@@ -50,6 +50,10 @@ public class ProductRequest {
     @Min(0)
     @Max(1000000000)
     String wholesalePrice;
+    
+    @Min(0)
+    @Max(5)
+    java.math.BigDecimal avgRate;
 
 }
 

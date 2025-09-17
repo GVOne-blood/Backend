@@ -13,13 +13,14 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Getter
 @Setter
 @Entity
 @Table(name = "user") //user trung voi key trong PostgreSQL
 @AttributeOverride(name = "id", column = @Column(name = "user_id"))
+@org.hibernate.annotations.Where(clause = "is_deleted = false AND status != 'DELETED'")
+@org.hibernate.annotations.SQLDelete(sql = "UPDATE \"user\" SET is_deleted = true, status = 'DELETED', updated_at = NOW() WHERE user_id = ?")
 public class User extends AbstractEntity implements UserDetails {
 
     @Column(name = "firstName")
@@ -113,12 +114,10 @@ public class User extends AbstractEntity implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<GrantedAuthority> authorities = new ArrayList<>();
-        
-        // Thêm các Role với prefix ROLE_
+
         this.userRoles.forEach(userRole -> {
             authorities.add(new SimpleGrantedAuthority("ROLE_" + userRole.getRole().getId()));
-            
-            // Thêm các Permission từ Role (không cần prefix)
+
             userRole.getRole().getRolePermissions().forEach(rolePermission -> {
                 authorities.add(new SimpleGrantedAuthority(rolePermission.getPermission().getId()));
             });

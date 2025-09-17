@@ -11,7 +11,7 @@ import java.util.List;
 @Getter
 @Setter
 @Table(name = "payment")
-@AttributeOverride(name = "id", column = @Column(name = "payment_method_name", nullable = true))
+@AttributeOverride(name = "id", column = @Column(name = "payment_name", nullable = true))
 public class Payment extends AbstractEntity {
 
     private String description;
