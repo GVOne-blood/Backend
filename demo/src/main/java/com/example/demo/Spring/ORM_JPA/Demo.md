@@ -1,7 +1,9 @@
 # ORM
 
 ## 1. ORM là gì ? **Sử dụng
-** ORM mang lại lợi ích như thế nào cho ứng dụng. Cơ chế hoạt động của ORM như thế nào? So sánh performance của việc sử dụng ORM vs JDBC
+
+** ORM mang lại lợi ích như thế nào cho ứng dụng. Cơ chế hoạt động của ORM như thế nào? So sánh performance của việc sử
+dụng ORM vs JDBC
 
 ## 2. Spring JPA có phải là 1 triển khai của ORM hay không ?
 
@@ -91,7 +93,85 @@ Data JPA nằm trên JPA do có thằng phân tích cú pháp
 +---------------------------------------------------+
 ```
 
+### Hibernate
+
+> Hibernate là 1 framwork mã nguồn mở cho Java, là 1 implementation của 1 đặc tả tên là JPA. JPA chỉ định nghĩa các
+> interfaces và annotations, hibernate cung cấp logic thực thi đằng sau đó.
+
+Hibernate sinh ra tất nhiên là để giải quyết nhược điểm của JDBC
+
+Ánh xạ với hibernate:
+
+- Class ánh xạ `@Entity` : Báo cho hibernate phải quản lý lifecycle của thằng này
+- Key ánh xạ `@Id` : Hibernate dùng nó để định danh cho đối tượng trong cache của nó
+- Field ánh xạ
+    - `@Column` : Báo tên cột cho hibernate ấnh xạ tới
+    - `@Transient` : Dùng riêng cho đối tượng Java
+    - `@Enumerated(EnumType.STRING)` : Báo hibernate lưu enum dưới dạng String thay vì dạng số
+- Ánh xạ quan hệ :
+    - `@ManyToOne` : Hibernate tạo 1 colum FK trong table được đánh dấu
+    - `@JoinColumn` : Chỉ định tên cột đó
+    - `@OneToMany` : Hay đi cùng mappedBy, liên kết 2 bảng với nhau, báo hibernate không tạo FK trên bảng này
+    - `@ManyToMany` : Hibernate tự động tạo 1 bảng trung gian để lưu trữ các FK
+    - `@JoinTable` : Tùy chỉnh tên bảng trung gian...
+    - `@OneToOne` : 36
+
+Persistence Context là một bộ đệm cache cấp 1, được quản lý bởi `EntityManager`. Mỗi khi thực hiện 1 transaction,
+Persistence Context sẽ được mở ra để lưu trạng thái đồ
+
+Trạng thái của entity
+
+- Transient : Một đối tượng mới được khởi tạo, hibernate không biết gi về nó, nó kh ở trong PC
+- Managed : Khi save hay findBy gì đó, đối tượng trả về sẽ nằm trong 1 PC
+- Detached : Một object được quản lý nhưng PC đã đóng
+- Removed : Entity chuyển trạng thái này khi gọi đến delete, sau đó nó sẽ bị xóa
+
 ## JPA
+
+Hầu hết các phương thức JPA cung cấp đều là các transaction
+
+- Với các method chỉ select data , transaction đó là `readOnly = true`
+- Với các method thay đổi data (save, delete,...) nó là 1 transaction
+
+```
+@Transactional
+public void updateProductName(Long id, String newName) {
+    // 1. Tải Product -> đối tượng 'product' ở trạng thái MANAGED
+    Product product = productRepository.findById(id).orElseThrow();
+
+    // 2. Chỉ cần thay đổi trạng thái của đối tượng Java
+    product.setName(newName);
+
+    // 3. Khi phương thức @Transactional kết thúc (commit),
+    // Hibernate sẽ tự động quét PC, thấy rằng 'product' đã bị thay đổi
+    // và TỰ ĐỘNG sinh ra một câu lệnh UPDATE.
+    // BẠN KHÔNG CẦN GỌI productRepository.save(product) LẦN NỮA!
+}
+```
+
+Luồng thực hiện của 1 method JPA:
+
+1. Khi gọi đến phương thức `updateProductName` Proxy AOP của Spring sẽ chặn nó lại
+2. Nó thấy `@Transaction` và bắt đầu thực hiện giao dịch, tạo ra 1 PC và gán nó với transaction hiện tại để giao dịch
+   làm việc
+3. Gọi đến `productRepository.findById()`, nó tạo ra 1 Product object và lưu trong bộ nhớ java, find xong thì hibernate
+   đặt Product object này vào PC và set status là `MANAGED`. Đồng thời hibernate tạo 1 snapshot của trạng thái ban đầu
+   của Product và lưu trong PC. PC bây giờ chứa 1 instance của Product và snapshot của Product đó
+4. Đến `product.setName`, giá trị của name trong instance của Product bị thay đổi
+5. Method được thực thi xong, Proxy chặn lời gọi trả về, nó chuẩn bị commit cho transaction và thực hiện Dirty-checking:
+6. Transaction báo cho PC đồng bộ hóa và dọn dẹp data, PC duyệt qua tất cả objecct đang ở trạng thái managed, nó so sánh
+   object ở trạng thái hiện tại với snapshot đã lưu và phát hiện ra sự khác biệt, nó sinh ra lệnh để đồng bộ
+    ```
+   UPDATE products SET name = ? WHERE id = ?
+    ```
+7. Hibernate thực hiện câu lệnh, transaction gửi lệnh commit đến CSDL và kết thúc, PC đóng.
+
+Như vậy, việc ta gọi hàm `save()` khi update entity với `@Transaction` nó hơi thừa, vì nó không làm gì cả
+Nhưng khi không có @Transaction, ta phải gọi `save()` để lưu entity mới cập nhật vì nó sẽ gọi đến hàm `merge()` - nó
+select và update entity đang ở trạng thái detached
+
+Như vậy trong 1 method update, nếu có @Transaction thì sẽ chỉ có 2 lệnh SELECT và UPDATE được gọi xuống DB, trong khi
+dùng `save()` sẽ là 3: SELECT, SELECT và UPDATE
 
 ### JPA relationship
 
@@ -321,6 +401,62 @@ trong.
 
 ### Paging
 
+> Paging là kỹ thuật chia nhỏ một tập kết quả lớn thành nhiều phần nhỏ, giúp UI client gọn và chịu tải không quá lớn
+
+Tất nhiên việc fetch 1 request với số lượng bản ghi lớn lên client làm tốn kém tài nguyên và thời gian của cả Server và
+client => UX giảm
+
+Request từ client thường có các tham số paging quan trọng :
+
+- `page` : PageNo - chỉ mục trang hiện tại cần lấy
+- `size` : PageSize - Số lượng bản ghi trong 1 trang
+- `sort` : Order theo fields
+
+Các phương pháp phân trang trong SQL :
+
+- **Offset-based Paging** (Phân trang theo offset): Nó yêu cầu SQL bỏ qua 1 số lượng bản ghi và sau đó lấy lượng bản ghi
+  tiếp theo.
+  Trong SQL, `OFFSET = (pageNo - 1) * pageSize` ; `LIMIT = pageSize`
+  Trong SQL hiện đại thì dễ hiểu hơn
+    ```
+    ORDER BY created_at DESC, product_id ASC
+    OFFSET 40 ROWS
+    FETCH NEXT 20 ROWS ONLY;
+  ```
+  Offset rất tốt nhưng request các trang càng sâu thì hiệu năng DB càng giảm, vì dù có bỏ qua thì CSDL vẫn phải select
+  đống bản ghi trước đó. Ngoài ra còn tính nhất quán khi đang chuyển trang mà có thêm mới đồng thời thì bản ghi mới có
+  thể bị bỏ sót - đó là 1 phần lý do mặc định paging sẽ sort by `updated_at` hoặc `created_at`
+
+- **Cursor-based Paging** (Phân trang theo Cursor): Thay vì bỏ qua N bản ghi, thằng này có 1 điểm đánh dấu (cursor), khi
+  request sẽ lấy thêm `pageSize` bản ghi bắt đầu từ điểm đánh dấu đó
+  Để lấy trang đầu tiên chưa có cursor
+    ```
+  SELECT *
+    FROM products
+    ORDER BY created_at DESC, product_id DESC -- Luôn thêm cột unique để phá vỡ sự trùng lặp
+    LIMIT 20;
+    -- Giả sử hàng cuối cùng trả về có created_at = '2024-05-10 09:00:00' và product_id = 123
+  ```
+  Từ đó lấy các trang tiếp theo
+    ```
+  SELECT *
+  FROM products
+  WHERE
+  -- Sử dụng so sánh tuple để xử lý các giá trị bằng nhau một cách hiệu quả
+  (created_at, product_id) < ('2024-05-10 09:00:00', 123)
+  ORDER BY
+  created_at DESC, product_id DESC
+  LIMIT 20;
+  ```
+  Hiệu năng thằng này là bố, bằng cách đánh index khi `ORDER BY`, nó nhảy xuống luôn được cursor. Ngoài ra tính nhất
+  quán cũng cao. Nhược điểm của nó là phức tạp hơn và không cho phép user nhảy đến 1 trang cụ thể vì cursor đã đến đó
+  đâu mà nhảy.
+
+  Cursor Paging thường dùng cho các ứng dụng infinite-scroll (cuộn vô tận) như Facebook, TikTok,...
+
+Tầm quan trọng của `ORDER BY` và Index trong query phân trang là không bàn cãi. `ORDER BY` phải chứa 1 field unique để
+đảm bảo không có bản ghi nào lặp lại. Index thì là chìa khóa của hiệu năng query, nhất là đối với cursor.
+
 ### Criteria
 
 > JPA Criteria là 1 API được định nghĩa trong JPA, cho phép ta xây dựng câu truy vấn một cách programming - nghĩa là
@@ -384,6 +520,18 @@ public interface Specification<T> {
     Predicate toPredicate(Root<T> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder);
 }
 ```
+
+Khi một Spec được thực thi, nó gọi đến JpaSpecExecuter mà implements của nó mặc định là `SimpleJpaRepository`, trong đó
+nó sẽ:
+
+1. Nó lấy ra 1 `EntityManager` hiện tại, vốn được gán với 1 transaction đang hoạt động
+2. Khởi tạo JPA Criteria API: gọi cb, cq, root đồ
+3. Gọi method `toPredicate()` của Spec và truyền 3 tham số đã tạo ở trên vào
+4. Kết hợp các thứ về 1 đối tượng `Perdicate` hợp nhất được tạo ra, Spring nhận object này và gán vào `cq.where`, nói
+   chung thì như trình tự của Criteria query
+5. Khi query criteria call để lấy ResultSet, hibernate sẽ tiếp quản, nó nhận vào cq và dịch nó thành 1 chuỗi SQL cụ thể,
+   nó lấy Connection từ DataSource và tạo `PreParedStatement`
+6. JDBC làm việc, gọi đến CSDL, thực thi và trả ngược về
 
 ### Đánh giá
 

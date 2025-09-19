@@ -14,6 +14,8 @@
 
 ## 7. Hướng dẫn sử dụng postman : param, body request
 
+## *. Spring AOP, Proxy
+
 [Chú thích](#chú_thích)
 
 ## Spring Core
@@ -522,8 +524,107 @@ Thực hiện hóa bằng các Servlet Container như Tomcat, Jetty, Undertow,..
 
 Sau đó request đến các handler và filter khác trước khi đến Controller
 
+Luồng đến của request:
+
+![ew](src/main/resources/local/filterchain-1a.png)
+
 ```
 HTTP Request -> Embedded Servlet Container (Tomcat) -> HttpServletRequest -> DispatcherServlet -> HandlerMapping -> Controller -> ...
 ```
+
+## Spring AOP
+
+Trước khi AOP ra đời, các vấn đề về Cross-Cutting Concerns được đặt ra:
+
+Các service khi tạo ra cần ghi log, kiểm tra quyền(authorize), caching, quản lý transaction,... Thông thường ta sẽ lặp
+lại việc xử lý các vấn đề này trong code, nó dẫn đến việc code bị lặp, khó bảo trì và logic nghiệp vụ bị cắt ngang bởi
+những thứ về hệ thống
+
+```
+public class OrderService {
+    public Order getOrder(Long id) {
+        // 1. Code bảo mật
+        SecurityManager.checkPermission("GET_ORDER");
+
+        // 2. Code bắt đầu giao dịch
+        Transaction tx = transactionManager.begin();
+
+        // 3. Code logging
+        log.info("Entering getOrder with id: " + id);
+        long start = System.currentTimeMillis();
+
+        try {
+            // 4. LOGIC NGHIỆP VỤ CỐT LÕI
+            Order order = repository.findById(id);
+            // ...
+
+            // 5. Code commit giao dịch
+            tx.commit();
+            return order;
+        } catch (Exception e) {
+            // 6. Code rollback
+            tx.rollback();
+            throw e;
+        } finally {
+            // 7. Code logging và đo lường hiệu năng
+            long end = System.currentTimeMillis();
+            log.info("Finished getOrder. Execution time: " + (end - start) + "ms");
+        }
+    }
+}
+```
+
+AOP sinh ra để giải quyết
+
+> Aspect-Oriented Programming là một mô hình lập tình cho phép tách biệt các CCC ra khỏi logic nghiệp vụ của ứng dụng
+
+Sring AOP là cách Spring thực hiện AOP trong framwork của mình, nó cho ta định nghĩa các advise (lời khuyên) và
+cắt chúng vào các điểm thực thi cụ thể trong code 1 cách linh hoạt mà không cần sửa code
+
+Các thuật ngữ chính :
+
+- **Aspect** : là một module đóng gói CCC. Trong Spring, class Aspect là class được đánh dấu bởi `@Aspect`
+- **Advise** : là hành động sẽ được thực hiện bởi 1 aspect, có các loại advise khác nhau:
+    - `@Before` : Chạy trước khi phương thức được gọi
+    - `@AfterReturnning` : Chạy sau khi phương thức trả về kết quả thành công
+    - `@AfterThrowing` : Chạy sau khi method ném ra exception
+    - `@After` : Chạy sau khi phương thức kết thúc bất kể thành công hay thất bại
+    - `@Around` : Mạnh, bao bọc toàn bộ phương thức, cho phép thực hiện các hành động cả trước cả sau, thậm chí có thể
+      không thực hiện gọi phương thức gốc. Thằng `@Transaction` dùng thằng này
+- **Pointcut** : Là một biểu thức (expression) để xác định chỗ nào sẽ được áp dụng advise
+- **Join Point** : Là một điểm cụ thể trong quá trình thực hiện chương trình, advise sẽ được cắm vào
+- **Weaving** : Là sự kết hợp các Aspect object với object mục tiêu để tạo ra advised object cuối cùng trong Runtime.
+
+Spring AOP không sửa code, nó dùng Proxy
+
+### Proxy Pattern
+
+> Một Proxy là đối tượng đứng ra đại diện cho một đối tượng khác. Proxy có cùng interface với đối tượng thật, cho phép
+> nó thay thế đối tượng thật 1 cách trong suốt
+
+Khi một phương thức bị bao bởi Proxy bị gọi,
+proxy có thể :
+
+- Thực hiện 1 số hành động trước khi chuyển lời gọi đến đối tượng thật
+- Chuyển tiếp lời gọi đến các phương thức tương ứng
+- Thực hiện 1 số hành động sau khi nhận được kết quả từ đối tượng thật
+- Trả về kết quả cho thằng gọi
+
+Với 1 ví dụ khi transaction cho 1 phương thức, quy trình sẽ diễn ra như sau
+
+1. Spring Container tạo ra `OrderService` - 1 đối tượng thật
+2. Spring AOP thấy `OrderService` có method có `@Transaction`
+3. Thay vì inject `OrderService` thật, Spring tạo ra 1 lớp Proxy và inject nos vào `OrderController` khi controller cần
+   dùng đến service
+4. Controller gọi một phương thức `orderService.order()` thực chất nó đang gọi method `order()` trên Proxy
+5. Method `order()` được kích hoạt, advise `@Around` hoạt động, nó tạo 1 transaction trước khi gọi phương thức thật
+6. Sau khi method thật thực thi xong, nếu rollback thì nó ném exception cho controller xử lý, không thì tra về kết quả
+
+Có 2 loại Proxy trong Spring :
+
+- **JDK Dynamic Proxy** (default) : Nó yêu cầu đối tượng thật phải implements 1 interface, Proxy sẽ được tạo ra để
+  implements interface đó
+- **CGLIB Proxy** : Nếu đối tượng thật không implements interface nào, nó sẽ tạo 1 subclass của đối tượng thật tại
+  Runtime. Spring boot thường dùng thằng này
 
 ### Chú thích

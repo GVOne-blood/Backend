@@ -453,6 +453,131 @@ Sự khác biệt giữa query của procedure và query trên application:
   flyway hay liquibase giúp điều này dễ dàng hơn
 - Phụ thuộc vào DB vendor(nhà cung cấp DB) nên khó di chuyển giữa các hệ quản trị CSDL
 
+### Transaction
+
+> Một transaction là một chuỗi các thao tác SQL được thực thi như một đơn vị công việc logic duy nhất và liền mạch. Toàn
+> bộ chuỗi thao tác này phải tuân thủ quy tắc: Hoặc là tất cả cùng thành công hoặc là không có gì thay dổi cả.
+
+Mục đích cuối cùng của transaction để đảm bảo tính vẽn toàn và nhất quán của dữ liệu, đặc biệt trong môi trường có nhiều
+người dùng hoặc nhiều tiến trình cùng truy cập và thay đổi dữ liệu đồng thời
+
+Ví dụ kinh điển là thằng chuyển tiền
+
+Các thuộc tính ACID: Để đảm bảo tính vẹn toàn, mọi transaction phải tuân thủ 4 thuộc tính nền tảng :
+
+- **Atomicity** (Tính nguyên tử) : Để đảm bảo nguyên tắc all-or-nothing, toàn bộ giao dịch được coi là một thao tác
+  nguyên tử duy
+  nhất, nó không thể tồn tại ở trạng thái "hoàn thành 1 nữa" mà sẽ phải rollback hết.
+- **Consistency** (Tính nhất quán) : Đảm bảo 1 giao dịch chỉ có thể đưa CSDL từ 1 trạng thái hợp lệ này sang 1 trạng
+  thái hợp lệ khác. Mọi dữ liệu được ghi vào CSDL phải tuân thủ các quy tắc đã được định nghĩa như các constraints,
+  triggers, ...
+- **Isolation** (Tính cô lập) : Đảm bảo các giao dịch đang thực hiện đồng thời không can thiệp lẫn nhau, mỗi transaction
+  không thể nhìn thấy kết quả của các giao dịch đồng thời đang thực hiện bên cạnh nó, nó giống việc thực hiện tuần tự
+  các giao dịch.
+- **Durability** (Tính bền vững) : Đảm bảo rằng khi 1 giao dịch xác nhận thành công, các thay đổi của nó phải được lưu
+  vĩnh viễn và tồn tại ngay cả khi hệ thống gặp sự cố.
+
+Cú pháp :
+Tạo một transaction với `BEGIN` or `START TRANSACTION` , theo sau là 1 chuỗi các lệnh trong transaction
+
+`COMMIT` để kết thúc transacion và lưu vĩnh viễn, sau khi commit thì các transaction khác sẽ nhìn thấy kết quả của
+transaction này.
+
+`ROLLBACK` để hủy bỏ transaction và hoàn tác tất cả những thay đổi đã được thực hiện kể từ `BEGIN` gần nhất. CSDL sẽ trả
+về trạng thái chính xác ngay trước khi transaction bắt đầu.
+
+Trong PostgreSQL, khối lệnh trong `BEGIN...END` sẽ từ động được commit hoặc rollback
+
+Cơ chế quản lý transaction :
+
+_ Cơ chế chính mà PostgreSQL sử dụng là MVCC(Multi-Version Concurrent Control) - điều khiển
+đồng thời đa phiên bản
+
+Nguyên lý : Khi thực hiện 1 lệnh `UPDATE` trên 1 hàng, postgre không ghi đè lên dữ liệu cũ. Thay vào đó nó tạo ra phiên
+bản mới của hàng đó và đánh dấu phiên bản cũ là đã hết hạn. Lệnh `DELETE` cũng chưa xóa hàng đó mà đánh dấu nó là hàng
+đã chết
+
+Mỗi transaction khi bắt đầu sẽ được cấp 1 id unique, tăng dần. Mỗi phiên bản mới của hàng dữ liệu sẽ được
+gắn với id của giao dịch đã tạo ra nó(`xmin`) và id của giao dịch đã cập nhật nó(`xmax`).
+
+Khi một giao dịch bắt đầu, nó sẽ lấy 1 snapshot của CSDL, snapshot này là 1 danh sách các id đã commit tại thời điểm đó
+
+Mỗi giao dịch sẽ chỉ nhìn thấy các phiên bản hàng thỏa mãn 2 điều kiện :
+
+- `xmin` của hàng đó phải là 1 id đã commit và có trong snapshot của giao dịch
+- `xmax` của hàng đó phải chưa được thiết lập, hoặc là 1 id chưa commit, hoặc là 1 id đã rollback
+
+Kết quả của MVCC là nhiều giao dịch có thể đọc và ghi trên 1 bảng đồng thời mà ít bị xung đột
+
+_ Cơ chế Write-Ahead Logging (WAL) - Cơ chế đảm bảo Atomicity và Durability:
+
+Nói chung đây là cơ chế ghi log : Trước khi bất kỳ thay đổi nào được ghi vào các file dữ liệu trên ổ đĩa, một bản ghi mô
+tả thay đổi đó được ghi xuống 1 file log tuần tự là WAL và được xác nhận là đã lưu an toàn trên đĩa
+
+Thực hiện hóa Durability : KHi commit 1 giao dịch, postgre chỉ cần đảm bảo rằng tất cả bản ghi trong WAL liên quan đến
+giao dịch đó đã được ghi thành công xuống đĩa, thao tác ghi log này rất nhanh, sau đó việc cập nhật các file dữ liệu
+chính có thể được thực hiện không đồng bộ sau. Nếu server bị sập, khi khởi động lại,postgre sẽ đọc lại WAL từ checkpoint
+cuối cùng và phát lại các thay đổi của commit cuối cùng mà chưa được ghi vào đĩa (do đang ghi thì mất điện đồ), đảm bảo
+không mất dữ liệu
+
+Postgre định dạng các loại cô lập khác nhau:
+
+- `READ COMMITED` (default) : Mỗi câu lệnh trong transaction sẽ lấy 1 snapshot mới, transaction này có thể thấy các thay
+  đổi được commit bởi các giao dịch khác trong khi nó đang chạy
+- `REPEATABLE READ` : Toàn bộ transaction chỉ sử dụng 1 snapshot duy nhất, đảm bảo dữ liệu được xử lý sẽ không thay đổi
+  trong suốt giao dịch
+- `SERIALIZABLE` : Đảm bảo kết qủa của giao địch đồng thời giốn hệt khi chúng chạy tuần tự.
+
+Cú pháp thiết lập isolate
+
+```
+SET TRANSACTION ISOLATION LEVEL READ COMMIED
+```
+
+`@Transaction` trong java :
+
+Khi đánh dấu 1 phương thức là một transaction, method đó sẽ được bao bọc bởi 1 transaction trong DB, nếu trong quá tình
+thực hiện hệ thống không ném ra `RuntimeException` thì sẽ commit giao dịch, còn không sẽ rollbakc
+
+Ngày xưa chưa có annotation thì kiểm soát transaction trong java thường được sử dụng với `Transaction` object, sau này
+`@Transaction` ra đời giusp loại bỏ các khối try-catch trong quá trình viết code transaction
+
+Cơ chế hoạt động của `@Transaction` được thực hiện hóa bởi Spring AOP(Aspect-Oriented Programming) và Proxy:
+
+1. Spring component scan, những class có phương thức được đánh dấu bởi `@Transaction` sẽ chưa được inject bean vội mà sẽ
+   được bọc trong 1 đối tượng Proxy. Khi 1 bean gọi đến phương thức này, thực chất nó đang gọi đến Proxy object
+2. Proxy object chứa logic quản lý giao dịch, nó sẽ:
+    - Chặn lời gọi
+    - Bắt đầu một giao dịch
+    - Gọi phương thức thực tế dựa trên bean gốc
+    - Chặn kết quả trả về (có thể là giá trị or exception)
+    - Thực hiện COMMIT or ROLLBACK dựa trên kết quả trả về
+    - Trả kết quả (or ném exception) cho bên gọi
+
+Proxy chỉ hoạt động trên các method *public*, không hoạt động trên private, protected,... Lời gọi phương thức phải đến
+từ ngoài đối tượng, vì gọi từ bên trong thì chả khác gì thực hiện gọi 1 hàm bình thường, vì proxy nó bao cả lớp đó, phải
+đi qua proxy mới transaction được
+
+Attribute trong `@Transaction` :
+
+- `propagation` (lan truyền): Xác định cách một transaction hoạt động khi nó được gọi từ 1 transaction(phương thức có
+  `@Transaction`) khác:
+    - `REQUIRED` (default) : Nếu có một giao dịch đâng hoạt động, nó sẽ tham gia vào giao dịch đó. Nếu chưa có nó sẽ bắt
+      đầu 1 giao dịch mới
+    - `REQUIRES_NEW` : Luôn bắt đầu giao dịch mới, tạm ngừng giao dịch hiện, nos thích hợp cho các giao dịch mà ta luôn
+      muốn nó phải thành công dù bị rollback
+    - ...
+- `isolation` (mức độ cô lập) : Tham số các thứ Giống với SQL
+- `readOnly` : nếu giá trị = `true`, giao dịch này sẽ không thực hiện bất kỳ thao tác ghi nào
+- `rollbackFor` & `noollbackFor` : Kiểm soát chính xác exception nào gây ra rollback
+    - default Spring chỉ rollback cho các runtime exception và error, nó không rollback cho các checked exception.
+    - `rollbackFor` cho phép chỉ định 1 danh sách các ngoại lệ kể cả checked có thể rollback
+    ```
+  @Transactional(rollbackFor = {SQLException.class, CustomCheckedException.class})
+    public void someMethod() throws SQLException, CustomCheckedException { ... }
+  ```
+    - `noRollbackFor` chỉ định danh sách `RuntimeException` ta không muốn Spring kích hoạt rollback
+
 ### Chú thích
 
 1. **Execution plan**: Một lộ trình chi tiết, từng bước một do Query Optimizer tạo ra, lộ trình này mô tả chuỗi các thao
