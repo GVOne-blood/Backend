@@ -14,5 +14,7 @@ public interface VNPayService {
 
     Map<String, String> queryTransactionStatus(String vnp_TxnRef, LocalDateTime vnp_TransDate, String requestIP) throws IOException;
 
+    Map<String, String> queryRefund(String vnp_TransactionNo, String vnp_txnRef, LocalDateTime vnp_TransDate, String requestIP);
+
     int processVNPayReturn(HttpServletRequest request);
 }

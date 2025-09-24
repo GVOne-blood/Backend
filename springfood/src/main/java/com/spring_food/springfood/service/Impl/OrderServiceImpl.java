@@ -5,10 +5,7 @@ import com.spring_food.springfood.common.enums.PaymentMethod;
 import com.spring_food.springfood.common.enums.ProductStatus;
 import com.spring_food.springfood.common.enums.TransactionStatus;
 import com.spring_food.springfood.config.VNPayConfig;
-import com.spring_food.springfood.dto.request.ItemRequest;
-import com.spring_food.springfood.dto.request.OrderRequest;
-import com.spring_food.springfood.dto.request.ShopOrderRequest;
-import com.spring_food.springfood.dto.request.VNPayPaymentRequest;
+import com.spring_food.springfood.dto.request.*;
 import com.spring_food.springfood.dto.response.OrderDetailResponse;
 import com.spring_food.springfood.dto.response.OrderPaymentResponse;
 import com.spring_food.springfood.dto.response.ProductDetail;
@@ -50,7 +47,6 @@ public class OrderServiceImpl implements OrderService {
     ShopService shopService;
     OrderItemRepository orderItemRepository;
     VNPayService vnPayService;
-    VNPayConfig vnPayConfig;
 
     ProductMapper productMapper;
     OrderMapper orderMapper;
@@ -58,7 +54,8 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Page<OrderDetailResponse> getListOrderForAdmin(Pageable pageable, String userId) {
-        return orderRepository.getAllOrder(pageable);
+        //return orderRepository.getAllOrder(pageable);
+        return null;
     }
 
     @Override
@@ -235,6 +232,16 @@ public class OrderServiceImpl implements OrderService {
             orderPaymentResponse.setPaymentUrl(vnPayService.createPaymentUrl(request, vnPayPaymentRequest));
         }
         return orderPaymentResponse;
+    }
+
+    @Override
+    public OrderPaymentResponse updateOrders(HttpServletRequest request, OrderUpdateRequest updateRequest, String userId) {
+
+        Optional<Order> order = orderRepository.findByUserIdAndOrderId(updateRequest.getOrderId(), userId);
+        if (order.isEmpty()) throw new InvalidDataException("Order not found");
+
+        OrderStatus status = order.get().getOrderStatus();
+        return null;
     }
 
 

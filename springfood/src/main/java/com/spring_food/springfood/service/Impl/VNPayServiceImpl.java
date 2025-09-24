@@ -4,12 +4,12 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.spring_food.springfood.config.VNPayConfig;
 import com.spring_food.springfood.dto.request.VNPayPaymentRequest;
-import com.spring_food.springfood.repository.OrderRepository;
-import com.spring_food.springfood.service.OrderService;
 import com.spring_food.springfood.service.PaymentService;
 import com.spring_food.springfood.service.VNPayService;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -26,16 +26,12 @@ import java.util.*;
 @Service
 @Slf4j
 @RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class VNPayServiceImpl implements VNPayService {
 
+
     PaymentService paymentService;
-    OrderService orderService;
-    OrderRepository orderRepository;
-
-
-    /**
-     * SỬ DỤNG LẠI PHƯƠNG PHÁP CỦA VNPAY CONFIG - ĐƠN GIẢN VÀ ĐỀU KHÔNG URL ENCODE
-     */
+    
     private String generateSecureHash(Map<String, String> params, String secretKey) throws UnsupportedEncodingException {
         // Theo sample của VNPay: sắp xếp tham số, nối field=value với GIÁ TRỊ ĐƯỢC URL-ENCODE UTF-8
         List<String> fieldNames = new ArrayList<>(params.keySet());
@@ -179,7 +175,7 @@ public class VNPayServiceImpl implements VNPayService {
         vnp_params.put("vnp_OrderInfo", "Kiem tra trang thai cua giao dich " + vnp_TxnRef);
 
         // Create signature
-        String vnp_SecureHash = generateSecureHash(vnp_params, VNPayConfig.vnp_HashSecret);
+        String vnp_SecureHash = generateQueryDrSecureHash(vnp_params, VNPayConfig.vnp_HashSecret);
         vnp_params.put("vnp_SecureHash", vnp_SecureHash);
 
         // Send request
@@ -210,6 +206,10 @@ public class VNPayServiceImpl implements VNPayService {
         return res;
     }
 
+    @Override
+    public Map<String, String> queryRefund(String vnp_TransactionNo, String vnp_txnRef, LocalDateTime vnp_TransDate, String requestIP) {
+        return Map.of();
+    }
 
     @Override
     public int processVNPayReturn(HttpServletRequest request) {
@@ -239,11 +239,11 @@ public class VNPayServiceImpl implements VNPayService {
         // So sánh chữ ký để xác thực
         if (calculatedHash.equals(vnp_SecureHash)) {
             if ("00".equals(request.getParameter("vnp_ResponseCode"))) {
-                paymentService.processPaymentReturnSuccess();
+                //   paymentService.handlePaymentReturnSuccess();
                 // TODO: Logic nghiệp vụ khi thanh toán thành công
                 return 1; // Thành công
             } else {
-                paymentService.processPaymentReturnFail();
+                //paymentService.handlePaymentReturnFail();
                 // TODO: Logic nghiệp vụ khi thanh toán thất bại
                 return 0; // Thất bại
             }

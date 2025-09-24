@@ -36,6 +36,7 @@ public class SecurityConfig {
             "/swagger-ui.html",
             "/webjars/**",
             "/actuator/**",
+            "/api/payment/vnpay-payment-return/**"
     };
     //    private final ExceptionHandlingFilter exceptionHandlingFilter;
     private final PreFilter preFilter;
@@ -93,11 +94,6 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/feedbacks/**").hasRole("CUSTOMER") // Customer tạo feedback
                         .requestMatchers(HttpMethod.GET, "/api/feedbacks/**").permitAll() // Tất cả xem feedback
                         .requestMatchers(HttpMethod.DELETE, "/api/feedbacks/**").hasRole("ADMIN") // Admin xóa feedback
-
-                        // Payment endpoints
-                        .requestMatchers(HttpMethod.POST, "/api/payments/**").hasAnyRole("CUSTOMER", "ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/api/payments/my-payments").hasRole("CUSTOMER")
-                        .requestMatchers(HttpMethod.GET, "/api/payments/**").hasRole("ADMIN")
 
                         // Notification endpoints
                         .requestMatchers(HttpMethod.GET, "/api/notifications/my-notifications").authenticated()

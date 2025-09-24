@@ -1,6 +1,7 @@
 package com.spring_food.springfood.service;
 
 import com.spring_food.springfood.dto.request.OrderRequest;
+import com.spring_food.springfood.dto.request.OrderUpdateRequest;
 import com.spring_food.springfood.dto.response.OrderDetailResponse;
 import com.spring_food.springfood.dto.response.OrderPaymentResponse;
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,6 +20,8 @@ public interface OrderService {
 
 
     OrderPaymentResponse createOrders(HttpServletRequest request, OrderRequest orderRequest, String user) throws UnsupportedEncodingException;
+
+    OrderPaymentResponse updateOrders(HttpServletRequest request, OrderUpdateRequest updateRequest, String userId);
 
     void deleteOrder(String orderId);
 }

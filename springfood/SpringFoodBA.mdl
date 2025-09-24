@@ -11,7 +11,43 @@
 	(object Attribute
 	    tool       	"Java"
 	    name       	"IDE"
-	    value      	"Internal Editor"))
+	    value      	"Internal Editor")
+	(object Attribute
+	    tool       	"Java"
+	    name       	"UserDefineTagName1"
+	    value      	"")
+	(object Attribute
+	    tool       	"Java"
+	    name       	"UserDefineTagText1"
+	    value      	"")
+	(object Attribute
+	    tool       	"Java"
+	    name       	"UserDefineTagApply1"
+	    value      	"")
+	(object Attribute
+	    tool       	"Java"
+	    name       	"UserDefineTagName2"
+	    value      	"")
+	(object Attribute
+	    tool       	"Java"
+	    name       	"UserDefineTagText2"
+	    value      	"")
+	(object Attribute
+	    tool       	"Java"
+	    name       	"UserDefineTagApply2"
+	    value      	"")
+	(object Attribute
+	    tool       	"Java"
+	    name       	"UserDefineTagName3"
+	    value      	"")
+	(object Attribute
+	    tool       	"Java"
+	    name       	"UserDefineTagText3"
+	    value      	"")
+	(object Attribute
+	    tool       	"Java"
+	    name       	"UserDefineTagApply3"
+	    value      	""))
     quid       	"68D2CD3E00D6"
     enforceClosureAutoLoad 	FALSE
     defaults   	(object defaults
@@ -69,7 +105,7 @@
 		quid       	"68D2CFBB026D")
 	    (object UseCase "Bao tri danh muc san pham"
 		quid       	"68D2CFCD024F")
-	    (object UseCase "Bao tri don hang"
+	    (object UseCase "Quan ly don hang"
 		quid       	"68D2D11C02DD")
 	    (object UseCase "Quan ly thong bao"
 		quid       	"68D2D12A00A2")
@@ -133,8 +169,8 @@
 			    Parent_View 	@1
 			    location   	(380, 844)
 			    anchor_loc 	1
-			    nlines     	1
-			    max_width  	328
+			    nlines     	2
+			    max_width  	325
 			    justify    	0
 			    label      	"Khach Hang")
 			icon       	"Actor"
@@ -162,7 +198,7 @@
 			    location   	(386, 1188)
 			    anchor_loc 	1
 			    nlines     	2
-			    max_width  	331
+			    max_width  	325
 			    justify    	0
 			    label      	"Nhan Vien")
 			icon       	"Actor"
@@ -189,8 +225,8 @@
 			    Parent_View 	@3
 			    location   	(373, 1550)
 			    anchor_loc 	1
-			    nlines     	1
-			    max_width  	335
+			    nlines     	2
+			    max_width  	325
 			    justify    	0
 			    label      	"Chu Cua Hang")
 			icon       	"Actor"
@@ -217,8 +253,8 @@
 			    Parent_View 	@4
 			    location   	(364, 1894)
 			    anchor_loc 	1
-			    nlines     	1
-			    max_width  	339
+			    nlines     	2
+			    max_width  	325
 			    justify    	0
 			    label      	"Nguoi Giao Hang")
 			icon       	"Actor"
@@ -245,8 +281,8 @@
 			    Parent_View 	@5
 			    location   	(358, 2257)
 			    anchor_loc 	1
-			    nlines     	1
-			    max_width  	447
+			    nlines     	2
+			    max_width  	429
 			    justify    	0
 			    label      	"Quan Tri Vien He Thong")
 			icon       	"Actor"
@@ -352,7 +388,7 @@
 			quidu      	"68D2CFB000D5"
 			height     	118)
 		    (object UseCaseView "Use Case View::Quan ly san pham" @10
-			location   	(1149, 1013)
+			location   	(1480, 1484)
 			font       	(object Font
 			    size       	10
 			    face       	"Arial"
@@ -364,7 +400,7 @@
 			    default_color 	TRUE)
 			label      	(object ItemLabel
 			    Parent_View 	@10
-			    location   	(1149, 1151)
+			    location   	(1480, 1622)
 			    anchor_loc 	1
 			    nlines     	2
 			    max_width  	630
@@ -399,8 +435,8 @@
 			fill_color 	13434879
 			quidu      	"68D2CFCD024F"
 			height     	118)
-		    (object UseCaseView "Use Case View::Bao tri don hang" @12
-			location   	(3018, 453)
+		    (object UseCaseView "Use Case View::Quan ly don hang" @12
+			location   	(1765, 1852)
 			font       	(object Font
 			    size       	10
 			    face       	"Arial"
@@ -412,12 +448,12 @@
 			    default_color 	TRUE)
 			label      	(object ItemLabel
 			    Parent_View 	@12
-			    location   	(3018, 591)
+			    location   	(1765, 1990)
 			    anchor_loc 	1
 			    nlines     	2
 			    max_width  	630
 			    justify    	0
-			    label      	"Bao tri don hang")
+			    label      	"Quan ly don hang")
 			icon_style 	"Icon"
 			line_color 	3342489
 			fill_color 	13434879
@@ -496,7 +532,7 @@
 			quidu      	"68D2D18F0077"
 			height     	118)
 		    (object UseCaseView "Use Case View::Xem danh muc san pham" @16
-			location   	(3215, 1591)
+			location   	(2362, 1459)
 			font       	(object Font
 			    size       	10
 			    face       	"Arial"
@@ -508,7 +544,7 @@
 			    default_color 	TRUE)
 			label      	(object ItemLabel
 			    Parent_View 	@16
-			    location   	(3215, 1729)
+			    location   	(2362, 1597)
 			    anchor_loc 	1
 			    nlines     	2
 			    max_width  	630
@@ -712,7 +748,7 @@
 			quidu      	"68D2D3040247"
 			height     	118)
 		    (object UseCaseView "Use Case View::Thanh toan" @25
-			location   	(2919, 1780)
+			location   	(1875, 1496)
 			font       	(object Font
 			    size       	10
 			    face       	"Arial"
@@ -724,7 +760,7 @@
 			    default_color 	TRUE)
 			label      	(object ItemLabel
 			    Parent_View 	@25
-			    location   	(2919, 1918)
+			    location   	(1875, 1634)
 			    anchor_loc 	1
 			    nlines     	2
 			    max_width  	630
@@ -736,7 +772,7 @@
 			quidu      	"68D2D32D004D"
 			height     	118)
 		    (object UseCaseView "Use Case View::Quan ly gio hang" @26
-			location   	(1222, 1243)
+			location   	(1216, 1734)
 			font       	(object Font
 			    size       	10
 			    face       	"Arial"
@@ -748,7 +784,7 @@
 			    default_color 	TRUE)
 			label      	(object ItemLabel
 			    Parent_View 	@26
-			    location   	(1222, 1381)
+			    location   	(1216, 1872)
 			    anchor_loc 	1
 			    nlines     	2
 			    max_width  	630
@@ -759,31 +795,7 @@
 			fill_color 	13434879
 			quidu      	"68D2D3AB032D"
 			height     	118)
-		    (object UseCaseView "Use Case View::Xac nhan don hang" @27
-			location   	(2869, 1549)
-			font       	(object Font
-			    size       	10
-			    face       	"Arial"
-			    bold       	FALSE
-			    italics    	FALSE
-			    underline  	FALSE
-			    strike     	FALSE
-			    color      	0
-			    default_color 	TRUE)
-			label      	(object ItemLabel
-			    Parent_View 	@27
-			    location   	(2869, 1687)
-			    anchor_loc 	1
-			    nlines     	2
-			    max_width  	630
-			    justify    	0
-			    label      	"Xac nhan don hang")
-			icon_style 	"Icon"
-			line_color 	3342489
-			fill_color 	13434879
-			quidu      	"68D2D3DA01F9"
-			height     	118)
-		    (object UseCaseView "Use Case View::Quan ly giao dich" @28
+		    (object UseCaseView "Use Case View::Quan ly giao dich" @27
 			location   	(1253, 736)
 			font       	(object Font
 			    size       	10
@@ -795,7 +807,7 @@
 			    color      	0
 			    default_color 	TRUE)
 			label      	(object ItemLabel
-			    Parent_View 	@28
+			    Parent_View 	@27
 			    location   	(1253, 874)
 			    anchor_loc 	1
 			    nlines     	2
@@ -806,30 +818,6 @@
 			line_color 	3342489
 			fill_color 	13434879
 			quidu      	"68D2D3E7005C"
-			height     	118)
-		    (object UseCaseView "Use Case View::Huy don hang" @29
-			location   	(3044, 1476)
-			font       	(object Font
-			    size       	10
-			    face       	"Arial"
-			    bold       	FALSE
-			    italics    	FALSE
-			    underline  	FALSE
-			    strike     	FALSE
-			    color      	0
-			    default_color 	TRUE)
-			label      	(object ItemLabel
-			    Parent_View 	@29
-			    location   	(3044, 1614)
-			    anchor_loc 	1
-			    nlines     	2
-			    max_width  	630
-			    justify    	0
-			    label      	"Huy don hang")
-			icon_style 	"Icon"
-			line_color 	3342489
-			fill_color 	13434879
-			quidu      	"68D2D51E01D2"
 			height     	118)))))
     root_category 	(object Class_Category "Logical View"
 	quid       	"68D2CD3E00D7"
