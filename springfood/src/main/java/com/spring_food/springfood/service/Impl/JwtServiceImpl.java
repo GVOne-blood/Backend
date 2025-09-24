@@ -24,19 +24,19 @@ public class JwtServiceImpl implements JwtService {
 
     @Value("${jwt.accessTokenExpiration:900000}") // 15 minutes default
     private long accessTokenExpiration;
-    
+
     @Value("${jwt.refreshTokenExpiration:604800000}") // 7 days default
     private long refreshTokenExpiration;
-    
+
     @Value("${jwt.resetTokenExpiration:300000}") // 5 minutes default
     private long resetTokenExpiration;
-    
+
     @Value("${jwt.secretKey}")
     private String secretKey;
-    
+
     @Value("${jwt.refreshKey}")
     private String refreshKey;
-    
+
     @Value("${jwt.resetKey}")
     private String resetKey;
 
@@ -63,8 +63,8 @@ public class JwtServiceImpl implements JwtService {
         try {
             final String username = extractUsername(token, tokenType);
             final String tokenTypeInClaim = extractClaim(token, tokenType, claims -> claims.get("type", String.class));
-            
-            return username.equals(user.getUsername()) 
+
+            return username.equals(user.getUsername())
                     && tokenType.name().equals(tokenTypeInClaim)
                     && !isTokenExpired(token, tokenType);
         } catch (Exception e) {
@@ -72,7 +72,7 @@ public class JwtServiceImpl implements JwtService {
             return false;
         }
     }
-    
+
     @Override
     public Long getTokenExpiration(TokenType tokenType) {
         switch (tokenType) {
@@ -90,7 +90,7 @@ public class JwtServiceImpl implements JwtService {
     private String createToken(Map<String, Object> claims, String subject, TokenType tokenType) {
         Date now = new Date();
         Date expiration = new Date(now.getTime() + getTokenExpiration(tokenType));
-        
+
         return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(subject)
@@ -99,7 +99,7 @@ public class JwtServiceImpl implements JwtService {
                 .signWith(getSigningKey(tokenType), getSignatureAlgorithm(tokenType))
                 .compact();
     }
-    
+
     private SignatureAlgorithm getSignatureAlgorithm(TokenType tokenType) {
         return switch (tokenType) {
             case ACCESS, REFRESH -> SignatureAlgorithm.HS256;
@@ -110,7 +110,7 @@ public class JwtServiceImpl implements JwtService {
 
     private Key getSigningKey(TokenType tokenType) {
         byte[] keyBytes;
-        
+
         switch (tokenType) {
             case ACCESS:
                 keyBytes = Decoders.BASE64.decode(secretKey);
@@ -124,7 +124,7 @@ public class JwtServiceImpl implements JwtService {
             default:
                 throw new IllegalArgumentException("Unknown token type: " + tokenType);
         }
-        
+
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
@@ -133,7 +133,7 @@ public class JwtServiceImpl implements JwtService {
         return claimsResolver.apply(claims);
     }
 
-    private boolean isTokenExpired(String token, TokenType tokenType) {
+    public boolean isTokenExpired(String token, TokenType tokenType) {
         return extractExpiration(token, tokenType).before(new Date());
     }
 

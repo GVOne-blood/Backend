@@ -36,17 +36,17 @@ public class ProductJDBCRepository {
         }
     }
 
-//named
+    //named
     public Page<Product> findByPrice(BigDecimal from, BigDecimal to, Pageable pageable) {
         String sql = " SELECT * FROM product WHERE price > :from and price < :to " +
-                        "ORDER BY product_id " +
-                        "LIMIT :limit OFFSET :offset ";
+                "ORDER BY product_id " +
+                "LIMIT :limit OFFSET :offset ";
         String sqlCount = " SELECT COUNT(*) FROM product WHERE price > :from and price < :to ";
 
         SqlParameterSource params = new MapSqlParameterSource()
-                .addValue("from", from)
+                .addValue("from", null)
                 .addValue("to", to)
-               // .addValue("sort", pageable.getSort().toString())
+                // .addValue("sort", pageable.getSort().toString())
                 .addValue("limit", pageable.getPageSize())
                 .addValue("offset", pageable.getOffset());
 
@@ -54,8 +54,8 @@ public class ProductJDBCRepository {
                 .addValue("from", from)
                 .addValue("to", to);
 
-        List<Product> products 
-         = namedParameterJdbcTemplate.query(sql, params, new BeanPropertyRowMapper<>(Product.class));
+        List<Product> products
+                = namedParameterJdbcTemplate.query(sql, params, new BeanPropertyRowMapper<>(Product.class));
 
         Integer total = namedParameterJdbcTemplate.queryForObject(sqlCount, paramsCount, Integer.class);
 

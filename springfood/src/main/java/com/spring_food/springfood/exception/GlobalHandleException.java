@@ -10,7 +10,9 @@ import jakarta.validation.ConstraintViolationException;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -19,12 +21,50 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
+import javax.naming.AuthenticationException;
+import java.nio.file.AccessDeniedException;
 import java.util.Date;
 
 @RestControllerAdvice
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class GlobalHandleException {
 
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<ResponseError> handleAuthenticationException(AuthenticationException e, WebRequest request) {
+        ResponseError error = ResponseError.builder()
+                .status(HttpStatus.UNAUTHORIZED.value())
+                .error(HttpStatus.UNAUTHORIZED.getReasonPhrase())
+                .timestamp(new Date())
+                .message(e.getMessage())
+                .path(request.getDescription(false).replace("uri=", ""))
+                .build();
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ResponseError> handleAccessDeniedException(AccessDeniedException e, WebRequest request) {
+        ResponseError error = ResponseError.builder()
+                .status(HttpStatus.FORBIDDEN.value())
+                .error(HttpStatus.FORBIDDEN.getReasonPhrase())
+                .timestamp(new Date())
+                .message(e.getMessage())
+                .path(request.getDescription(false).replace("uri=", ""))
+                .build();
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
+    }
+
+    @ExceptionHandler(InvalidDataAccessApiUsageException.class)
+    public ResponseEntity<ResponseError> handleException(InvalidDataAccessApiUsageException e, WebRequest request) {
+        ResponseError error = ResponseError.builder()
+                .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
+                .timestamp(new Date())
+                .message("Error inside application : " + e.getMessage())
+                .path(request.getDescription(false).replace("uri=", ""))
+                .build();
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+    }
+    
     @ExceptionHandler({InvalidDataException.class, DataIntegrityViolationException.class})
     @ResponseStatus(HttpStatus.CONFLICT)
     public ResponseError handleSqlException(Exception e, WebRequest request) {
@@ -35,10 +75,11 @@ public class GlobalHandleException {
                 .path(request.getDescription(false).replace("uri=", ""))
                 .build();
     }
+
     @ExceptionHandler(value = {ExpiredJwtException.class, MalformedJwtException.class, SignatureException.class})
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public ResponseError handleJwtException(Exception e, WebRequest request) {
-        return 
+        return
                 ResponseError.builder()
                         .status(HttpStatus.UNAUTHORIZED.value())
                         .message(e.getMessage())
@@ -48,9 +89,9 @@ public class GlobalHandleException {
     }
 
     // handle exception when some field in param is not valid
-    @ExceptionHandler({ConstraintViolationException.class, MethodArgumentNotValidException.class,  MethodArgumentTypeMismatchException.class, IllegalArgumentException.class})
-    @ResponseStatus (HttpStatus.BAD_REQUEST)
-    public ResponseError handleParamException(Exception e, WebRequest request){
+    @ExceptionHandler({ConstraintViolationException.class, MethodArgumentNotValidException.class, MethodArgumentTypeMismatchException.class, IllegalArgumentException.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseError handleParamException(Exception e, WebRequest request) {
         ResponseError errorResponse = new ResponseError();
         errorResponse.setStatus(HttpStatus.BAD_GATEWAY.value());
 
@@ -58,8 +99,8 @@ public class GlobalHandleException {
         //message.substring(message.lastIndexOf('.') + 1);
         errorResponse.setMessage(message); // lấy ra lỗi ở dạng text
         errorResponse.setError(HttpStatus.BAD_REQUEST.getReasonPhrase());
-        errorResponse.setTimestamp( new Date());
-        errorResponse.setPath(request.getDescription(false ).replace("url=", "")); // lấy ra đường dẫn request
+        errorResponse.setTimestamp(new Date());
+        errorResponse.setPath(request.getDescription(false).replace("url=", "")); // lấy ra đường dẫn request
         return errorResponse;
     }
 

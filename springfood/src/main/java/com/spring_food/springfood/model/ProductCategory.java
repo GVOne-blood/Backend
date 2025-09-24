@@ -4,7 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-@Setter @Getter
+@Setter
+@Getter
 @Entity
 @Table(name = "product_category")
 public class ProductCategory {
@@ -16,7 +17,9 @@ public class ProductCategory {
 
     @Id
     @ManyToOne
-    @JoinColumn(name = "category_name")
+    @JoinColumn(name = "slug")
     private Categories categories;
 
+    @Column(name = "category_name")
+    private String categoryName;
 }

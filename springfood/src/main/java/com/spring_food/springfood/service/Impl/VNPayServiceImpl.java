@@ -1,0 +1,254 @@
+package com.spring_food.springfood.service.Impl;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.spring_food.springfood.config.VNPayConfig;
+import com.spring_food.springfood.dto.request.VNPayPaymentRequest;
+import com.spring_food.springfood.repository.OrderRepository;
+import com.spring_food.springfood.service.OrderService;
+import com.spring_food.springfood.service.PaymentService;
+import com.spring_food.springfood.service.VNPayService;
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+
+@Service
+@Slf4j
+@RequiredArgsConstructor
+public class VNPayServiceImpl implements VNPayService {
+
+    PaymentService paymentService;
+    OrderService orderService;
+    OrderRepository orderRepository;
+
+
+    /**
+     * SỬ DỤNG LẠI PHƯƠNG PHÁP CỦA VNPAY CONFIG - ĐƠN GIẢN VÀ ĐỀU KHÔNG URL ENCODE
+     */
+    private String generateSecureHash(Map<String, String> params, String secretKey) throws UnsupportedEncodingException {
+        // Theo sample của VNPay: sắp xếp tham số, nối field=value với GIÁ TRỊ ĐƯỢC URL-ENCODE UTF-8
+        List<String> fieldNames = new ArrayList<>(params.keySet());
+        Collections.sort(fieldNames);
+
+        log.info("=== DEBUG VNPay Signature Generation ===");
+        log.info("Parameters to sign (sorted): {}", fieldNames);
+
+        StringBuilder sb = new StringBuilder();
+        boolean isFirst = true;
+        for (String fieldName : fieldNames) {
+            String fieldValue = params.get(fieldName);
+            if ((fieldValue != null) && (!fieldValue.isEmpty())) {
+                // Encode GIÁ TRỊ theo UTF-8 để khớp với cách VNPay tính toán
+                String encodedValue = URLEncoder.encode(fieldValue, StandardCharsets.UTF_8);
+                log.info("Adding to signature: {}={} (encoded)", fieldName, encodedValue);
+
+                if (!isFirst) {
+                    sb.append("&");
+                }
+                sb.append(fieldName);
+                sb.append("=");
+                sb.append(encodedValue);
+                isFirst = false;
+            } else {
+                log.warn("Skipping empty parameter: {}", fieldName);
+            }
+        }
+
+        String hashData = sb.toString();
+        log.info("Final signature string (encoded values): [{}]", hashData);
+        log.info("Secret key (last 4 chars): ***{}", secretKey != null ? secretKey.substring(Math.max(0, secretKey.length() - 4)) : "NULL");
+
+        String signature = VNPayConfig.hmacSHA512(secretKey, hashData);
+        log.info("Generated signature: {}", signature);
+        log.info("=== END DEBUG ===");
+
+        return signature;
+    }
+
+    private String generateQueryDrSecureHash(Map<String, String> params, String secretKey) throws UnsupportedEncodingException {
+        String data = params.get("vnp_RequestId") + "|" + params.get("vnp_Version") + "|" +
+                params.get("vnp_Command") + "|" + params.get("vnp_TmnCode") + "|" +
+                params.get("vnp_TxnRef") + "|" + params.get("vnp_TransactionDate") + "|" +
+                params.get("vnp_CreateDate") + "|" + params.get("vnp_IpAddr") + "|" +
+                params.get("vnp_OrderInfo");
+
+        return VNPayConfig.hmacSHA512(secretKey, data);
+    }
+
+
+    @Override
+    public String createPaymentUrl(HttpServletRequest request, VNPayPaymentRequest paymentRequest) throws UnsupportedEncodingException {
+
+        Long amount = paymentRequest.getAmount();
+        String orderInfo = paymentRequest.getOrderInfo();
+        String transactionId = paymentRequest.getGeneratedTransactionId();
+        long vnp_Amount = amount * 100;
+
+        String vnp_TxnRef = transactionId;
+        String vnp_IpAddr = VNPayConfig.getIpAddress(request);
+        log.info("VNPay IpAddr: {}", vnp_IpAddr);
+
+        Map<String, String> vnp_Params = new HashMap<>();
+        vnp_Params.put("vnp_Version", "2.1.0");
+        vnp_Params.put("vnp_Command", "pay");
+        vnp_Params.put("vnp_TmnCode", VNPayConfig.vnp_TmnCode);
+        vnp_Params.put("vnp_Amount", String.valueOf(vnp_Amount));
+        vnp_Params.put("vnp_CurrCode", "VND");
+        vnp_Params.put("vnp_TxnRef", vnp_TxnRef);
+        // Làm sạch orderInfo - giữ khoảng trắng để người dùng dễ đọc, tránh ký tự đặc biệt gây lỗi
+        String cleanOrderInfo = orderInfo.replaceAll("[^a-zA-Z0-9\\s\\.]", " ").replaceAll("\\s+", " ").trim();
+        if (cleanOrderInfo.length() > 255) {
+            cleanOrderInfo = cleanOrderInfo.substring(0, 255);
+        }
+        vnp_Params.put("vnp_OrderInfo", cleanOrderInfo);
+        vnp_Params.put("vnp_OrderType", "other");
+        vnp_Params.put("vnp_Locale", "vn");
+
+        String returnUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + VNPayConfig.vnp_Returnurl;
+        vnp_Params.put("vnp_ReturnUrl", returnUrl);
+        log.info("VNPay ReturnUrl: {}", returnUrl);
+        vnp_Params.put("vnp_IpAddr", vnp_IpAddr);
+
+        // Sử dụng thời gian hiện tại của hệ thống
+        Calendar cld = Calendar.getInstance();
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
+
+        String vnp_CreateDate = formatter.format(cld.getTime());
+        vnp_Params.put("vnp_CreateDate", vnp_CreateDate);
+        log.info("VNPay CreateDate: {}", vnp_CreateDate);
+
+        // Tăng thời gian hết hạn lên 30 phút để đảm bảo
+        cld.add(Calendar.MINUTE, 30);
+        String vnp_ExpireDate = formatter.format(cld.getTime());
+        vnp_Params.put("vnp_ExpireDate", vnp_ExpireDate);
+        log.info("VNPay ExpireDate: {}", vnp_ExpireDate);
+
+        // Khai báo loại hash gửi kèm (KHÔNG tính vào chữ ký)
+        vnp_Params.put("vnp_SecureHashType", "HmacSHA512");
+
+        // Tạo bản copy để tính chữ ký, loại bỏ trường không cần băm
+        Map<String, String> paramsForHash = new HashMap<>(vnp_Params);
+        paramsForHash.remove("vnp_SecureHashType");
+        paramsForHash.remove("vnp_SecureHash");
+
+        // --- TẠO CHỮ KÝ ---
+        String vnp_SecureHash = generateSecureHash(paramsForHash, VNPayConfig.vnp_HashSecret);
+        vnp_Params.put("vnp_SecureHash", vnp_SecureHash);
+
+        // Build URL
+        StringBuilder query = new StringBuilder();
+        for (Map.Entry<String, String> entry : vnp_Params.entrySet()) {
+            if (!query.isEmpty()) {
+                query.append('&');
+            }
+            query.append(URLEncoder.encode(entry.getKey(), StandardCharsets.UTF_8));
+            query.append('=');
+            query.append(URLEncoder.encode(entry.getValue(), StandardCharsets.UTF_8));
+        }
+
+        return VNPayConfig.vnp_PayUrl + "?" + query.toString();
+    }
+
+    @Override
+    public Map<String, String> queryTransactionStatus(String vnp_TxnRef, LocalDateTime vnp_TransDate, String requestIP) throws IOException {
+        String vnp_RequestId = VNPayConfig.getRandomNumber(8);
+        String vnp_Version = "2.1.0";
+        String vnp_Command = "querydr";
+        String vnp_TmnCode = VNPayConfig.vnp_TmnCode;
+
+        Map<String, String> vnp_params = new LinkedHashMap<>();
+        vnp_params.put("vnp_RequestId", vnp_RequestId);
+        vnp_params.put("vnp_Version", vnp_Version);
+        vnp_params.put("vnp_Command", "querydr");
+        vnp_params.put("vnp_TmnCode", vnp_TmnCode);
+        vnp_params.put("vnp_TxnRef", vnp_TxnRef);
+        vnp_params.put("vnp_TransactionDate", vnp_TransDate.format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss")));
+        vnp_params.put("vnp_CreateDate", LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss")));
+        vnp_params.put("vnp_IpAddr", requestIP);
+        vnp_params.put("vnp_OrderInfo", "Kiem tra trang thai cua giao dich " + vnp_TxnRef);
+
+        // Create signature
+        String vnp_SecureHash = generateSecureHash(vnp_params, VNPayConfig.vnp_HashSecret);
+        vnp_params.put("vnp_SecureHash", vnp_SecureHash);
+
+        // Send request
+        URL url = new URL(VNPayConfig.vnp_apiUrl);
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("POST");
+        conn.setRequestProperty("Content-Type", "application/json");
+        conn.setDoOutput(true);
+
+        try (DataOutputStream wr = new DataOutputStream(conn.getOutputStream())) {
+            wr.writeBytes(new ObjectMapper().writeValueAsString(vnp_params));
+            wr.flush();
+        }
+
+        StringBuilder response = new StringBuilder();
+
+        try (BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
+            String inputLine;
+            while ((inputLine = rd.readLine()) != null) {
+                response.append(inputLine);
+            }
+        }
+
+        // Convert JSON response -> Map
+        Map<String, String> res = new ObjectMapper().readValue(response.toString(), new TypeReference<>() {
+        });
+
+        return res;
+    }
+
+
+    @Override
+    public int processVNPayReturn(HttpServletRequest request) {
+        Map<String, String> paramsFromVnPay = new HashMap<>();
+        for (Enumeration<String> params = request.getParameterNames(); params.hasMoreElements(); ) {
+            String fieldName = params.nextElement();
+            String fieldValue = request.getParameter(fieldName);
+            if ((fieldValue != null) && (!fieldValue.isEmpty())) {
+                paramsFromVnPay.put(fieldName, fieldValue);
+            }
+        }
+
+        String vnp_SecureHash = paramsFromVnPay.remove("vnp_SecureHash"); // Lấy ra và xóa khỏi map
+        paramsFromVnPay.remove("vnp_SecureHashType"); // Xóa khỏi map
+
+        // --- Sử DỤNG LẠI HÀM CHUNG ĐỂ TẠO CHỮ KÝ TỪ Dữ LIỆU TRẢ VỀ ---
+        String calculatedHash;
+        try {
+            calculatedHash = generateSecureHash(paramsFromVnPay, VNPayConfig.vnp_HashSecret);
+        } catch (UnsupportedEncodingException e) {
+            log.error("Encoding error during signature verification", e);
+            return -2;
+        }
+
+        log.debug("VNPay return - received hash: {} vs calculated: {}", vnp_SecureHash, calculatedHash);
+
+        // So sánh chữ ký để xác thực
+        if (calculatedHash.equals(vnp_SecureHash)) {
+            if ("00".equals(request.getParameter("vnp_ResponseCode"))) {
+                paymentService.processPaymentReturnSuccess();
+                // TODO: Logic nghiệp vụ khi thanh toán thành công
+                return 1; // Thành công
+            } else {
+                paymentService.processPaymentReturnFail();
+                // TODO: Logic nghiệp vụ khi thanh toán thất bại
+                return 0; // Thất bại
+            }
+        } else {
+            return -1; // Chữ ký không hợp lệ
+        }
+    }
+}

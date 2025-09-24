@@ -22,7 +22,7 @@ public interface ProductRepository extends
 
     void deleteProductById(String id);
 
-   // <T> Page<T> findAll(Pageable pageable);
+    // <T> Page<T> findAll(Pageable pageable);
 
     @Query("SELECT new com.spring_food.springfood.dto.response.ProductDetail(p.id, p.name, p.description, p.price, p.images, p.quantity,  p.msg, p.exp) FROM Product p")
     Page<ProductDetail> findListProduct(Pageable pageable);
@@ -36,6 +36,9 @@ public interface ProductRepository extends
             @Param("shopId") String shopId,
             @Param("sku") String sku);
 
+
+    @Query("SELECT p.id, p.name, p.quantity, p.price, p.images FROM Product p WHERE p.shop.id = :shopId")
+    Optional<Product> findProductByShopId(String shopId);
 
 
     @Query("SELECT new com.spring_food.springfood.dto.response.ProductDetail(p.id, p.name, p.description, p.price, p.images, p.quantity, p.msg, p.exp) FROM Product p WHERE p.id = :productId ")

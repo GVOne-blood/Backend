@@ -11,9 +11,9 @@ import java.math.BigDecimal;
 @Setter
 @Table(name = "order_item")
 @AttributeOverride(name = "id", column = @Column(name = "bill_id"))
-public class OrderItem extends AbstractEntity{
+public class OrderItem extends AbstractEntity {
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "order_id", nullable = false)
     private Order order;
 
@@ -23,6 +23,9 @@ public class OrderItem extends AbstractEntity{
 
     @Column(nullable = false)
     private Integer quantity;
+
+    @Column(name = "discount_amount")
+    private BigDecimal discountAmount;
 
     @Column(name = "price_at_booking", nullable = false, precision = 15, scale = 2)
     private BigDecimal priceAtBooking;

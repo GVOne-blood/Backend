@@ -18,11 +18,11 @@ import java.time.LocalDateTime;
 public abstract class AbstractEntity implements Serializable {
     @Id
     @GeneratedValue(generator = "objectid-generator")
-    @GenericGenerator(name = "objectid-generator", 
-                     strategy = "com.spring_food.springfood.common.generator.ObjectIdGenerator")
+    @GenericGenerator(name = "objectid-generator",
+            strategy = "com.spring_food.springfood.common.util.ObjectIdGeneratorUtil")
     @Column(length = 24)
     private String id;
-    
+
     @CreatedDate
     @Column(name = "created_at")
     private LocalDateTime createdAt;

@@ -8,29 +8,26 @@ import lombok.Setter;
 
 import java.util.Set;
 
-@Getter @Setter
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
 @Table(name = "categories")
-@AttributeOverride(name = "id", column = @Column(name = "category_name"))
+@AttributeOverride(name = "id", column = @Column(name = "slug"))
 public class Categories extends AbstractEntity {
-
-    private String slug;
-
-    @Column(name = "description", columnDefinition = "TEXT")
-    private String description;
-
-    @Column(name = "is_active")
-    private boolean isActive;
-
-    @ManyToOne
-    @JoinColumn(name = "parent_id")
-    private Categories parentCategories;
 
     @OneToMany(mappedBy = "parentCategories", cascade = CascadeType.ALL, orphanRemoval = true)
     Set<Categories> children;
-
+    @Column(name = "category_name")
+    private String name;
+    @Column(name = "description", columnDefinition = "TEXT")
+    private String description;
+    @Column(name = "is_active")
+    private boolean isActive;
+    @ManyToOne
+    @JoinColumn(name = "parent_id")
+    private Categories parentCategories;
     @OneToMany(mappedBy = "categories", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<ProductCategory> productCategories;
 

@@ -24,6 +24,7 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -55,20 +56,26 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public boolean isProductExists(String productId) {
+        return productRepository.existsById(productId);
+    }
+
+    @Override
     public ProductDetail getProductDetailById(String productId) {
 
         return productMapper.toProductDetail(productJDBCRepository.findById(productId).get()); // JDBC template
-       // return productRepository.findProductDetailById(productId).orElseThrow(() -> new InvalidDataException("Product not found"));
+        // return productRepository.findProductDetailById(productId).orElseThrow(() -> new InvalidDataException("Product not found"));
     }
 
-    private boolean isProductExist(String productId) {
-        return productRepository.findById(productId).isPresent();
-    }
-
-    private boolean isProductExist(String shopId, String sku) {
+    public boolean isProductExist(String shopId, String sku) {
         return productRepository.findProductBySku(shopId, sku).isEmpty();
     }
 
+    public boolean isProductExist(String shopId) {
+        return productRepository.findProductByShopId(shopId).isEmpty();
+    }
+
+    @PreAuthorize("hasRole('SHOP_OWNER') and hasAuthority('product:create')")
     @Override
     @Transactional
     public Product addProduct(ProductRequest productRequest) {
@@ -81,19 +88,19 @@ public class ProductServiceImpl implements ProductService {
         if (userShop.isEmpty()) throw new InvalidDataException("User not found");
 
 
-            if (!userShop.get().contains(currentUser)) {
-                throw new InvalidDataException("User does not have a shop or shop ID mismatch");
-            }
-      //  productRequest.setShopId();
+        if (!userShop.get().contains(currentUser)) {
+            throw new InvalidDataException("User does not have a shop or shop ID mismatch");
+        }
+        //  productRequest.setShopId();
 
-   // if (!categoryRepository.existsById(productRequest.getCategoryName())) throw new InvalidDataException("Categories not found");
+        // if (!categoryRepository.existsById(productRequest.getCategoryName())) throw new InvalidDataException("Categories not found");
 
         Shop shop = shopRepository.findById(productRequest.getShopId())
                 .orElseThrow(() -> new InvalidDataException("Shop not found"));
         if (shop.getShopStatus() == ShopStatus.ACTIVE) throw new InvalidDataException("Shop is not active");
 
-    Product product =
-        productMapper.toProduct(productRequest);
+        Product product =
+                productMapper.toProduct(productRequest);
         if (isProductExist(productRequest.getShopId(), productRequest.getSku())) {
             throw new InvalidDataException("Product already exists");
         }
@@ -119,7 +126,7 @@ public class ProductServiceImpl implements ProductService {
             pc.setCategories(cat);
             pc.setProduct(product);
             return pc;
-        } ).collect(Collectors.toSet()));
+        }).collect(Collectors.toSet()));
 
         product.setProductStatus(productRequest.getStatus());
 
@@ -128,6 +135,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @PreAuthorize("hasRole('SHOP_OWNER') and hasAuthority('product:upadte')")
     @Transactional
     public Product updateProduct(String productId, ProductRequest productRequest) {
         Product productToUpdate = productRepository.findById(productId)
@@ -152,7 +160,7 @@ public class ProductServiceImpl implements ProductService {
             List<String> categoriesNames;
             if (productRequest.getCategoryNames().contains(",")) {
                 categoriesNames = Arrays.stream(productRequest.getCategoryNames().split(","))
-                        .map(String::trim) // Loại bỏ khoảng trắng thừa
+                        .map(String::trim)
                         .collect(Collectors.toList());
             } else {
                 categoriesNames = List.of(productRequest.getCategoryNames().trim());
@@ -178,6 +186,8 @@ public class ProductServiceImpl implements ProductService {
 
         return productRepository.save(productToUpdate);
     }
+
+    @PreAuthorize("hasRole('SHOP_OWNER') and hasAuthority('product:delete')")
     @Override
     @Transactional
     public void deleteProduct(String productId) {
@@ -194,9 +204,9 @@ public class ProductServiceImpl implements ProductService {
         BigDecimal priceFrom;
         BigDecimal priceTo;
         try {
-             priceFrom = BigDecimal.valueOf(Double.parseDouble(from));
-             priceTo = BigDecimal.valueOf(Double.parseDouble(to));
-        }catch (NumberFormatException e){
+            priceFrom = BigDecimal.valueOf(Double.parseDouble(from));
+            priceTo = BigDecimal.valueOf(Double.parseDouble(to));
+        } catch (NumberFormatException e) {
             throw new InvalidDataException("Data sai");
         }
         if (priceFrom.compareTo(priceTo) > 0) throw new InvalidDataException("From must be not greater than to");
@@ -219,27 +229,29 @@ public class ProductServiceImpl implements ProductService {
 
     /**
      * Dynamic search method for products using flexible search criteria
-     * 
+     *
      * @param pageable pagination information
-     * @param params varargs containing search criteria in format "field+operation+value"
-     *               Examples:
-     *               - "quantity>10" - find products with quantity greater than 10
-     *               - "price<=100" - find products with price less than or equal to 100
-     *               - "name:laptop" - find products with name containing "laptop"
-     *               - "status=ACTIVE" - find products with status equals to ACTIVE
-     *               - "price>=50", "quantity<100" - multiple criteria (AND condition)
-     *               
-     *               Supported operations:
-     *               - "=" : equals
-     *               - "!=" : not equals  
-     *               - ">" : greater than
-     *               - ">=" : greater than or equal
-     *               - "<" : less than
-     *               - "<=" : less than or equal
-     *               - ":" : contains (for string fields)
+     * @param params   varargs containing search criteria in format "field+operation+value"
+     *                 Examples:
+     *                 - "quantity>10" - find products with quantity greater than 10
+     *                 - "price<=100" - find products with price less than or equal to 100
+     *                 - "name:laptop" - find products with name containing "laptop"
+     *                 - "status=ACTIVE" - find products with status equals to ACTIVE
+     *                 - "price>=50", "quantity<100" - multiple criteria (AND condition)
+     *                 <p>
+     *                 Supported operations:
+     *                 - "=" : equals
+     *                 - "!=" : not equals
+     *                 - ">" : greater than
+     *                 - ">=" : greater than or equal
+     *                 - "<" : less than
+     *                 - "<=" : less than or equal
+     *                 - ":" : contains (for string fields)
      * @return Page of ProductDetail matching the search criteria
      */
-    public Page<ProductDetail> search(Pageable pageable, Map<String, String> params){
+
+    @PreAuthorize("hasRole('ADMIN')")
+    public Page<ProductDetail> search(Pageable pageable, Map<String, String> params) {
 
         if (params.isEmpty()) {
             return productRepository.findAll(pageable).map(productMapper::toProductDetail);
@@ -255,7 +267,7 @@ public class ProductServiceImpl implements ProductService {
 
         List<SearchCriteria> searchParams = new ArrayList<>();
         Specification<Product> spec = null;
-        for (Map.Entry<String, String> entry : params.entrySet()){
+        for (Map.Entry<String, String> entry : params.entrySet()) {
 
             String key = entry.getKey();
             String value = entry.getValue();
@@ -273,7 +285,7 @@ public class ProductServiceImpl implements ProductService {
         }
 
         // Build specifications based on search parameters
-        
+
         for (SearchCriteria searchParam : searchParams) {
             Specification<Product> currentSpec = SearchSpecification.buildSpecification(searchParam);
             if (spec == null) {
@@ -282,7 +294,7 @@ public class ProductServiceImpl implements ProductService {
                 spec = spec.and(currentSpec);
             }
         }
-        
+
         // If no valid search params, return all products
         if (spec == null) {
             return productRepository.findAll(pageable).map(productMapper::toProductDetail);

@@ -16,6 +16,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,41 +38,43 @@ public class ProductController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ResponseData<ProductDetail>> getProductById(@PathVariable("id") String id){
+    public ResponseEntity<ResponseData<ProductDetail>> getProductById(@PathVariable("id") String id) {
         return new ResponseEntity<>(
                 new ResponseData<>(200, "Get product by id successfully", productService.getProductDetailById(id)), HttpStatus.OK);
     }
 
+    @PostAuthorize(value = "ADMIN")
     @PostMapping("/")
-    public ResponseEntity<ResponseData<Product>> createProduct(@RequestBody @Valid ProductRequest productRequest){
-        try{
+    public ResponseEntity<ResponseData<Product>> createProduct(@RequestBody @Valid ProductRequest productRequest) {
+        try {
             Product newProduct = productService.addProduct(productRequest);
             return new ResponseEntity<>(
                     new ResponseData<>(201, "Create product successfully", newProduct), HttpStatus.CREATED);
-        } catch (InvalidDataException e){
+        } catch (InvalidDataException e) {
             return new ResponseEntity<>(
                     new ResponseData<>(400, "Create product failed: " + e.getMessage(), null), HttpStatus.BAD_REQUEST);
         }
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ResponseData<Product>> updateProduct(@PathVariable("id") String id, @RequestBody @Valid ProductRequest productRequest){
-        try{
+    public ResponseEntity<ResponseData<Product>> updateProduct(@PathVariable("id") String id, @RequestBody @Valid ProductRequest productRequest) {
+        try {
             Product updatedProduct = productService.updateProduct(id, productRequest);
             return new ResponseEntity<>(
                     new ResponseData<>(200, "Update product successfully", updatedProduct), HttpStatus.OK);
-        } catch (Exception e){
+        } catch (Exception e) {
             return new ResponseEntity<>(
                     new ResponseData<>(400, "Update product failed: " + e.getMessage(), null), HttpStatus.BAD_REQUEST);
         }
     }
+
     @DeleteMapping("/{id}")
-    public ResponseEntity<ResponseData<Void>> deleteProduct(@PathVariable("id") String id){
-        try{
+    public ResponseEntity<ResponseData<Void>> deleteProduct(@PathVariable("id") String id) {
+        try {
             productService.deleteProduct(id);
             return new ResponseEntity<>(
                     new ResponseData<>(200, "Delete product successfully", null), HttpStatus.OK);
-        } catch (Exception e){
+        } catch (Exception e) {
             return new ResponseEntity<>(
                     new ResponseData<>(400, "Delete product failed: " + e.getMessage(), null), HttpStatus.BAD_REQUEST);
         }
@@ -79,10 +82,10 @@ public class ProductController {
 
     @GetMapping("/search/price")
     public ResponseEntity<ResponseData<Page<ProductDetail>>> searchByPrice(@RequestParam String from,
-                                                            @RequestParam String to,
-                                                            @PageableDefault(page = 0, size = 5, sort = "product_id", direction = Sort.Direction.ASC) Pageable pageable){
+                                                                           @RequestParam String to,
+                                                                           @PageableDefault(page = 0, size = 5, sort = "product_id", direction = Sort.Direction.ASC) Pageable pageable) {
 
-    return ResponseEntity.ok(new ResponseData<>(200, "Search successfully", productService.findByPrice(from, to, pageable)));
+        return ResponseEntity.ok(new ResponseData<>(200, "Search successfully", productService.findByPrice(from, to, pageable)));
 
     }
 
@@ -93,14 +96,14 @@ public class ProductController {
 
         try {
             Page<ProductDetail> results;
-                results = productService.search(pageable, criteria);
+            results = productService.search(pageable, criteria);
             return ResponseEntity.ok(
-                new ResponseData<>(200, "Search products successfully", results)
+                    new ResponseData<>(200, "Search products successfully", results)
             );
         } catch (Exception e) {
             return new ResponseEntity<>(
-                new ResponseData<>(400, "Search failed: " + e.getMessage(), null),
-                HttpStatus.BAD_REQUEST
+                    new ResponseData<>(400, "Search failed: " + e.getMessage(), null),
+                    HttpStatus.BAD_REQUEST
             );
         }
     }

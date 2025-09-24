@@ -20,7 +20,7 @@ import java.util.Set;
 @Table(name = "product")
 @AttributeOverride(name = "id", column = @Column(name = "product_id"))
 public class Product extends AbstractEntity {
-    
+
     @ManyToOne
     @JoinColumn(name = "shop_id", nullable = false)
     private Shop shop;
@@ -73,4 +73,9 @@ public class Product extends AbstractEntity {
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
     private Set<ProductCategory> productCategories = new HashSet<>();
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+    private List<CartItem> cartItems = new ArrayList<>();
+
+
 }

@@ -35,7 +35,7 @@ public class Shop extends AbstractEntity {
     private ShopStatus shopStatus;
 
     @OneToMany(mappedBy = "shop", cascade = CascadeType.ALL)
-    private List<ShopMember> shopMembers  = new ArrayList<>();
+    private List<ShopMember> shopMembers = new ArrayList<>();
 
     @OneToMany(mappedBy = "shop", cascade = CascadeType.ALL)
     private List<Product> products = new ArrayList<>();
@@ -43,6 +43,9 @@ public class Shop extends AbstractEntity {
     @OneToOne(mappedBy = "shop", cascade = CascadeType.ALL)
     private ShopWallet shopWallet;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "shop", cascade = CascadeType.ALL)
     private List<BankAccount> bankAccounts = new ArrayList<>();
+
+    @OneToMany(mappedBy = "shop", cascade = CascadeType.ALL)
+    private List<Order> orders = new ArrayList<>();
 }

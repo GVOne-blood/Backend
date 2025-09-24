@@ -6,6 +6,7 @@ import com.spring_food.springfood.service.CategoryService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +26,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    @PreAuthorize("hasRole('ADMIN') and hasAuthority('category:create')")
     @Transactional
     public void addCategory(String categoryName, String description) {
         Categories categories = new Categories();
@@ -35,6 +37,7 @@ public class CategoryServiceImpl implements CategoryService {
         categoryRepository.save(categories);
     }
 
+    @PreAuthorize("hasRole('ADMIN') and hasAuthority('category:create')")
     @Override
     public void updateCategory(String categoryName, String description, boolean isActive) {
         Optional<Categories> categories = categoryRepository.findById(categoryName);
@@ -45,14 +48,15 @@ public class CategoryServiceImpl implements CategoryService {
         if (!categoryName.isBlank()) categories.get().setCategoryName(categoryName);
         if (!description.isBlank()) categories.get().setDescription(description);
         categories.get().setActive(isActive);
-        categoryRepository.save(categories.get());
+//        categoryRepository.save(categories.get());
     }
 
+    @PreAuthorize("hasRole('ADMIN') and hasAuthority('category:create')")
     @Override
     public void deleteCategory(String categoryName) {
-            if (!categoryRepository.existsById(categoryName)) {
-                throw new IllegalArgumentException("Category not found");
-            }
-            categoryRepository.deleteById(categoryName);
+        if (!categoryRepository.existsById(categoryName)) {
+            throw new IllegalArgumentException("Category not found");
+        }
+        categoryRepository.deleteById(categoryName);
     }
 }

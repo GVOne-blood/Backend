@@ -1,9 +1,12 @@
 package com.spring_food.springfood.model;
 
+import com.spring_food.springfood.common.enums.Gender;
 import com.spring_food.springfood.common.enums.UserStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -19,14 +22,14 @@ import java.util.List;
 @Entity
 @Table(name = "user") //user trung voi key trong PostgreSQL
 @AttributeOverride(name = "id", column = @Column(name = "user_id"))
-@org.hibernate.annotations.Where(clause = "is_deleted = false AND status != 'DELETED'")
-@org.hibernate.annotations.SQLDelete(sql = "UPDATE \"user\" SET is_deleted = true, status = 'DELETED', updated_at = NOW() WHERE user_id = ?")
+@Where(clause = "is_deleted = false AND status != 'DELETED'")
+@SQLDelete(sql = "UPDATE \"user\" SET is_deleted = true, status = 'DELETED', updated_at = NOW() WHERE user_id = ?")
 public class User extends AbstractEntity implements UserDetails {
 
-    @Column(name = "firstName")
+    @Column(name = "first_name")
     private String firstName;
 
-    @Column(name = "lastName")
+    @Column(name = "last_name")
     private String lastName;
 
     @Column(unique = true, nullable = false)
@@ -52,6 +55,10 @@ public class User extends AbstractEntity implements UserDetails {
 
     @Column(name = "avatar")
     private String avatar;
+
+    @Column(name = "gender")
+    @Enumerated(EnumType.STRING)
+    private Gender gender;
 
     @Column(name = "is_deleted", nullable = false)
     private Boolean isDeleted = false;
@@ -83,16 +90,18 @@ public class User extends AbstractEntity implements UserDetails {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Feedback> feedbacks = new ArrayList<>();
 
-
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Notification> notifications = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Token> tokens = new ArrayList<>();
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<BankAccount> bankAccounts = new ArrayList<>();
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private Cart cart;
+
 
     // Gán giá trị mặc định trước khi lưu vào database
     @PrePersist
@@ -122,7 +131,7 @@ public class User extends AbstractEntity implements UserDetails {
                 authorities.add(new SimpleGrantedAuthority(rolePermission.getPermission().getId()));
             });
         });
-        
+
         return authorities;
     }
 

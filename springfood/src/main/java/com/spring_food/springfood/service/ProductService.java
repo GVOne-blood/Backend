@@ -12,6 +12,8 @@ public interface ProductService {
 
     Page<ProductDetail> getAllProductDetails(Pageable pageable);
 
+    boolean isProductExists(String productId);
+
     ProductDetail getProductDetailById(String productId);
 
     Product addProduct(ProductRequest productRequest);

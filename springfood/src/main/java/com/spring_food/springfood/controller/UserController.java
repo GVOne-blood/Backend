@@ -10,13 +10,17 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/users")
@@ -28,47 +32,51 @@ public class UserController {
     UserService userService;
     AuthService authService;
 
-    @GetMapping("/")
-    public ResponseEntity<ResponseData<List<UserDetail>>> listUsers(){
 
-        List<UserDetail> users = userService.getListUsers();
+    @GetMapping("/")
+    public ResponseEntity<ResponseData<Page<UserDetail>>> listUsers(
+            @PageableDefault Pageable pageable
+    ) {
+
+        Page<UserDetail> users = userService.getListUsers(pageable);
 
         return new ResponseEntity<>
                 (new ResponseData<>(HttpStatus.OK.value(),
                         "Get list users successfully",
                         users), HttpStatus.OK);
     }
-    @GetMapping("/{id}")
-    public ResponseEntity<ResponseData<UserDetail>> getUserById(@PathVariable String id){
 
-        UserDetail user = userService.getUserDetail(id);
+    @GetMapping("/profile")
+    public ResponseEntity<ResponseData<UserDetail>> getUserById(@AuthenticationPrincipal User user) {
+
+        UserDetail resUser = userService.getUserDetail(user.getId());
 
         return new ResponseEntity<>
                 (new ResponseData<>(HttpStatus.OK.value(),
                         "Get user detail successfully",
-                        user), HttpStatus.OK);
+                        resUser), HttpStatus.OK);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<ResponseData<UserDetail>> updateUser(@PathVariable(value = "id") String id, @RequestBody UserRequest userRequest){
-        UserDetail user = userService.updateUser(id, userRequest);
-        return new ResponseEntity<>(new ResponseData<>(200, "User updated successfully", user), HttpStatus.OK);
+    @PutMapping("/profile")
+    public ResponseEntity<ResponseData<UserDetail>> updateUser(@AuthenticationPrincipal User user, @RequestBody UserRequest userRequest) {
+        UserDetail resUser = userService.updateUser(user.getId(), userRequest);
+        return new ResponseEntity<>(new ResponseData<>(200, "User updated successfully", resUser), HttpStatus.OK);
 
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/profile/{id}")
     public ResponseEntity<ResponseData<?>> deleteUserById(
-            @PathVariable String id, 
+            @PathVariable String id,
             HttpServletResponse response,
             @AuthenticationPrincipal
-            UserDetails currentUser){
-        try{
+            UserDetails currentUser) {
+        try {
 
             User userToDelete = userService.findById(id);
 
-            boolean isSelfDelete = currentUser != null && 
-                                  currentUser.getUsername() != null && 
-                                  userToDelete.getUsername().equals(currentUser.getUsername());
+            boolean isSelfDelete = currentUser != null &&
+                    currentUser.getUsername() != null &&
+                    userToDelete.getUsername().equals(currentUser.getUsername());
 
             userService.deleteUser(id);
 
@@ -78,8 +86,28 @@ public class UserController {
             }
 
             return new ResponseEntity<>(new ResponseData<>(204, "User deleted successfully", null), HttpStatus.OK);
-        }catch (Exception e){
+        } catch (Exception e) {
             return new ResponseEntity<>(new ResponseData<>(500, "Error deleting user: " + e.getMessage(), null), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @GetMapping("/search")
+    public ResponseEntity<ResponseData<Page<UserDetail>>> searchUsers(
+            @PageableDefault(size = 5, page = 0, sort = "updated_at", direction = Sort.Direction.ASC) Pageable pageable,
+            @RequestParam Map<String, String> criteria
+    ) {
+        try {
+            Page<UserDetail> results;
+            results = userService.search(pageable, criteria);
+            return ResponseEntity.ok(
+                    new ResponseData<>(200, "Search users successfully", results)
+            );
+        } catch (Exception e) {
+            return new ResponseEntity<>(
+                    new ResponseData<>(400, "Search failed: " + e.getMessage(), null),
+                    HttpStatus.BAD_REQUEST
+            );
+        }
+    }
+
 }
