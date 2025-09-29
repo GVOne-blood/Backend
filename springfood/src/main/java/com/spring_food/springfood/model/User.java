@@ -26,6 +26,9 @@ import java.util.List;
 @SQLDelete(sql = "UPDATE \"user\" SET is_deleted = true, status = 'DELETED', updated_at = NOW() WHERE user_id = ?")
 public class User extends AbstractEntity implements UserDetails {
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    List<PaymentTransactions> paymentTransactions = new ArrayList<>();
+
     @Column(name = "first_name")
     private String firstName;
 
@@ -101,7 +104,6 @@ public class User extends AbstractEntity implements UserDetails {
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private Cart cart;
-
 
     // Gán giá trị mặc định trước khi lưu vào database
     @PrePersist

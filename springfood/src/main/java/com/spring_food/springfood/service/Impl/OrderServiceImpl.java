@@ -4,6 +4,7 @@ import com.spring_food.springfood.common.enums.OrderStatus;
 import com.spring_food.springfood.common.enums.PaymentMethod;
 import com.spring_food.springfood.common.enums.ProductStatus;
 import com.spring_food.springfood.common.enums.TransactionStatus;
+import com.spring_food.springfood.common.util.OrderStatusValidationUtil;
 import com.spring_food.springfood.config.VNPayConfig;
 import com.spring_food.springfood.dto.request.*;
 import com.spring_food.springfood.dto.response.OrderDetailResponse;
@@ -105,6 +106,7 @@ public class OrderServiceImpl implements OrderService {
         for (ShopOrderRequest shop : shops) {
             if (!shopService.isShopExists(shop.getShopId())) throw new InvalidDataException("Shop does not exist");
             items = shop.getItems();
+            List<Order> orders = new ArrayList<>();
             Order order = new Order();
             List<ProductDetail> productList = new ArrayList<>();
             BigDecimal subtotalPrice = BigDecimal.ZERO;
@@ -188,12 +190,13 @@ public class OrderServiceImpl implements OrderService {
             //total price
             order.setFinalPrice(finalPrice);
 
-            orderRepository.save(order);
+            // orderRepository.save(order);
+            orders.add(order);
 
 
             for (OrderItem item : orderItems) {
                 item.setOrder(order);
-                orderItemRepository.save(item);
+                //  orderItemRepository.save(item);
             }
 
             orderDetailResponse = orderMapper.toOrderDetail(order);
@@ -210,6 +213,7 @@ public class OrderServiceImpl implements OrderService {
             orderDetailResponseList.add(orderDetailResponse);
 
             for (ProductDetail p : productList) orderPaymentInfo.append(p.getName()).append(" ");
+            orderRepository.saveAll(orders);
         }
         Long amount = 0l;
         BigDecimal totalShippingFee = new BigDecimal(0);
@@ -227,6 +231,9 @@ public class OrderServiceImpl implements OrderService {
         if (orderDetailResponse.getPaymentMethod().equals(PaymentMethod.VNPAY.name())) {
             VNPayPaymentRequest vnPayPaymentRequest = new VNPayPaymentRequest();
             vnPayPaymentRequest.setOrderInfo(orderPaymentInfo.toString());
+            vnPayPaymentRequest.setUserId(userId);
+            // maybe cái này không quan trọng vì nó là trans tổng thể
+            vnPayPaymentRequest.setTxnRef();
             vnPayPaymentRequest.setAmount(amount);
             vnPayPaymentRequest.setGeneratedTransactionId(orderPaymentResponse.getTransactionId());
             orderPaymentResponse.setPaymentUrl(vnPayService.createPaymentUrl(request, vnPayPaymentRequest));
@@ -234,13 +241,103 @@ public class OrderServiceImpl implements OrderService {
         return orderPaymentResponse;
     }
 
+    /**
+     * REQUIRE : Tất cả các order phải thuộc cùng 1 giỏ hàng(cùng 1 transactionId), các order phải được thanh toán cùng lúc (thanh toán sản phẩm trong giỏ hàng)
+     * NOTE : Hàm dùng để update order, nhưng khi update order lên trạng thái mới sẽ buộc phải kèm theo các event liên quan đến nghiệp vụ
+     * nên dữ liệu trả về của hàm sẽ là một order cha (OrderPaymentResponse) đã được cập nhật
+     *
+     * @param request
+     * @param updateRequest
+     * @param userId
+     * @return
+     * @throws UnsupportedEncodingException
+     */
+    @Transactional
     @Override
-    public OrderPaymentResponse updateOrders(HttpServletRequest request, OrderUpdateRequest updateRequest, String userId) {
+    public OrderPaymentResponse updatePendingOrders(HttpServletRequest request, OrdersUpdateRequest updateRequest, String userId) throws UnsupportedEncodingException {
 
-        Optional<Order> order = orderRepository.findByUserIdAndOrderId(updateRequest.getOrderId(), userId);
-        if (order.isEmpty()) throw new InvalidDataException("Order not found");
+        OrderPaymentResponse response = new OrderPaymentResponse();
 
-        OrderStatus status = order.get().getOrderStatus();
+        List<SingleOrderRequest> modifyFields = updateRequest.getOrder();
+        List<String>
+                ids = new ArrayList<>();
+        for (SingleOrderRequest x : modifyFields) {
+            if (addressRepository.findById(x.getAddressId()).isEmpty()) {
+                throw new InvalidDataException("Address of order " + x.getOrderId() + "not found");
+            }
+            ids.add(x.getOrderId());
+        }
+
+
+        List<Order> orders = orderRepository.findAllById(ids);
+        if (ids.size() != orders.size() || orders.isEmpty() || ids.isEmpty()) {
+            throw new InvalidDataException("Orders must contain at least one valid order");
+        }
+
+        OrderStatus requestOrderStatus = updateRequest.getOrderStatus();
+        if (!OrderStatusValidationUtil.isValidStatusTransition(requestOrderStatus))
+            throw new InvalidDataException("Invalid Order Status: This Status unreachable");
+
+
+        // đổi phương thức thanh toán từ COD -> online transfer
+        if (requestOrderStatus.equals(OrderStatus.PENDING_PAYMENT)) {
+
+            if (updateRequest.getPaymentMethod().name().equals(PaymentMethod.VNPAY.name())) {
+                response.setPaymentUrl(getVNPayReturnUrl(request, orders));
+            }
+            for (int i = 0; i < orders.size(); i++) {
+                if (!orders.get(i).getId().equals(modifyFields.get(i).getOrderId())) {
+
+                    throw new InvalidDataException("Invalid Order ID request");
+                }
+                orders.get(i).setPaymentStatus(TransactionStatus.PENDING);
+                orders.get(i).setOrderStatus(OrderStatus.PENDING_PAYMENT);
+            }
+
+        } else if (requestOrderStatus.equals(OrderStatus.CONFIRMED)) {
+            for (Order order : orders) {
+
+                // sàn gửi thông báo đến shop để nó chuẩn bị, nó nhấn confirm thì đơn hàng sẽ là confirm
+                order.setOrderStatus(OrderStatus.CONFIRMED);
+            }
+        }
+        //map customer note & addressId
+        orders = orderMapper.toOrder(modifyFields);
+        return response;
+    }
+
+    @Override
+    public OrderPaymentResponse updatePaymentPendingOrders(HttpServletRequest request, OrdersUpdateRequest updateRequest, String userId) {
+        return null;
+    }
+
+    @Override
+    public OrderPaymentResponse updateConfirmedOrders(HttpServletRequest request, OrdersUpdateRequest updateRequest, String userId) {
+        return null;
+    }
+
+    @Override
+    public OrderPaymentResponse updateProcessingOrders(HttpServletRequest request, OrdersUpdateRequest updateRequest, String userId) {
+        return null;
+    }
+
+    @Override
+    public OrderPaymentResponse updateReadyPickupOrders(HttpServletRequest request, OrdersUpdateRequest updateRequest, String userId) {
+        return null;
+    }
+
+    @Override
+    public OrderPaymentResponse updateShippingOrders(HttpServletRequest request, OrdersUpdateRequest updateRequest, String userId) {
+        return null;
+    }
+
+    @Override
+    public OrderPaymentResponse updateCompletedOrders(HttpServletRequest request, OrdersUpdateRequest updateRequest, String userId) {
+        return null;
+    }
+
+    @Override
+    public OrderPaymentResponse updateOrderReturnOrders(HttpServletRequest request, OrdersUpdateRequest updateRequest, String userId) {
         return null;
     }
 
@@ -248,5 +345,28 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public void deleteOrder(String orderId) {
 
+        Optional<Order> order = orderRepository.findById(orderId);
+        if (order.isEmpty() || order.get().getOrderStatus().equals(OrderStatus.DELETED))
+            throw new InvalidDataException("Order with id " + orderId + " not found");
+
+        order.get().setOrderStatus(OrderStatus.DELETED);
+    }
+
+    private String getVNPayReturnUrl(HttpServletRequest request, List<Order> orders) throws UnsupportedEncodingException {
+        VNPayPaymentRequest vnPayPaymentRequest = new VNPayPaymentRequest();
+        vnPayPaymentRequest.setOrderInfo("Thanh toan cho don hang " + orders.get(0).getPaymentTransactionId());
+        vnPayPaymentRequest.setPaymentMethod(PaymentMethod.VNPAY);
+        vnPayPaymentRequest.setAmount(getTotalAmount(orders));
+        vnPayPaymentRequest.setGeneratedTransactionId(orders.get(0).getPaymentTransactionId());
+        return vnPayService.createPaymentUrl(request, vnPayPaymentRequest);
+    }
+
+    private Long getTotalAmount(List<Order> orders) {
+
+        Long amount = 0l;
+        for (Order orderItem : orders) {
+            amount += orderItem.getFinalPrice().longValue();
+        }
+        return amount;
     }
 }

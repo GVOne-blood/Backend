@@ -6,24 +6,27 @@ import com.spring_food.springfood.common.enums.TransactionType;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.util.List;
+
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class OrderUpdateRequest {
+public class OrdersUpdateRequest {
 
-    String orderId;
-    
+
+    boolean wantToRefund;
+
+    boolean wantToDestroy;
+
+    List<SingleOrderRequest> order;
+
     OrderStatus orderStatus;
 
     PaymentMethod paymentMethod;
 
-    String addressId;
-
     TransactionType transactionType;
-
-    String customerNote;
 
 
 }

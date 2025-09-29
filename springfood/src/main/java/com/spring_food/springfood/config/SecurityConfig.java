@@ -36,7 +36,6 @@ public class SecurityConfig {
             "/swagger-ui.html",
             "/webjars/**",
             "/actuator/**",
-            "/api/payment/vnpay-payment-return/**"
     };
     //    private final ExceptionHandlingFilter exceptionHandlingFilter;
     private final PreFilter preFilter;

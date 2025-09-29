@@ -4,6 +4,7 @@ package com.spring_food.springfood.controller;
 import com.spring_food.springfood.common.enums.PaymentMethod;
 import com.spring_food.springfood.dto.request.VNPayPaymentRequest;
 import com.spring_food.springfood.dto.response.ResponseData;
+import com.spring_food.springfood.model.User;
 import com.spring_food.springfood.service.PaymentService;
 import com.spring_food.springfood.service.VNPayService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -13,6 +14,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.view.RedirectView;
@@ -33,16 +35,20 @@ public class PaymentController {
 
 
     @GetMapping("/status/{orderId}")
-    public ResponseEntity<ResponseData<?>> handlePaymentStatus(HttpServletRequest request, @PathVariable String orderId) throws IOException {
-        String message = paymentService.handlePaymentCheckingStatus(request, orderId);
+    public ResponseEntity<ResponseData<?>> handlePaymentStatus(HttpServletRequest request,
+                                                               @PathVariable String orderId,
+                                                               @AuthenticationPrincipal User user) throws IOException {
+        String message = paymentService.handlePaymentCheckingStatus(request, user.getId(), orderId);
         return ResponseEntity.ok(new ResponseData<>(200, "check chung successfully", message));
     }
 
-    @GetMapping("/refund{orderId}")
-    //@PreAuthorize("hasRole('CUSTOMER')")
-    public ResponseEntity<ResponseData<?>> refundPaymentForOrder(HttpServletRequest request, @PathVariable String orderId) throws IOException {
-        String message = paymentService.handlePaymentRefund(request, orderId);
-        return ResponseEntity.ok(new ResponseData<>(200, "refund refung successfully", message));
+    @GetMapping("/refund/{orderId}")
+    @PreAuthorize("hasAnyRole({'ADMIN', 'CUSTOMER', 'SHOP_OWNER', 'STAFF'})")
+    public ResponseEntity<ResponseData<?>> refundPaymentForOrder(HttpServletRequest request,
+                                                                 @PathVariable String orderId,
+                                                                 @AuthenticationPrincipal User user) throws IOException {
+        String message = paymentService.handlePaymentRefund(request, user.getId(), orderId);
+        return ResponseEntity.ok(new ResponseData<>(200, "refund refund successfully", message));
     }
 
     // Endpoint này client sẽ gọi để lấy URL thanh toán
@@ -63,7 +69,7 @@ public class PaymentController {
     // Endpoint này VNPay sẽ redirect về sau khi thanh toán
     // Nó phải khớp với `vnp_Returnurl` trong config
     @GetMapping("/vnpay-payment-return")
-    //   @PreAuthorize("hasAnyRole({'ADMIN', 'CUSTOMER', 'SHOP_OWNER', 'STAFF'})")
+    @PreAuthorize("hasAnyRole({'ADMIN', 'CUSTOMER', 'SHOP_OWNER', 'STAFF'})")
     public RedirectView handleVnpayReturn(HttpServletRequest request) {
         int paymentStatus = vnPayService.processVNPayReturn(request);
 

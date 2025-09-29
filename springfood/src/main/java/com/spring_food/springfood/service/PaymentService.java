@@ -12,7 +12,7 @@ public interface PaymentService {
 
     void handlePaymentReturnFail();
 
-    String handlePaymentCheckingStatus(HttpServletRequest request, String orderId) throws IOException;
+    String handlePaymentCheckingStatus(HttpServletRequest request, String userId, String orderId) throws IOException;
 
-    String handlePaymentRefund(HttpServletRequest request, String orderId) throws IOException;
+    String handlePaymentRefund(HttpServletRequest request, String userId, String orderId) throws IOException;
 }

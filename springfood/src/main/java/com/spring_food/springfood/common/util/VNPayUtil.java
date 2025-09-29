@@ -42,4 +42,35 @@ public class VNPayUtil {
             default -> "Trạng thái giao dịch không xác định. Mã trạng thái từ VNPAY: " + statusCode;
         };
     }
+
+    public static String getRefundResponseDescription(String responseCode) {
+        if (responseCode == null || responseCode.isEmpty()) {
+            return "Không nhận được phản hồi từ VNPay.";
+        }
+
+        return switch (responseCode) {
+            // == Thành công ==
+            case "00" -> "Yêu cầu hoàn tiền đã được gửi thành công. Vui lòng chờ VNPAY xử lý.";
+
+            // == Lỗi Dữ liệu đầu vào ==
+            case "02" -> "Merchant không hợp lệ (kiểm tra lại vnp_TmnCode).";
+            case "03" -> "Dữ liệu gửi sang không đúng định dạng.";
+            case "91" -> "Không tìm thấy giao dịch yêu cầu hoàn trả.";
+            case "93" ->
+                    "Số tiền hoàn trả không hợp lệ. Số tiền hoàn trả phải nhỏ hơn hoặc bằng số tiền đã thanh toán.";
+            case "97" -> "Chữ ký không hợp lệ (vnp_SecureHash sai).";
+
+            // == Lỗi Trạng thái Nghiệp vụ ==
+            case "16" -> "Giao dịch này không thể thực hiện hoàn tiền trong thời gian này.";
+            case "94" -> "Giao dịch đã được gửi yêu cầu hoàn tiền trước đó. Yêu cầu này VNPAY đang xử lý.";
+            case "95" -> "Giao dịch này không thành công bên phía VNPAY. VNPAY từ chối xử lý yêu cầu.";
+
+            // == Lỗi Hệ thống ==
+            case "08" -> "Hệ thống VNPay đang bảo trì. Vui lòng thử lại sau.";
+            case "99" -> "Các lỗi không xác định khác. Vui lòng liên hệ VNPAY để được hỗ trợ.";
+
+            // == Trường hợp mặc định ==
+            default -> "Lỗi không xác định. Mã lỗi từ VNPAY: " + responseCode;
+        };
+    }
 }

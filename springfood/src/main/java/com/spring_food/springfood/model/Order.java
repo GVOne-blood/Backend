@@ -1,7 +1,6 @@
 package com.spring_food.springfood.model;
 
 import com.spring_food.springfood.common.enums.OrderStatus;
-import com.spring_food.springfood.common.enums.TransactionStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -48,12 +47,16 @@ public class Order extends AbstractEntity {
     @Column(name = "discount_amount")
     private BigDecimal discount;
 
-    @Column(name = "payment_status")
-    @Enumerated(EnumType.STRING)
-    private TransactionStatus paymentStatus;
+//    @Column(name = "payment_status")
+//    @Enumerated(EnumType.STRING)
+//    private TransactionStatus paymentStatus;
 
-    @Column(name = "payment_transaction_id")
-    private String paymentTransactionId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id")
+    private PaymentTransactions paymentTransactions;
+
+    @Column(name = "transfer_at")
+    private LocalDateTime transferDate;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItem> bookingItems = new ArrayList<>();
@@ -84,8 +87,8 @@ public class Order extends AbstractEntity {
         if (discount == null) {
             discount = BigDecimal.ZERO;
         }
-        if (paymentStatus == null) {
-            paymentStatus = TransactionStatus.PENDING;
-        }
+//        if (paymentStatus == null) {
+//            paymentStatus = TransactionStatus.PENDING;
+//        }
     }
 }

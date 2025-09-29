@@ -1,15 +1,17 @@
 package com.spring_food.springfood.common.util;
 
 import com.spring_food.springfood.common.enums.OrderStatus;
+import com.spring_food.springfood.exception.custom.InvalidDataException;
+import lombok.RequiredArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@RequiredArgsConstructor
 public class OrderStatusValidationUtil {
 
-
-    public static boolean isValidStatusTransition(OrderStatus currentStatus) {
-        return getValidStatusTransition(currentStatus).contains(currentStatus);
+    public static boolean isValidStatusTransition(OrderStatus nextStatus) {
+        return getValidStatusTransition(nextStatus).contains(nextStatus);
     }
 
     public static List<OrderStatus> getValidStatusTransition(OrderStatus currentStatus) {
@@ -20,6 +22,7 @@ public class OrderStatusValidationUtil {
                 validStatus.add(OrderStatus.CONFIRMED);
             }
             case PENDING_PAYMENT -> {
+                validStatus.add(OrderStatus.PENDING);
                 validStatus.add(OrderStatus.CONFIRMED);
             }
             case CONFIRMED -> {
@@ -37,7 +40,16 @@ public class OrderStatusValidationUtil {
                 validStatus.add(OrderStatus.FAILED);
             }
             case COMPLETED -> {
-                validStatus.add(OrderStatus.CANCELLED);
+                validStatus.add(OrderStatus.ORDER_RETURN);
+            }
+            case ORDER_RETURN -> {
+                validStatus.add(OrderStatus.SHIPPING);
+            }
+            case FAILED -> {
+                validStatus.add(OrderStatus.DELETED);
+            }
+            default -> {
+                throw new InvalidDataException("Order Status invalid");
             }
         }
         return validStatus;
