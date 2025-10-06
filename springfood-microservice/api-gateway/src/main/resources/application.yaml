@@ -1,0 +1,54 @@
+# Cổng mà API Gateway sẽ lắng nghe các yêu cầu từ bên ngoài
+server:
+  port: 9090
+
+# Định danh của chính Gateway
+spring:
+  application:
+    name: api-gateway
+
+  # Cấu hình Gateway Routes
+  cloud:
+    gateway:
+      routes:
+        # === Route 1: Định tuyến đến User Service ===
+        - id: identity-service-user
+          uri: lb://identity-service
+          predicates:
+            - Path=/api/v1/user/**
+          filters:
+            - StripPrefix=2
+        # === Route 2: Định tuyến đến Auth Service ===
+        - id: identity-service-auth
+          uri: lb://identity-service
+          predicates:
+            - Path=/api/v1/auth/**
+          filters:
+            - StripPrefix=2
+        # === Route 3: Định tuyến đến Product Service ===
+        - id: product-service
+          uri: lb://product-service
+          predicates:
+            - Path=/api/v1/product/**
+          filters:
+            - StripPrefix=2
+    discovery:
+      locator:
+        enabled: true
+        # Chuyển tên service từ dạng CAMEL_CASE sang lower-case-hyphen
+        lower-case-service-id: true
+
+# Cấu hình để Gateway đăng ký với Eureka Server
+eureka:
+  client:
+    service-url:
+        instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
+
+app:
+  jwt:
+    secretKey:  4dVgNvOxWTz2PKJZqCYFoh+AXX0l2OVHoCTfN9ZdXGs=
+    open-api-endpoints:
+      - /api/auth/login
+      - /api/auth/register
+      - /api/auth/refresh-token
+      - /eureka
