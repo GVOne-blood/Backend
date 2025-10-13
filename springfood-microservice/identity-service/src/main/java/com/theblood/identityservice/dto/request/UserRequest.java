@@ -1,8 +1,8 @@
 package com.theblood.identityservice.dto.request;
 
-import com.theblood.identityservice.common.enums.Gender;
-import com.theblood.identityservice.common.enums.util.EnumPattern;
-import com.theblood.identityservice.common.enums.util.PhoneNumber;
+import com.theblood.identityservice.common.Gender;
+import com.theblood.identityservice.common.util.EnumPattern;
+import com.theblood.identityservice.common.util.PhoneNumber;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;

@@ -1,20 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ExternalStorageConfigurationManager" enabled="true" />
-  <component name="MaterialThemeProjectNewConfig">
-    <option name="metadata">
-      <MTProjectMetadataState>
-        <option name="migrated" value="true" />
-        <option name="pristineConfig" value="false" />
-        <option name="userId" value="-576b5008:1987ac88fb1:-7ff9" />
-      </MTProjectMetadataState>
-    </option>
-    <option name="titleBarState">
-      <MTProjectTitleBarConfigState>
-        <option name="overrideColor" value="false" />
-      </MTProjectTitleBarConfigState>
-    </option>
-  </component>
   <component name="MavenProjectsManager">
     <option name="originalFiles">
       <list>
@@ -27,8 +13,13 @@
         <option value="$PROJECT_DIR$/order-service/pom.xml" />
       </list>
     </option>
+    <option name="ignoredFiles">
+      <set>
+        <option value="$PROJECT_DIR$/auth-service/pom.xml" />
+      </set>
+    </option>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_17" default="true" project-jdk-name="temurin-17" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_21" project-jdk-name="temurin-17" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/out" />
   </component>
 </project>

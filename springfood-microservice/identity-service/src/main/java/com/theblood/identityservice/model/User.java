@@ -1,7 +1,7 @@
 package com.theblood.identityservice.model;
 
-import com.theblood.identityservice.common.enums.Gender;
-import com.theblood.identityservice.common.enums.UserStatus;
+import com.theblood.identityservice.common.Gender;
+import com.theblood.identityservice.common.UserStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;

@@ -5,7 +5,7 @@ import com.theblood.common.enums.TokenType;
 import com.theblood.common.exception.custom.InvalidDataException;
 import com.theblood.common.util.CookieUtil;
 import com.theblood.common.util.PasswordEncoderUtil;
-import com.theblood.identityservice.common.enums.UserStatus;
+import com.theblood.identityservice.common.UserStatus;
 import com.theblood.identityservice.dto.request.SearchCriteria;
 import com.theblood.identityservice.dto.request.UserRequest;
 import com.theblood.identityservice.dto.response.RegisterResponse;

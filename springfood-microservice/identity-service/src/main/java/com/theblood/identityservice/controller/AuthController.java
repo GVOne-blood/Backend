@@ -85,7 +85,7 @@ public class AuthController {
     @GetMapping("/logout")
     public ResponseEntity<ResponseData<?>> logout(HttpServletRequest request, HttpServletResponse response) {
         // blacklist with redis
-        authService.logout(response);
+        authService.logout(request, response);
         return ResponseEntity.ok(new ResponseData<>(204, "Logout successful", null));
     }
 }

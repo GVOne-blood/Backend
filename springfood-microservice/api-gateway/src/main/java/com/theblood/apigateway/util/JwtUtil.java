@@ -1,6 +1,7 @@
 package com.theblood.apigateway.util;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -28,7 +29,11 @@ public class JwtUtil {
     }
 
     public boolean isTokenExpired(String token) {
-        return extractExpiration(token).before(new java.util.Date());
+        try {
+            return extractExpiration(token).before(new java.util.Date());
+        } catch (ExpiredJwtException e) {
+            return true;
+        }
     }
 
     private java.util.Date extractExpiration(String token) {

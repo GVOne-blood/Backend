@@ -48,7 +48,6 @@ public class JwtServiceImpl implements JwtService {
         claims.put("type", tokenType.name());
         claims.put("username", user.getUsername());
         claims.put("roles", user.getAuthorities());
-        claims.put("exp", getTokenExpiration(tokenType));
 
         return createToken(claims, user.getUsername(), tokenType);
     }
@@ -131,6 +130,20 @@ public class JwtServiceImpl implements JwtService {
     private <T> T extractClaim(String token, TokenType tokenType, Function<Claims, T> claimsResolver) {
         final Claims claims = extractAllClaims(token, tokenType);
         return claimsResolver.apply(claims);
+    }
+
+    @Override
+    public long getExpirationTime(String token, TokenType tokenType) {
+        Date expirationDate = extractExpiration(token, tokenType);
+        return expirationDate.getTime(); // Return milliseconds since epoch
+    }
+
+    @Override
+    public long getRemainingTTL(String token, TokenType tokenType) {
+        long expirationTime = getExpirationTime(token, tokenType);
+        long currentTime = System.currentTimeMillis();
+        long ttl = expirationTime - currentTime;
+        return Math.max(ttl, 0); // Return 0 if already expired
     }
 
     public boolean isTokenExpired(String token, TokenType tokenType) {

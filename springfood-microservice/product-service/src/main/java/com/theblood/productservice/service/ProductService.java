@@ -1,0 +1,35 @@
+package com.theblood.productservice.service;
+
+import com.theblood.productservice.dto.response.ProductDetail;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.UUID;
+
+public interface ProductService {
+
+    Page<ProductDetail> getAllProductDetails(Pageable pageable);
+
+    List<ProductDetail> getAllProductDetails();
+
+    List<ProductDetail> getAllLastUpdatedProducts(LocalDateTime lastModifyAt);
+
+    boolean isProductExists(UUID productId);
+
+    ProductDetail getProductDetailById(UUID productId);
+
+    Page<ProductDetail> getListProductsRelated(Pageable pageable, UUID productId);
+
+    List<ProductDetail> getListProductsRelated(UUID productId, int limit);
+//    Product addProduct(ProductRequest productRequest);
+//
+//    Product updateProduct(UUID productId, ProductRequest productRequest);
+//
+//    void deleteProduct(UUID productId);
+//
+//    Page<ProductDetail> findByPrice(String from, String to, Pageable pageable);
+//
+//    Page<ProductDetail> search(Pageable pageable, Map<String, String> params);
+}

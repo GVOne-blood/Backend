@@ -11,6 +11,7 @@ import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
+import org.springframework.data.redis.RedisConnectionFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -29,6 +30,18 @@ import java.util.Date;
 @RestControllerAdvice
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class GlobalHandleException {
+
+    @ExceptionHandler(RedisConnectionFailureException.class)
+    public ResponseEntity<ResponseError> handleRedisConnectionFailureException(RedisConnectionFailureException e, WebRequest request) {
+        ResponseError error = ResponseError.builder()
+                .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
+                .timestamp(new Date())
+                .message("Kafka Connection Error : " + e.getMessage())
+                .path(request.getDescription(false).replace("uri=", ""))
+                .build();
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+    }
 
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<ResponseError> handleAuthenticationException(AuthenticationException e, WebRequest request) {

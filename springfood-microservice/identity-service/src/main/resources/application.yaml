@@ -24,8 +24,8 @@ eureka:
     prefer-ip-address: true
 
 jwt:
-  cookie-max-age: 60000  # 1 phút cho cookie
-  accessTokenExpiration: 60000  # 1 phút cho access token (test)
+  cookie-max-age: 3600000  # 1 hour cho cookie
+  accessTokenExpiration: 3600000  # 1 hour cho access token (test)
   refreshTokenExpiration: 604800000  # 7 ngày cho refresh token
   resetTokenExpiration: 300000  # 5 phút cho reset token
   secretKey: 4dVgNvOxWTz2PKJZqCYFoh+AXX0l2OVHoCTfN9ZdXGs=

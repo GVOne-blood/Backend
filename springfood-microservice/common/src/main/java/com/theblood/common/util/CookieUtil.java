@@ -1,6 +1,8 @@
 package com.theblood.common.util;
 
+import com.theblood.common.exception.custom.InvalidDataException;
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 
 public class CookieUtil {
 
@@ -13,5 +15,16 @@ public class CookieUtil {
         cookie.setMaxAge(maxAge);
 
         return cookie;
+    }
+
+    public static String getElementFromCookie(HttpServletRequest request, String cookieName) {
+        Cookie[] cookies = request.getCookies();
+        for (Cookie cookie : cookies) {
+            if (cookie.getName().equals(cookieName)) {
+                return cookie.getValue();
+            }
+        }
+        throw new InvalidDataException("Cookie name not found");
+
     }
 }

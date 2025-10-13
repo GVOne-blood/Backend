@@ -6,6 +6,7 @@ import com.theblood.identityservice.dto.response.UserDetail;
 import com.theblood.identityservice.model.User;
 import com.theblood.identityservice.service.AuthService;
 import com.theblood.identityservice.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -70,6 +71,7 @@ public class UserController {
     @DeleteMapping("/profile/{id}")
     public ResponseEntity<ResponseData<?>> deleteUserById(
             @PathVariable UUID id,
+            HttpServletRequest request,
             HttpServletResponse response,
             @AuthenticationPrincipal
             UserDetails currentUser) {
@@ -84,7 +86,7 @@ public class UserController {
             userService.deleteUser(id);
 
             if (isSelfDelete) {
-                authService.logout(response);
+                authService.logout(request, response);
                 return new ResponseEntity<>(new ResponseData<>(204, "Your account has been deleted", null), HttpStatus.OK);
             }
 
