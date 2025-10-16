@@ -7,8 +7,6 @@ import com.theblood.common.exception.custom.InvalidDataException;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import org.hibernate.exception.ConstraintViolationException;
-import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.redis.RedisConnectionFailureException;
@@ -21,6 +19,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import javax.naming.AuthenticationException;
 import java.nio.file.AccessDeniedException;
@@ -28,8 +27,19 @@ import java.security.SignatureException;
 import java.util.Date;
 
 @RestControllerAdvice
-@Order(Ordered.HIGHEST_PRECEDENCE)
 public class GlobalHandleException {
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<ResponseError> handleNoResourceFoundException(NoResourceFoundException e, WebRequest request) {
+        ResponseError error = ResponseError.builder()
+                .status(HttpStatus.NOT_FOUND.value())
+                .error(HttpStatus.NOT_FOUND.getReasonPhrase())
+                .timestamp(new Date())
+                .message("Endpoint khong ton tai :  " + e.getMessage())
+                .path(request.getDescription(false).replace("uri=", ""))
+                .build();
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+    }
 
     @ExceptionHandler(RedisConnectionFailureException.class)
     public ResponseEntity<ResponseError> handleRedisConnectionFailureException(RedisConnectionFailureException e, WebRequest request) {
@@ -37,7 +47,7 @@ public class GlobalHandleException {
                 .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
                 .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
                 .timestamp(new Date())
-                .message("Kafka Connection Error : " + e.getMessage())
+                .message("Redis Connection Error : " + e.getMessage())
                 .path(request.getDescription(false).replace("uri=", ""))
                 .build();
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);

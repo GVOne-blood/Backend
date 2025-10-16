@@ -49,6 +49,7 @@ public class UserController {
                         "Get list users successfully",
                         users), HttpStatus.OK);
     }
+
     @PreAuthorize("hasRole('CUSTOMER')")
     @GetMapping("/profile")
     public ResponseEntity<ResponseData<UserDetail>> getUserById(@AuthenticationPrincipal User user) {
@@ -60,6 +61,7 @@ public class UserController {
                         "Get user detail successfully",
                         resUser), HttpStatus.OK);
     }
+
     @PreAuthorize("hasRole('CUSTOMER')")
     @PutMapping("/profile")
     public ResponseEntity<ResponseData<UserDetail>> updateUser(@AuthenticationPrincipal User user, @RequestBody UserRequest userRequest) {
@@ -67,6 +69,7 @@ public class UserController {
         return new ResponseEntity<>(new ResponseData<>(200, "User updated successfully", resUser), HttpStatus.OK);
 
     }
+
     @PreAuthorize("hasAnyRole('CUSTOMER', 'ADMIN')")
     @DeleteMapping("/profile/{id}")
     public ResponseEntity<ResponseData<?>> deleteUserById(

@@ -16,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -35,6 +36,7 @@ public class ProductServiceImpl implements ProductService {
     String REDIS_CACHE_RELATE_RESULT = "related_product:";
     String REDIS_CACHE_KEY = "product_relate_request_queue";
 
+    KafkaTemplate<String, Object> kafkaTemplate;
     ProductRepository productRepository;
     CategoryRepository categoryRepository;
     ProductMapper productMapper;
@@ -58,7 +60,9 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public List<ProductDetail> getAllProductDetails() {
-        return productMapper.toProductDetail(productRepository.findAll());
+        // return productMapper.toProductDetail(productRepository.findAll());
+        return productMapper.toProductDetail(productRepository.findTop300ByOrderByUpdatedAtDesc());
+
     }
 
     @Override
@@ -250,7 +254,7 @@ public class ProductServiceImpl implements ProductService {
 //
 //        return productRepository.save(product);
 //    }
-//
+
 //    @Override
 //    @PreAuthorize("hasRole('SHOP_OWNER') and hasAuthority('product:upadte')")
 //    @Transactional

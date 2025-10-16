@@ -29,6 +29,16 @@ spring:
           max-idle: 10
           min-idle: 5
           max-wait: 2000ms
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: my-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
 
 eureka:
   client:
@@ -44,3 +54,17 @@ eureka:
       time-to-live: 600000  # 10 phút
       cache-null-values: false
       key-prefix: "product-service:"
+
+security:
+  internal:
+    auth:
+      enabled: false  # Set false để disable authentication (dev only)
+      header:
+        username: X-User-Username
+        roles: X-User-Roles
+logging:
+  level:
+    org.springframework.security: DEBUG
+    org.springframework.security.web.FilterChainProxy: DEBUG
+    org.springframework.security.web.access.ExceptionTranslationFilter: DEBUG
+    org.springframework.security.authentication: DEBUG

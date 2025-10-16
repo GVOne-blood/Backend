@@ -1,0 +1,7 @@
+security:
+  internal:
+    auth:
+      enabled: false  # Set false để disable authentication (dev only)
+      header:
+        username: X-User-Username
+        roles: X-User-Roles

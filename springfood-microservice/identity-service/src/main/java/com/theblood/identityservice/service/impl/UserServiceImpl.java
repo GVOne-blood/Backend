@@ -4,8 +4,8 @@ import com.theblood.common.enums.CookieKey;
 import com.theblood.common.enums.TokenType;
 import com.theblood.common.exception.custom.InvalidDataException;
 import com.theblood.common.util.CookieUtil;
-import com.theblood.common.util.PasswordEncoderUtil;
 import com.theblood.identityservice.common.UserStatus;
+import com.theblood.identityservice.common.util.PasswordEncoderUtil;
 import com.theblood.identityservice.dto.request.SearchCriteria;
 import com.theblood.identityservice.dto.request.UserRequest;
 import com.theblood.identityservice.dto.response.RegisterResponse;
@@ -76,7 +76,7 @@ public class UserServiceImpl implements UserService {
 
         // Set default values
         user.setStatus(UserStatus.ACTIVE);
-       // user.setIsDeleted(false);
+        // user.setIsDeleted(false);
 
         UserHasRole userHasRole = new UserHasRole();
         userHasRole.setUser(user);

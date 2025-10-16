@@ -8,6 +8,7 @@ import com.theblood.productservice.service.ProductService;
 import com.theblood.productservice.service.impl.RedisServiceWrapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -27,7 +28,10 @@ public class ProductDetailCronJob {
     private final ProductMapper productMapper;
     private LocalDateTime lastRunCompleted = LocalDateTime.now();
 
-    @Scheduled(cron = "0 0 */6 * * *")
+    private int limit = 300;
+    private Pageable pageableInput;
+
+    @Scheduled(cron = "0 */2 * * * *")
     public void cacheProductDetails() {
         log.info("Starting ProductDetailCronJob cacheProductDetails at {}", java.time.LocalDateTime.now());
         try {
@@ -40,7 +44,12 @@ public class ProductDetailCronJob {
             }
             log.info("Fetched {} product details from database", productDetails.size());
 
+            int cnt = 0;
             for (ProductDetail pd : productDetails) {
+                if (cnt == limit) {
+                    break;
+                }
+                cnt++;
                 String key = REDIS_PRODUCT_DETAIL_PREFIX + pd.getId().toString();
                 redisServiceWrapper.setValueWithTimeout(key, pd, 5, TimeUnit.HOURS);
             }

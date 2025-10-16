@@ -21,6 +21,9 @@ public interface ProductRepository extends
         JpaSpecificationExecutor<Product> // Specification
 {
 
+    @Query("SELECT p FROM Product p ORDER BY p.updatedAt DESC LIMIT 300")
+    List<Product> findTop300ByOrderByUpdatedAtDesc();
+
     void deleteProductById(UUID id);
 
     // <T> Page<T> findAll(Pageable pageable);
