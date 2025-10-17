@@ -24,11 +24,13 @@
         <module>product-service</module>
         <module>order-service</module>
         <module>common</module>
+        <module>grpc</module>
     </modules>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
+        <grpc.version>1.76.0</grpc.version>
         <spring-cloud.version>2025.0.0</spring-cloud.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>

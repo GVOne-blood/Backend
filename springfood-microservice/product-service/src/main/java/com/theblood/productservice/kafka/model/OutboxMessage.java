@@ -31,6 +31,7 @@ public class OutboxMessage {
     @Column(name = "payload", columnDefinition = "TEXT")
     private String payload;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     private MessageStatus status; // PENDING, SENT, FAILED
 

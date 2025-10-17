@@ -62,7 +62,7 @@ public interface ProductRepository extends
 
 
     @Query("SELECT p.sku FROM Product p WHERE p.shopId = :shopId and p.sku = :sku")
-    String findProductBySku(
+    Optional<String> findProductBySku(
             @Param("shopId") UUID shopId,
             @Param("sku") String sku);
 

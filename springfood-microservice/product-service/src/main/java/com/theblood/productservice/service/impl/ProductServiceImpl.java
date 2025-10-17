@@ -1,14 +1,22 @@
 package com.theblood.productservice.service.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.theblood.common.exception.custom.InvalidDataException;
+import com.theblood.productservice.dto.request.ProductRequest;
 import com.theblood.productservice.dto.request.RelateProductRequest;
 import com.theblood.productservice.dto.response.ProductDetail;
+import com.theblood.productservice.grpc.ProductGrpcClient;
+import com.theblood.productservice.grpc.ValidateProductCreationResponse;
+import com.theblood.productservice.kafka.consumer.ProductServiceConsumer;
+import com.theblood.productservice.kafka.service.OutboxService;
 import com.theblood.productservice.mapper.ProductMapper;
+import com.theblood.productservice.model.Categories;
 import com.theblood.productservice.model.Product;
 import com.theblood.productservice.repository.*;
 import com.theblood.productservice.repository.projection.ProductProjection;
 import com.theblood.productservice.service.ProductService;
+import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -17,9 +25,12 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -40,15 +51,15 @@ public class ProductServiceImpl implements ProductService {
     ProductRepository productRepository;
     CategoryRepository categoryRepository;
     ProductMapper productMapper;
+    ProductServiceConsumer productServiceConsumer;
     ProductCategoryRepository productCategoryRepository;
-    //    UserRepository userRepository;
-    //    ShopRepository shopRepository;
-    //    CategoryRepository categoryRepository;
     ProductJDBCRepository productJDBCRepository;
     RedisServiceWrapper redisServiceWrapper;
     ProductCacheManager productCacheManager;
     ProductCacheService productCacheService;
+    OutboxService outboxService;
     FeedbackRepository feedbackRepository;
+    ProductGrpcClient productGrpcClient;
     @Qualifier("redisObjectMapper")
     ObjectMapper objectMapper;
 
@@ -189,71 +200,76 @@ public class ProductServiceImpl implements ProductService {
     }
 
     public boolean isProductExist(UUID shopId, String sku) {
-        return productRepository.findProductBySku(shopId, sku).isEmpty();
+        return productRepository.findProductBySku(shopId, sku).isPresent();
     }
 
     public boolean isProductExist(UUID shopId) {
         return productRepository.findProductByShopId(shopId).isEmpty();
     }
-//
-//    @PreAuthorize("hasRole('SHOP_OWNER') and hasAuthority('product:create')")
-//    @Override
-//    @Transactional
-//    public Product addProduct(ProductRequest productRequest) {
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//        String currentUser = authentication.getName(); // Lấy tên người dùng hiện tại
-//
+
+    // @PreAuthorize("hasRole('SHOP_OWNER') and hasAuthority('product:create')")
+    @Override
+    @Transactional
+    public Product addProduct(ProductRequest productRequest) throws JsonProcessingException {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentUser = authentication.getName(); // Lấy tên người dùng hiện tại
+
+        // validate using gRPC
+        ValidateProductCreationResponse validationResponse = productGrpcClient.validateProduct(
+            productRequest.getSku(),
+            productRequest.getShopId().toString(),
+            currentUser,
+            productRequest.getCategoryNames()
+        );
+
+        if (!validationResponse.getIsValid()) {
+            throw new InvalidDataException("Product validation failed: " + validationResponse.getMessage());
+        }
+
+
 //        Optional<List<String>> userShop = userRepository.findUsernamesByShopId(productRequest.getShopId());
-////        Optional<User> user =  userRepository.findByUsername(currentUser);
-////        String userShop = user.get().getShop().getId();
+//        Optional<User> user =  userRepository.findByUsername(currentUser);
+//        String userShop = user.get().getShop().getId();
 //        if (userShop.isEmpty()) throw new InvalidDataException("User not found");
-//
-//
 //        if (!userShop.get().contains(currentUser)) {
 //            throw new InvalidDataException("User does not have a shop or shop ID mismatch");
 //        }
-//        //  productRequest.setShopId();
-//
-//        // if (!categoryRepository.existsById(productRequest.getCategoryName())) throw new InvalidDataException("Categories not found");
-//
-//        Shop shop = shopRepository.findById(productRequest.getShopId())
-//                .orElseThrow(() -> new InvalidDataException("Shop not found"));
-//        if (shop.getShopStatus() == ShopStatus.ACTIVE) throw new InvalidDataException("Shop is not active");
-//
-//        Product product =
-//                productMapper.toProduct(productRequest);
-//        if (isProductExist(productRequest.getShopId(), productRequest.getSku())) {
-//            throw new InvalidDataException("Product already exists");
-//        }
-//        product.setShop(shop);
-//        // process categories
-//        //
-//        List<String> categoriesNames;
-//        if (productRequest.getCategoryNames().contains(",")) {
-//            categoriesNames = Arrays.stream(productRequest.getCategoryNames().split(","))
-//                    .map(String::trim) // Loại bỏ khoảng trắng thừa
-//                    .collect(Collectors.toList());
-//        } else {
-//            categoriesNames = List.of(productRequest.getCategoryNames().trim());
-//        }
-//
-//        List<Categories> categories = categoryRepository.findAllById(categoriesNames);
-//
-//        if (categories.isEmpty()) throw
-//                new InvalidDataException("invalid Categories ");
-//
+        //  productRequest.setShopId();
+
+        // if (!categoryRepository.existsById(productRequest.getCategoryName())) throw new InvalidDataException("Categories not found");
+        // create a product. save invalidate field
+        Product product =
+                productMapper.toProduct(productRequest);
+        // process categories
+        //
+        List<String> categoriesNames;
+        if (productRequest.getCategoryNames().contains(",")) {
+            categoriesNames = Arrays.stream(productRequest.getCategoryNames().split(","))
+                    .map(String::trim) // Loại bỏ khoảng trắng thừa
+                    .collect(Collectors.toList());
+        } else {
+            categoriesNames = List.of(productRequest.getCategoryNames().trim());
+        }
+
+        List<Categories> categories = categoryRepository.findAllById(categoriesNames);
+
+        if (categories.isEmpty()) throw
+                new InvalidDataException("invalid Categories ");
+
 //        product.setProductCategories(categories.stream().map(cat -> {
 //            ProductCategory pc = new ProductCategory();
 //            pc.setCategories(cat);
 //            pc.setProduct(product);
 //            return pc;
 //        }).collect(Collectors.toSet()));
-//
-//        product.setProductStatus(productRequest.getStatus());
-//
-//
-//        return productRepository.save(product);
-//    }
+
+        product.setProductStatus(productRequest.getStatus());
+        if (isProductExist(productRequest.getShopId(), productRequest.getSku())) {
+            throw new InvalidDataException("Product already exists");
+        }
+        product.setShopId(productRequest.getShopId());
+        return productRepository.save(product);
+    }
 
 //    @Override
 //    @PreAuthorize("hasRole('SHOP_OWNER') and hasAuthority('product:upadte')")

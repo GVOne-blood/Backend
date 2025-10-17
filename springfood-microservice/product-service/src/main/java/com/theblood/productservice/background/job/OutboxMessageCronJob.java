@@ -22,7 +22,7 @@ public class OutboxMessageCronJob {
     private final OutboxMessageRepository repository;
     private final KafkaTemplate<String, Object> kafkaTemplate;
 
-    @Scheduled(fixedDelay = 5000) // Chạy mỗi 5 giây
+    @Scheduled(fixedDelay = 500) // Chạy mỗi 5 ms
     @Transactional
     public void processOutboxMessages() {
         List<OutboxMessage> pendingMessages = repository

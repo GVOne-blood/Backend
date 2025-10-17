@@ -1,5 +1,6 @@
 package com.theblood.productservice.mapper;
 
+import com.theblood.common.dto.kafka.ProductValidationRequest;
 import com.theblood.productservice.dto.request.ItemRequest;
 import com.theblood.productservice.dto.request.ProductRequest;
 import com.theblood.productservice.dto.response.ProductDetail;
@@ -23,6 +24,8 @@ public interface ProductMapper {
     @Mapping(target = "id", ignore = true)
     Product toProduct(ProductRequest productRequest);
 
+    ProductValidationRequest toProductValidationRequest(ProductRequest productRequest);
+
     ItemRequest toItemRequest(Product product);
 
     ProductDetail toProductDetail(Product product);
@@ -43,6 +46,7 @@ public interface ProductMapper {
 
     //List<ProductDetail> toProductNotDetail(List<OrderItem> orderItems);
 
+    ProductValidationRequest toProductValidationRequest(Product product);
 
     void updateProductFromDto(ProductRequest productRequest, @MappingTarget Product product);
 

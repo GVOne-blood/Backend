@@ -29,7 +29,8 @@ public class SecurityConfig {
             "/swagger-ui/**",
             "/v3/api-docs/**",
             "/swagger-resources/**",
-            "/webjars/**"
+            "/webjars/**",
+            "/com.theblood.shopservice.grpc.ProductService/**" // Allow gRPC calls
     };
 //    private CustomAuthenticationEntryPoint authenticationEntryPoint;
 //    private CustomAccessDeniedHandler accessDeniedHandler;

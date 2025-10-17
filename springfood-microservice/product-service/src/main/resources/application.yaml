@@ -62,6 +62,13 @@ security:
       header:
         username: X-User-Username
         roles: X-User-Roles
+
+grpc:
+  client:
+    shop-service:
+      address: static://localhost:9090
+      negotiation-type: plaintext
+    
 logging:
   level:
     org.springframework.security: DEBUG

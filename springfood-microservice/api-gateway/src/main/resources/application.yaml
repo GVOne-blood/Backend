@@ -1,6 +1,6 @@
 # Cổng mà API Gateway sẽ lắng nghe các yêu cầu từ bên ngoài
 server:
-  port: 9090
+  port: 8080
 
 # Định danh của chính Gateway
 spring:

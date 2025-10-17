@@ -10,7 +10,7 @@ public class KafkaTopicConfig {
 
     @Bean
     public NewTopic productCreationTopic() {
-        return TopicBuilder.name("product-creation")
+        return TopicBuilder.name("product-validation-request")
                 .partitions(3)
                 .replicas(1)
                 .build();

@@ -1,6 +1,9 @@
 package com.theblood.productservice.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.theblood.productservice.dto.request.ProductRequest;
 import com.theblood.productservice.dto.response.ProductDetail;
+import com.theblood.productservice.model.Product;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -22,6 +25,12 @@ public interface ProductService {
 
     Page<ProductDetail> getListProductsRelated(Pageable pageable, UUID productId);
 
+    //List<ProductDetail> getListProductsRelated(UUID productId, int limit);
+
+    Product addProduct(ProductRequest productRequest) throws JsonProcessingException;
+
+    //    Product addProduct(ProductRequest productRequest);
+//
     List<ProductDetail> getListProductsRelated(UUID productId, int limit);
 //    Product addProduct(ProductRequest productRequest);
 //

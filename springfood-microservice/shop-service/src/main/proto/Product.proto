@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "com.theblood.productservice.grpc";
+//option java_outer_classname = "ProductProto";
+
+service ProductService {
+  rpc ValidateProductCreation (ValidateProductCreationRequest) returns (ValidateProductCreationResponse);
+}
+
+message ValidateProductCreationRequest {
+  string sku = 1;
+  string shopId = 2;
+  string username = 3; // current user
+  string categoryNames = 4;
+}
+message ValidateProductCreationResponse {
+  bool isValid = 1;
+  string message = 2;
+}

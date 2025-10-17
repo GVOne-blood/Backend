@@ -25,7 +25,25 @@ public class ProductRelateCronJob {
     private final ProductRepository productRepository;
     private final ProductCategoryRepository productCategoryRepository;
     private final String REDIS_CACHE_RELATE_RESULT = "related_products:";
+    private final String REDIS_PRODUCT_DETAIL_PREFIX = "product_detail:";
     private Pageable pageable;
+
+
+    @Scheduled(cron = "0 0 */6 * * *")
+    public void cacheProductRelated() {
+        List<UUID> productIds = redisServiceWrapper.getKeys(REDIS_PRODUCT_DETAIL_PREFIX + "*").stream()
+                .map(key -> key.replace(REDIS_PRODUCT_DETAIL_PREFIX, ""))
+                .map(UUID::fromString)
+                .toList();
+
+        if (productIds.isEmpty()) {
+            log.warn("No product IDs found in cache to process related products.");
+            // try to get from DB ...
+            return;
+        }
+        log.info("Starting ProductRelateCronJob cacheProductRelated for {} products at {}", productIds.size(), java.time.LocalDateTime.now());
+
+    }
 
     @Scheduled(cron = "0 */30 * * * *")
     public void updateProductRelate() {
@@ -35,10 +53,12 @@ public class ProductRelateCronJob {
             Set<String> relatedKeys = redisServiceWrapper.getKeys(REDIS_CACHE_RELATE_RESULT + "*");
             log.info("Found {} cached related product keys", relatedKeys != null ? relatedKeys.size() : 0);
 
+            // Chưa có key relate nào trong redis
             if (relatedKeys == null || relatedKeys.isEmpty()) {
-                log.info("No cached related products found, skipping update");
-                return;
+                log.warn("No cached related products found, get id from cache then get list relate product from DB...");
+                // try to call cron job cacheProductRelated
             }
+
 
             int processedCount = 0;
             int successCount = 0;

@@ -1,9 +1,14 @@
 package com.theblood.productservice.controller;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.theblood.common.dto.response.ResponseData;
+import com.theblood.common.exception.custom.InvalidDataException;
+import com.theblood.productservice.dto.request.ProductRequest;
 import com.theblood.productservice.dto.response.ProductDetail;
+import com.theblood.productservice.model.Product;
 import com.theblood.productservice.service.ProductService;
+import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -13,10 +18,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
@@ -51,19 +53,19 @@ public class ProductController {
     public ResponseEntity<ResponseData<List<ProductDetail>>> getRelatedProducts(@PathVariable("id") UUID id) {
         return new ResponseEntity<>(new ResponseData<>(200, "Get related products successfully", productService.getListProductsRelated(id, 20)), HttpStatus.OK);
     }
-//
-//    @PostAuthorize(value = "ADMIN")
-//    @PostMapping("/")
-//    public ResponseEntity<ResponseData<Product>> createProduct(@RequestBody @Valid ProductRequest productRequest) {
-//        try {
-//            Product newProduct = productService.addProduct(productRequest);
-//            return new ResponseEntity<>(
-//                    new ResponseData<>(201, "Create product successfully", newProduct), HttpStatus.CREATED);
-//        } catch (InvalidDataException e) {
-//            return new ResponseEntity<>(
-//                    new ResponseData<>(400, "Create product failed: " + e.getMessage(), null), HttpStatus.BAD_REQUEST);
-//        }
-//    }
+
+    //@PostAuthorize(value = "ADMIN")
+    @PostMapping("/")
+    public ResponseEntity<ResponseData<Product>> createProduct(@RequestBody @Valid ProductRequest productRequest) {
+        try {
+            Product newProduct = productService.addProduct(productRequest);
+            return new ResponseEntity<>(
+                    new ResponseData<>(201, "Create product successfully", newProduct), HttpStatus.CREATED);
+        } catch (InvalidDataException | JsonProcessingException e) {
+            return new ResponseEntity<>(
+                    new ResponseData<>(400, "Create product failed: " + e.getMessage(), null), HttpStatus.BAD_REQUEST);
+        }
+    }
 //
 //    @PutMapping("/{id}")
 //    public ResponseEntity<ResponseData<Product>> updateProduct(@PathVariable("id") String id, @RequestBody @Valid ProductRequest productRequest) {
