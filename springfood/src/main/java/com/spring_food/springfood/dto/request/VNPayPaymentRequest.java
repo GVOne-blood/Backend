@@ -2,7 +2,6 @@ package com.spring_food.springfood.dto.request;
 
 import com.spring_food.springfood.common.enums.PaymentMethod;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Data;
@@ -16,12 +15,10 @@ import java.time.LocalDateTime;
 public class VNPayPaymentRequest {
 
     // all
-    String userId; // user transfer / txmRef code
+    String userId; // user transfer /
     String userEmail; // support vnpay send mail to notify
     PaymentMethod paymentMethod;
     Long amount;
-    @NotBlank(message = "transaction id must be not blank")
-    String generatedTransactionId;
     String orderInfo;
 
     // refund

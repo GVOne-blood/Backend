@@ -1,11 +1,14 @@
 package com.theblood.shopservice.kafka.consumer;
 
 import com.theblood.common.dto.kafka.ProductValidationRequest;
+import com.theblood.common.enums.Role;
 import com.theblood.common.enums.kafka.ProductCreationMessage;
 import com.theblood.common.exception.custom.InvalidDataException;
 import com.theblood.shopservice.common.enums.ShopStatus;
 import com.theblood.shopservice.model.Shop;
+import com.theblood.shopservice.repository.ShopMemberRepository;
 import com.theblood.shopservice.repository.ShopRepository;
+import com.theblood.shopservice.service.ShopService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -23,7 +26,9 @@ import java.util.Optional;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class ProductValidationConsumer {
 
+    ShopService shopService;
     ShopRepository shopRepository;
+    ShopMemberRepository shopMemberRepository;
     KafkaTemplate<String, Object> kafkaTemplate;
 
     @KafkaListener(topics = "product-validation-request")
@@ -38,4 +43,9 @@ public class ProductValidationConsumer {
         log.info("Validated product creation for shop id: {}", message.getShopId());
     }
 
+    @KafkaListener(topics = "product-update-request")
+    public void validateProductUpdate(ProductValidationRequest message) {
+        if (shopMemberRepository.existsByIdAndUserIdAndRoleName(message.getShopId(), message.getUserId(), Role.SHOP_OWNER.name()))
+            kafkaTemplate.send("product-update-validated", "validated");
+    }
 }

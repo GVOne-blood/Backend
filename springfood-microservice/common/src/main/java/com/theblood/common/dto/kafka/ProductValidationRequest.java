@@ -13,6 +13,7 @@ public class ProductValidationRequest {
     private UUID productId;
     private String sku;
     private UUID shopId;
+    private UUID userId;
     private String username; // current user
     private String categoryNames;
 }

@@ -1,7 +1,6 @@
 package com.theblood.identityservice.config;
 
 import com.theblood.identityservice.service.UserService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -26,13 +25,13 @@ import java.util.List;
 @EnableMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
 
-    GatewayAuthenticationFilter gatewayAuthenticationFilter;
+    InternalAuthenticationFilter internalAuthenticationFilter;
     UserService userService;
     PasswordEncoder passwordEncoder;
 
     // Thêm constructor thủ công
-    public SecurityConfig(GatewayAuthenticationFilter gatewayAuthenticationFilter, UserService userService, PasswordEncoder passwordEncoder) {
-        this.gatewayAuthenticationFilter = gatewayAuthenticationFilter;
+    public SecurityConfig(InternalAuthenticationFilter internalAuthenticationFilter, UserService userService, PasswordEncoder passwordEncoder) {
+        this.internalAuthenticationFilter = internalAuthenticationFilter;
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
     }
@@ -42,10 +41,10 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**", "/actuator/**").permitAll()  // Public
+                        .requestMatchers("/auth/**", "/error", "/user/", "/actuator/**").permitAll()  // Public
                         .anyRequest().authenticated()  // ← Private endpoints need headers
                 )
-                .addFilterBefore(gatewayAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(internalAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
@@ -66,7 +65,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:3000", "http://localhost:8081"));
+        configuration.setAllowedOrigins(List.of("http://localhost:3000", "http://localhost:8081", "http://localhost:8080"));
         configuration.setAllowedMethods(List.of("*"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);

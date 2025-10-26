@@ -1,6 +1,7 @@
 package com.theblood.identityservice.service.impl;
 
 import com.theblood.common.enums.TokenType;
+import com.theblood.identityservice.model.User;
 import com.theblood.identityservice.service.JwtService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -42,20 +43,21 @@ public class JwtServiceImpl implements JwtService {
 
 
     @Override
-    public String generateToken(TokenType tokenType, UserDetails user) {
+    public String generateToken(TokenType tokenType, User user) {
         Map<String, Object> claims = new HashMap<>();
 
         claims.put("type", tokenType.name());
         claims.put("username", user.getUsername());
-        claims.put("roles", user.getAuthorities());
+        claims.put("permissions", user.getAuthorities());
 
-        return createToken(claims, user.getUsername(), tokenType);
+        return createToken(claims, user.getId().toString(), tokenType);
     }
 
     @Override
     public String extractUsername(String token, TokenType tokenType) {
-        return extractClaim(token, tokenType, Claims::getSubject);
+        return extractClaim(token, tokenType, claims -> claims.get("username", String.class));
     }
+
 
     @Override
     public boolean isValid(String token, UserDetails user, TokenType tokenType) {

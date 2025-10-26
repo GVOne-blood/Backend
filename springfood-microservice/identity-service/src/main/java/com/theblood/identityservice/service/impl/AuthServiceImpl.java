@@ -5,30 +5,23 @@ import com.theblood.common.enums.CookieKey;
 import com.theblood.common.enums.TokenType;
 import com.theblood.common.exception.custom.InvalidDataException;
 import com.theblood.common.util.CookieUtil;
-import com.theblood.identityservice.config.RedisConfig;
 import com.theblood.identityservice.dto.response.TokenResponse;
-import com.theblood.identityservice.model.Token;
 import com.theblood.identityservice.model.User;
 import com.theblood.identityservice.repository.UserRepository;
 import com.theblood.identityservice.service.AuthService;
 import com.theblood.identityservice.service.JwtService;
 import com.theblood.identityservice.service.UserService;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 
@@ -42,6 +35,7 @@ public class AuthServiceImpl implements AuthService {
     UserService userService;
     AuthenticationManager authenticationManager;
     RedisTemplate<String, String> redisTemplate;
+
     @Override
     public TokenResponse login(LoginRequest loginRequest, HttpServletResponse response) {
         String redisKey = "auth:login:A+Rtoken:" + loginRequest.getUsername();
@@ -86,26 +80,49 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public TokenResponse refresh(HttpServletRequest request) {
+    public TokenResponse refresh(String refreshToken) {  // ✅ Nhận token trực tiếp
 
-        String token = request.getHeader("r_token");
-        if (!StringUtils.isNotBlank(token)) throw new InvalidDataException("Token is not provided ");
+        // Validate token not null/empty
+        if (refreshToken == null || refreshToken.trim().isEmpty()) {
+            throw new InvalidDataException("Refresh token is required");
+        }
 
-        String username = jwtService.extractUsername(token, TokenType.REFRESH);
-        Optional<User> user = userRepository.findByUsername(username);
-        if (!jwtService.isValid(token, user.get(), TokenType.REFRESH)) throw new InvalidDataException("Token is not valid");
+        try {
+            // Validate refresh token
+            if (jwtService.isTokenExpired(refreshToken, TokenType.REFRESH)) {
+                throw new InvalidDataException("Refresh token has expired");
+            }
 
-        String newAccessToken = jwtService.generateToken(TokenType.ACCESS, user.get());
+            // Extract username
+            String username = jwtService.extractUsername(refreshToken, TokenType.REFRESH);
 
-        TokenResponse tokenResponse = new TokenResponse();
-        tokenResponse.setRefreshToken(token);
-        tokenResponse.setAccessToken(newAccessToken);
-        tokenResponse.setUserId(user.get().getId().toString());
-        tokenResponse.setUsername(user.get().getUsername());
-        tokenResponse.setExpiresIn(jwtService.getTokenExpiration(TokenType.REFRESH));
+            // Load user
+            User user = userRepository.findByUsername(username)
+                    .orElseThrow(() -> new InvalidDataException("User not found"));
 
-        return tokenResponse;
+            // Validate token belongs to user
+            if (!jwtService.isValid(refreshToken, user, TokenType.REFRESH)) {
+                throw new InvalidDataException("Invalid refresh token");
+            }
+
+            // Generate new access token
+            String newAccessToken = jwtService.generateToken(TokenType.ACCESS, user);
+
+            // Build response
+            TokenResponse tokenResponse = new TokenResponse();
+            tokenResponse.setAccessToken(newAccessToken);
+            tokenResponse.setRefreshToken(refreshToken);  // Return same refresh token
+            tokenResponse.setUserId(user.getId().toString());
+            tokenResponse.setUsername(user.getUsername());
+            tokenResponse.setExpiresIn(jwtService.getTokenExpiration(TokenType.ACCESS)); // Access token expiry
+
+            return tokenResponse;
+
+        } catch (Exception e) {
+            throw new InvalidDataException("Failed to refresh token: " + e.getMessage());
+        }
     }
+
 
     @Override
     public void logout(HttpServletRequest request, HttpServletResponse response) {

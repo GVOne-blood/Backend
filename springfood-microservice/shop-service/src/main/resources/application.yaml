@@ -26,9 +26,6 @@ spring:
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
 
-grpc:
-  server:
-    port: 9090
 
 eureka:
   client:
@@ -37,3 +34,10 @@ eureka:
   instance:
     prefer-ip-address: true
 
+grpc:
+  server:
+    port: 9090
+  client:
+    product-service:
+      address: 'static://localhost:9091'
+      negotiationType: PLAINTEXT

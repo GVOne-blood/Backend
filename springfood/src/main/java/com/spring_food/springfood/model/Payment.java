@@ -14,13 +14,12 @@ import java.util.List;
 @AttributeOverride(name = "id", column = @Column(name = "payment_name", nullable = true))
 public class Payment extends AbstractEntity {
 
+    @OneToMany(mappedBy = "payment", cascade = CascadeType.ALL)
+    List<PaymentTransactions> paymentTransactions = new ArrayList<>();
     private String description;
-
     @Column(name = "is_active")
     private Boolean isActive = true;
-
     @OneToMany(mappedBy = "paymentMethod")
     private List<Order> orders = new ArrayList<>();
 
-    @
 }

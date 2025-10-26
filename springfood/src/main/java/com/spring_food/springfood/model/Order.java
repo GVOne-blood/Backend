@@ -51,7 +51,7 @@ public class Order extends AbstractEntity {
 //    @Enumerated(EnumType.STRING)
 //    private TransactionStatus paymentStatus;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "id")
     private PaymentTransactions paymentTransactions;
 

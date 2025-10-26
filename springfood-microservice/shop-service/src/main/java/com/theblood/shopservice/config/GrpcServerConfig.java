@@ -1,6 +1,6 @@
 package com.theblood.shopservice.config;
 
-import com.theblood.shopservice.grpc.ProductValidationService;
+import com.theblood.shopservice.grpc.server_role.ProductValidationService;
 import io.grpc.BindableService;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;

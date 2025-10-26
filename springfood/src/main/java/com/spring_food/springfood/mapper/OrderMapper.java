@@ -22,6 +22,8 @@ public interface OrderMapper {
     @Mapping(target = "id", ignore = true)
     Order toOrder(SingleOrderRequest singleOrderRequest);
 
+    List<SingleOrderRequest> toSingleOrderRequest(List<Order> order);
+
     @Mapping(target = "id", ignore = true)
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     List<Order> toOrder(List<SingleOrderRequest> request);

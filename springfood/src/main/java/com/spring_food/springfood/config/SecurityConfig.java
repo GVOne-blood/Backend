@@ -31,6 +31,7 @@ public class SecurityConfig {
 
     private static final String[] WHITE_LIST = {
             "/api/auth/**",
+            "/api/payment/vnpay-payment-return/**",
             "/v3/api-docs/**",
             "/swagger-ui/**",
             "/swagger-ui.html",

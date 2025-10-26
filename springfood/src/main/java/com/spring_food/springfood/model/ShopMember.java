@@ -7,7 +7,11 @@ import lombok.*;
 import java.io.Serializable;
 
 
-@Getter @Setter @AllArgsConstructor @NoArgsConstructor @EqualsAndHashCode
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@EqualsAndHashCode
 @Embeddable
 class ShopMemberId implements Serializable {
 
@@ -16,14 +20,13 @@ class ShopMemberId implements Serializable {
 
     @Column(name = "shop_id")
     private String shopId;
-
-
 }
 
 
 @Getter
 @Setter
-@AllArgsConstructor @NoArgsConstructor
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @Table(name = "shop_member")
 

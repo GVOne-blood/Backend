@@ -6,6 +6,7 @@ option java_package = "com.theblood.productservice.grpc";
 
 service ProductService {
   rpc ValidateProductCreation (ValidateProductCreationRequest) returns (ValidateProductCreationResponse);
+  rpc ValidateProductUpdate (ValidateProductUpdateRequest) returns (ValidateProductUpdateResponse);
 }
 
 message ValidateProductCreationRequest {
@@ -15,6 +16,14 @@ message ValidateProductCreationRequest {
   string categoryNames = 4;
 }
 message ValidateProductCreationResponse {
+  bool isValid = 1;
+  string message = 2;
+}
+message ValidateProductUpdateRequest{
+  string shopId = 1;
+  string userId = 2;
+}
+message ValidateProductUpdateResponse{
   bool isValid = 1;
   string message = 2;
 }

@@ -27,7 +27,7 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         connection:
-          handling_mode: DELAYED_ACQUISITION_AND_HOLD
+        handling_mode: DELAYED_ACQUISITION_AND_HOLD
           provider_disables_autocommit: false
         default_schema: public
         globally_quoted_identifiers: true
@@ -47,7 +47,7 @@ vnpay:
 
   # URL để VNPay gọi lại sau khi người dùng thanh toán xong (phải khớp với endpoint trong controller)
   # Lưu ý: Phần domain sẽ được lấy tự động từ request, ở đây chỉ cần path
-  return-url: /api/payment/vnpay-payment-return
+  return-url: /api/payment/vnpay-payment-return/
 
   # Mã website (Terminal ID) do VNPay cung cấp
   #tmn-code: T2NFMFM4

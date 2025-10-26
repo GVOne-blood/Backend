@@ -31,3 +31,9 @@ jwt:
   secretKey: 4dVgNvOxWTz2PKJZqCYFoh+AXX0l2OVHoCTfN9ZdXGs=
   resetKey: 4dVgNvOxWTz2PKJZqCYFoh+AXX0l2OVHoCTfN9ZdXGs=
   refreshKey: RKyKtM34VufukHK6sSPlQdDA8wBOHCYUygwIp6Fekco=
+logging:
+  level:
+    org.springframework.security: DEBUG
+    org.springframework.security.web.FilterChainProxy: DEBUG
+    org.springframework.security.web.access.ExceptionTranslationFilter: DEBUG
+    org.springframework.security.authentication: DEBUG

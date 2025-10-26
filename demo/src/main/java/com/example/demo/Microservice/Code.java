@@ -1,4 +1,4 @@
-package com.example.demo.Microservice.Demo;
+package com.example.demo.Microservice;
 
 public class Code {
 }

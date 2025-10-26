@@ -23,6 +23,7 @@ public class SecurityConfig {
                 .authorizeExchange(exchange -> exchange
                         // Public endpoints
                         .pathMatchers("/api/v1/auth/login",
+                                "/error",
                                 "/api/v1/auth/register",
                                 "/api/v1/products/**",
                                 "/api/v1/auth/refresh-token").permitAll()

@@ -1,18 +1,21 @@
 package com.spring_food.springfood.service;
 
-import jakarta.servlet.http.HttpServletRequest;
+import com.spring_food.springfood.common.enums.TransactionStatus;
+import com.spring_food.springfood.dto.request.PaymentInfoRequest;
+import com.spring_food.springfood.model.Order;
+import com.spring_food.springfood.model.PaymentTransactions;
 
-import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 public interface PaymentService {
 
 
-    void handlePaymentReturnSuccess(String orderId, Map<String, String> response);
+    PaymentTransactions createPaymentTransaction(PaymentInfoRequest paymentInfoRequest, List<Order> orders);
 
-    void handlePaymentReturnFail();
+    void updatePaymentTransaction(String id, String transactionNo, TransactionStatus transactionStatus);
 
-    String handlePaymentCheckingStatus(HttpServletRequest request, String userId, String orderId) throws IOException;
+    void handlePaymentReturnSuccess(Map<String, String> response);
 
-    String handlePaymentRefund(HttpServletRequest request, String userId, String orderId) throws IOException;
+    void handlePaymentReturnFail(Map<String, String> response);
 }

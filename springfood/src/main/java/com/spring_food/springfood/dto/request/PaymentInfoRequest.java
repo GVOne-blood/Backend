@@ -8,8 +8,6 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import java.math.BigDecimal;
-
 @Getter
 @Setter
 @NoArgsConstructor
@@ -21,7 +19,7 @@ public class PaymentInfoRequest {
     String userId;
 
     @Min(0)
-    BigDecimal amount;
+    Long amount;
 
     @EnumPattern(name = "status", regexp = "PENDING|PAID|FAILED|CANCELLED")
     TransactionStatus status;

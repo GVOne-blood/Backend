@@ -21,9 +21,9 @@ public interface OrderService {
 
     OrderPaymentResponse createOrders(HttpServletRequest request, OrderRequest orderRequest, String user) throws UnsupportedEncodingException;
 
-    OrderPaymentResponse updatePendingOrders(HttpServletRequest request, OrdersUpdateRequest updateRequest, String userId) throws UnsupportedEncodingException;
+    OrderPaymentResponse updatePendingOrders(HttpServletRequest request, OrdersUpdateRequest updateRequest) throws UnsupportedEncodingException;
 
-    OrderPaymentResponse updatePaymentPendingOrders(HttpServletRequest request, OrdersUpdateRequest updateRequest, String userId);
+    OrderPaymentResponse updatePaymentPendingOrders(OrdersUpdateRequest updateRequest);
 
     OrderPaymentResponse updateConfirmedOrders(HttpServletRequest request, OrdersUpdateRequest updateRequest, String userId);
 

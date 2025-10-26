@@ -38,8 +38,8 @@ public class PaymentController {
     public ResponseEntity<ResponseData<?>> handlePaymentStatus(HttpServletRequest request,
                                                                @PathVariable String orderId,
                                                                @AuthenticationPrincipal User user) throws IOException {
-        String message = paymentService.handlePaymentCheckingStatus(request, user.getId(), orderId);
-        return ResponseEntity.ok(new ResponseData<>(200, "check chung successfully", message));
+        String message = vnPayService.handlePaymentCheckingStatus(request, user.getId(), orderId);
+        return ResponseEntity.ok(new ResponseData<>(200, "call api checking payment status successfully", message));
     }
 
     @GetMapping("/refund/{orderId}")
@@ -47,8 +47,8 @@ public class PaymentController {
     public ResponseEntity<ResponseData<?>> refundPaymentForOrder(HttpServletRequest request,
                                                                  @PathVariable String orderId,
                                                                  @AuthenticationPrincipal User user) throws IOException {
-        String message = paymentService.handlePaymentRefund(request, user.getId(), orderId);
-        return ResponseEntity.ok(new ResponseData<>(200, "refund refund successfully", message));
+        String message = vnPayService.handlePaymentRefund(request, user.getId(), orderId);
+        return ResponseEntity.ok(new ResponseData<>(200, "call api refund successfully", message));
     }
 
     // Endpoint này client sẽ gọi để lấy URL thanh toán
@@ -68,8 +68,8 @@ public class PaymentController {
 
     // Endpoint này VNPay sẽ redirect về sau khi thanh toán
     // Nó phải khớp với `vnp_Returnurl` trong config
-    @GetMapping("/vnpay-payment-return")
-    @PreAuthorize("hasAnyRole({'ADMIN', 'CUSTOMER', 'SHOP_OWNER', 'STAFF'})")
+    // @PreAuthorize("hasAnyRole({'ADMIN', 'CUSTOMER', 'SHOP_OWNER', 'STAFF'})")
+    @GetMapping("/vnpay-payment-return/")
     public RedirectView handleVnpayReturn(HttpServletRequest request) {
         int paymentStatus = vnPayService.processVNPayReturn(request);
 

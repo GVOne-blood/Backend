@@ -1,6 +1,7 @@
 package com.spring_food.springfood.dto.request;
 
 
+import com.spring_food.springfood.common.enums.PaymentMethod;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -21,8 +22,7 @@ public class OrderRequest {
     List<ShopOrderRequest> shopOrderItems;
 
     @NotNull(message = "Payment info must be not blank")
-    @Valid
-    PaymentInfoRequest paymentInfo;
+    PaymentMethod paymentMethod;
 
     @NotNull(message = "Shipping address id must be not null")
     String shippingAddressId;

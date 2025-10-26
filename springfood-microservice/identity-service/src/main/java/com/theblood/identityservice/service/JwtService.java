@@ -1,10 +1,11 @@
 package com.theblood.identityservice.service;
 
 import com.theblood.common.enums.TokenType;
+import com.theblood.identityservice.model.User;
 import org.springframework.security.core.userdetails.UserDetails;
 
 public interface JwtService {
-    String generateToken(TokenType tokenType, UserDetails user);
+    String generateToken(TokenType tokenType, User user);
 
     /**
      * Extract expiration timestamp (milliseconds) from existing token

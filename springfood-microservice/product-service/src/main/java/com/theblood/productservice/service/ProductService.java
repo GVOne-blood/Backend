@@ -19,6 +19,8 @@ public interface ProductService {
 
     List<ProductDetail> getAllLastUpdatedProducts(LocalDateTime lastModifyAt);
 
+    Product updateProduct(UUID productId, ProductRequest productRequest);
+
     boolean isProductExists(UUID productId);
 
     ProductDetail getProductDetailById(UUID productId);
@@ -34,7 +36,6 @@ public interface ProductService {
     List<ProductDetail> getListProductsRelated(UUID productId, int limit);
 //    Product addProduct(ProductRequest productRequest);
 //
-//    Product updateProduct(UUID productId, ProductRequest productRequest);
 //
 //    void deleteProduct(UUID productId);
 //

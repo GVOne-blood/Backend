@@ -23,4 +23,12 @@ public class KafkaTopicConfig {
                 .replicas(1)
                 .build();
     }
+
+    @Bean
+    public NewTopic productUpdateRequestTopic() {
+        return TopicBuilder.name("product-update-request")
+                .partitions(3)
+                .replicas(1)
+                .build();
+    }
 }

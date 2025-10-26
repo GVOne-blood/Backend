@@ -1,6 +1,7 @@
 package com.theblood.identityservice.controller;
 
 
+import com.theblood.common.dto.request.TokenRefreshRequest;
 import com.theblood.common.dto.response.LoginRequest;
 import com.theblood.common.dto.response.ResponseData;
 import com.theblood.identityservice.dto.request.UserRequest;
@@ -60,16 +61,12 @@ public class AuthController {
         }
     }
 
-    @GetMapping("/refresh")
-    public ResponseEntity<ResponseData<TokenResponse>> refreshToken(HttpServletRequest request) {
-        try {
-            TokenResponse response =
-                    authService.refresh(request);
-            return ResponseEntity.ok(new ResponseData<>(200, "Token refreshed successfully", response));
-        } catch (Exception e) {
-            // System.out.println(e.getMessage());
-            return ResponseEntity.ok(new ResponseData<>(400, e.getMessage(), null));
-        }
+    @PostMapping("/refresh")
+    public ResponseEntity<TokenResponse> refreshToken(
+            @RequestBody TokenRefreshRequest request) {  // ✅ Nhận từ body
+
+        TokenResponse response = authService.refresh(request.getRefreshToken());
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/login")

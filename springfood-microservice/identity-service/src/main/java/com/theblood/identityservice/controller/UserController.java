@@ -1,5 +1,6 @@
 package com.theblood.identityservice.controller;
 
+import com.theblood.common.dto.request.CustomUserPrincipal;
 import com.theblood.common.dto.response.ResponseData;
 import com.theblood.identityservice.dto.request.UserRequest;
 import com.theblood.identityservice.dto.response.UserDetail;
@@ -19,7 +20,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -39,7 +39,7 @@ public class UserController {
 
     @GetMapping("/")
     public ResponseEntity<ResponseData<Page<UserDetail>>> listUsers(
-            @PageableDefault Pageable pageable
+            @PageableDefault(size = 5, page = 0, sort = "id", direction = Sort.Direction.ASC) Pageable pageable
     ) {
 
         Page<UserDetail> users = userService.getListUsers(pageable);
@@ -52,9 +52,9 @@ public class UserController {
 
     @PreAuthorize("hasRole('CUSTOMER')")
     @GetMapping("/profile")
-    public ResponseEntity<ResponseData<UserDetail>> getUserById(@AuthenticationPrincipal User user) {
+    public ResponseEntity<ResponseData<UserDetail>> getUserById(@AuthenticationPrincipal CustomUserPrincipal user) {
 
-        UserDetail resUser = userService.getUserDetail(user.getId());
+        UserDetail resUser = userService.getUserDetail(user.getUserId());
 
         return new ResponseEntity<>
                 (new ResponseData<>(HttpStatus.OK.value(),
@@ -64,8 +64,8 @@ public class UserController {
 
     @PreAuthorize("hasRole('CUSTOMER')")
     @PutMapping("/profile")
-    public ResponseEntity<ResponseData<UserDetail>> updateUser(@AuthenticationPrincipal User user, @RequestBody UserRequest userRequest) {
-        UserDetail resUser = userService.updateUser(user.getId(), userRequest);
+    public ResponseEntity<ResponseData<UserDetail>> updateUser(@AuthenticationPrincipal CustomUserPrincipal user, @RequestBody UserRequest userRequest) {
+        UserDetail resUser = userService.updateUser(user.getUserId(), userRequest);
         return new ResponseEntity<>(new ResponseData<>(200, "User updated successfully", resUser), HttpStatus.OK);
 
     }
@@ -77,7 +77,7 @@ public class UserController {
             HttpServletRequest request,
             HttpServletResponse response,
             @AuthenticationPrincipal
-            UserDetails currentUser) {
+            CustomUserPrincipal currentUser) {
         try {
 
             User userToDelete = userService.findById(id);

@@ -13,6 +13,7 @@ import com.theblood.productservice.kafka.service.OutboxService;
 import com.theblood.productservice.mapper.ProductMapper;
 import com.theblood.productservice.model.Categories;
 import com.theblood.productservice.model.Product;
+import com.theblood.productservice.model.ProductCategory;
 import com.theblood.productservice.repository.*;
 import com.theblood.productservice.repository.projection.ProductProjection;
 import com.theblood.productservice.service.ProductService;
@@ -25,6 +26,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -216,10 +218,10 @@ public class ProductServiceImpl implements ProductService {
 
         // validate using gRPC
         ValidateProductCreationResponse validationResponse = productGrpcClient.validateProduct(
-            productRequest.getSku(),
-            productRequest.getShopId().toString(),
-            currentUser,
-            productRequest.getCategoryNames()
+                productRequest.getSku(),
+                productRequest.getShopId().toString(),
+                currentUser,
+                productRequest.getCategoryNames()
         );
 
         if (!validationResponse.getIsValid()) {
@@ -271,64 +273,68 @@ public class ProductServiceImpl implements ProductService {
         return productRepository.save(product);
     }
 
-//    @Override
-//    @PreAuthorize("hasRole('SHOP_OWNER') and hasAuthority('product:upadte')")
-//    @Transactional
-//    public Product updateProduct(UUID productId, ProductRequest productRequest) {
-//        Product productToUpdate = productRepository.findById(productId)
-//                .orElseThrow(() -> new InvalidDataException("Product not found with ID: " + productId));
-//
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//        String currentUsername = authentication.getName();
-//
+    @Override
+    @PreAuthorize("hasRole('SHOP_OWNER') and hasAuthority('product:upadte')")
+    @Transactional
+    public Product updateProduct(UUID productId, ProductRequest productRequest) {
+        Product productToUpdate = productRepository.findById(productId)
+                .orElseThrow(() -> new InvalidDataException("Product not found with ID: " + productId));
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentUsername = authentication.getName();
+
+
+        kafkaTemplate.send("product-update-request", productToUpdate.getShopId());
+
+
 //        List<String> authorizedUsers = userRepository.findUsernamesByShopId(productToUpdate.getShop().getId())
 //                .orElseThrow(() -> new InvalidDataException("Shop of the product not found or has no users"));
 //
 //        if (!authorizedUsers.contains(currentUsername)) {
 //            throw new InvalidDataException("User is not authorized to update this product.");
 //        }
-//
-//        productMapper.updateProductFromDto(productRequest, productToUpdate);
-//
-//        if (productRequest.getCategoryNames() != null && !productRequest.getCategoryNames().isBlank()) {
-//            // XÓA CÁC LIÊN KẾT HIỆN TẠI
-//            productToUpdate.getProductCategories().clear();
-//
-//            List<String> categoriesNames;
-//            if (productRequest.getCategoryNames().contains(",")) {
-//                categoriesNames = Arrays.stream(productRequest.getCategoryNames().split(","))
-//                        .map(String::trim)
-//                        .collect(Collectors.toList());
-//            } else {
-//                categoriesNames = List.of(productRequest.getCategoryNames().trim());
-//            }
-//
-//
-//            List<Categories> newCategories = categoryRepository.findAllById(categoriesNames);
-//
-//            if (newCategories.size() != categoriesNames.size()) {
-//                throw new InvalidDataException("One or more categories not found.");
-//            }
-//            for (Categories cat : newCategories) {
-//                ProductCategory pc = new ProductCategory();
-//                pc.setCategories(cat);
-//                pc.setProduct(productToUpdate);
-//                productToUpdate.getProductCategories().add(pc);
-//            }
-//        }
-//
-//        if (productRequest.getStatus() != null) {
-//            productToUpdate.setProductStatus(productRequest.getStatus());
-//        }
-//
-//        Product updatedProduct = productRepository.save(productToUpdate);
-//
-//        // Invalidate cache after successful update
-//        productCacheManager.invalidateProductCache(productId);
-//
-//        return updatedProduct;
-//    }
-//
+
+        productMapper.updateProductFromDto(productRequest, productToUpdate);
+
+        if (productRequest.getCategoryNames() != null && !productRequest.getCategoryNames().isBlank()) {
+            // XÓA CÁC LIÊN KẾT HIỆN TẠI
+            productToUpdate.getProductCategories().clear();
+
+            List<String> categoriesNames;
+            if (productRequest.getCategoryNames().contains(",")) {
+                categoriesNames = Arrays.stream(productRequest.getCategoryNames().split(","))
+                        .map(String::trim)
+                        .collect(Collectors.toList());
+            } else {
+                categoriesNames = List.of(productRequest.getCategoryNames().trim());
+            }
+
+
+            List<Categories> newCategories = categoryRepository.findAllById(categoriesNames);
+
+            if (newCategories.size() != categoriesNames.size()) {
+                throw new InvalidDataException("One or more categories not found.");
+            }
+            for (Categories cat : newCategories) {
+                ProductCategory pc = new ProductCategory();
+                pc.setCategories(cat);
+                pc.setProduct(productToUpdate);
+                productToUpdate.getProductCategories().add(pc);
+            }
+        }
+
+        if (productRequest.getStatus() != null) {
+            productToUpdate.setProductStatus(productRequest.getStatus());
+        }
+
+        Product updatedProduct = productRepository.save(productToUpdate);
+
+        // Invalidate cache after successful update
+        productCacheManager.invalidateProductCache(productId);
+
+        return updatedProduct;
+    }
+
 //    @PreAuthorize("hasRole('SHOP_OWNER') and hasAuthority('product:delete')")
 //    @Override
 //    @Transactional

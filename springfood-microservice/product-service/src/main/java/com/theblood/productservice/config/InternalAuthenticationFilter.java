@@ -1,5 +1,6 @@
 package com.theblood.productservice.config;
 
+import com.theblood.common.dto.request.CustomUserPrincipal;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -15,21 +16,22 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
 @Slf4j
 public class InternalAuthenticationFilter extends OncePerRequestFilter {
 
+
     @Value("${security.internal.auth.header.username:X-User-Username}")
     private String usernameHeader;
 
     @Value("${security.internal.auth.header.roles:X-User-Roles}")
     private String rolesHeader;
+
+    @Value("X-User-ID")
+    private String userIdHeader;
 
     @Value("${security.internal.auth.header.authorities:X-User-Authorities}")
     private String authoritiesHeader;
@@ -45,6 +47,7 @@ public class InternalAuthenticationFilter extends OncePerRequestFilter {
         log.debug("🔍 Filter processing: {}", path);
 
         // Extract headers
+        String userId = request.getHeader(userIdHeader);
         String username = request.getHeader(usernameHeader);
         String rolesString = request.getHeader(rolesHeader);
         String authoritiesString = request.getHeader(authoritiesHeader);
@@ -52,7 +55,10 @@ public class InternalAuthenticationFilter extends OncePerRequestFilter {
         // NẾU có headers → set authentication
         if (StringUtils.hasText(username)) {
             log.info("✅ Setting authentication for user: {}", username);
-            setAuthentication(username, rolesString, authoritiesString);
+            CustomUserPrincipal principal = new CustomUserPrincipal();
+            principal.setUserId(UUID.fromString(userId));
+            principal.setUsername(username);
+            setAuthentication(principal, rolesString, authoritiesString);
         } else {
             log.debug("⚠️ No authentication headers - request will be anonymous");
             // KHÔNG set gì cả - để Spring Security tự handle
@@ -67,17 +73,18 @@ public class InternalAuthenticationFilter extends OncePerRequestFilter {
     /**
      * Set authentication vào SecurityContext
      */
-    private void setAuthentication(String username, String rolesString, String authoritiesString) {
+    private void setAuthentication(Object principal, String rolesString, String authoritiesString) {
         List<String> rolesList = parseCommaSeparated(rolesString);
         List<String> authoritiesList = parseCommaSeparated(authoritiesString);
         List<GrantedAuthority> grantedAuthorities = buildAuthorities(rolesList, authoritiesList);
 
+
         UsernamePasswordAuthenticationToken authentication =
-                new UsernamePasswordAuthenticationToken(username, null, grantedAuthorities);
+                new UsernamePasswordAuthenticationToken(principal, null, grantedAuthorities);
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        log.debug("✅ SecurityContext set: user={}, authorities={}", username, grantedAuthorities);
+        log.debug("✅ SecurityContext set: user={}, authorities={}", principal, grantedAuthorities);
     }
 
     private List<String> parseCommaSeparated(String str) {

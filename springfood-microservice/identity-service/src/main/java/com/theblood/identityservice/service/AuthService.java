@@ -6,8 +6,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 public interface AuthService {
-    TokenResponse login (LoginRequest loginRequest, HttpServletResponse response);
-    TokenResponse refresh(HttpServletRequest request);
+    TokenResponse login(LoginRequest loginRequest, HttpServletResponse response);
+
+    TokenResponse refresh(String request);
+
     void logout(HttpServletRequest request, HttpServletResponse response);
 
 }

@@ -1,9 +1,9 @@
 package com.theblood.apigateway.filter;
 
-import com.theblood.apigateway.dto.TokenRefreshRequest;
-import com.theblood.apigateway.dto.TokenRefreshResponse;
 import com.theblood.apigateway.util.JwtUtil;
 import com.theblood.apigateway.util.RouterValidator;
+import com.theblood.common.dto.request.TokenRefreshRequest;
+import com.theblood.common.dto.response.TokenResponse;
 import com.theblood.common.enums.TokenType;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
@@ -191,10 +191,10 @@ public class AuthenticationFilter implements GlobalFilter, GatewayFilter, Ordere
                     TokenRefreshRequest refreshRequest = new TokenRefreshRequest(refreshToken);
 
                     return webClientBuilder.build().post()
-                            .uri("lb://identity-service/api/auth/refresh-token")
+                            .uri("lb://identity-service/auth/refresh")
                             .bodyValue(refreshRequest)
                             .retrieve()
-                            .bodyToMono(TokenRefreshResponse.class)
+                            .bodyToMono(TokenResponse.class)
                             .flatMap(response -> {
                                 log.info("Successfully refreshed access token");
                                 String newAccessToken = response.getAccessToken();
@@ -226,7 +226,8 @@ public class AuthenticationFilter implements GlobalFilter, GatewayFilter, Ordere
         Claims claims = jwtUtil.extractAllClaims(token);
 
         String username = claims.get("username", String.class);
-        List<?> authoritiesFromJwt = claims.get("roles", List.class);
+        UUID userId = UUID.fromString(claims.getSubject());
+        List<?> authoritiesFromJwt = claims.get("permissions", List.class);
 
         if (authoritiesFromJwt == null) {
             authoritiesFromJwt = Collections.emptyList();
@@ -243,7 +244,7 @@ public class AuthenticationFilter implements GlobalFilter, GatewayFilter, Ordere
 
                 if (authority != null) {
                     if (authority.startsWith("ROLE_")) {
-                        roles.add(authority.substring(5)); // Remove "ROLE_" prefix
+                        roles.add(authority);
                     } else {
                         authorities.add(authority);
                     }
@@ -258,6 +259,7 @@ public class AuthenticationFilter implements GlobalFilter, GatewayFilter, Ordere
                 username, rolesHeader, authoritiesHeader);
 
         ServerHttpRequest mutatedRequest = exchange.getRequest().mutate()
+                .header("X-User-ID", userId.toString())
                 .header("X-User-Username", username)
                 .header("X-User-Roles", rolesHeader)
                 .header("X-User-Authorities", authoritiesHeader)
