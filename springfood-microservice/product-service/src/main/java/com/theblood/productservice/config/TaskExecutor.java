@@ -1,6 +1,7 @@
 package com.theblood.productservice.config;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.ConcurrencyFailureException;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -43,8 +44,11 @@ public class TaskExecutor {
             }
             try {
                 Thread.sleep(100);
-            } catch (Exception e) {
+            } catch (ConcurrencyFailureException e) {
+                log.error("Race condition between " + e.getCause());
                 log.error(e.getMessage());
+            } catch (InterruptedException e) {
+                log.error("Thread is interrupted" + e.getMessage());
             }
         }
         log.info(" finish all task in {} ms", System.currentTimeMillis() - start);

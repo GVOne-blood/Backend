@@ -1,4 +1,4 @@
-package com.theblood.orderservice.common.enums;
+package com.theblood.common.enums;
 
 public enum OrderStatus {
     PENDING_PAYMENT,

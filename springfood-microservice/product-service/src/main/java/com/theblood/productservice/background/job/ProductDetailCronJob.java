@@ -1,7 +1,7 @@
 package com.theblood.productservice.background.job;
 
 
-import com.theblood.productservice.dto.response.ProductDetail;
+import com.theblood.common.dto.response.ProductDetail;
 import com.theblood.productservice.mapper.ProductMapper;
 import com.theblood.productservice.repository.ProductRepository;
 import com.theblood.productservice.service.ProductService;
@@ -26,12 +26,12 @@ public class ProductDetailCronJob {
     private final ProductService productService;
     private final ProductRepository productRepository;
     private final ProductMapper productMapper;
-    private LocalDateTime lastRunCompleted = LocalDateTime.now();
+    private volatile LocalDateTime lastRunCompleted = LocalDateTime.now();
 
     private int limit = 300;
     private Pageable pageableInput;
 
-    @Scheduled(cron = "0 */2 * * * *")
+    @Scheduled(cron = "0 * * */2 * *")
     public void cacheProductDetails() {
         log.info("Starting ProductDetailCronJob cacheProductDetails at {}", java.time.LocalDateTime.now());
         try {
@@ -54,7 +54,7 @@ public class ProductDetailCronJob {
                 redisServiceWrapper.setValueWithTimeout(key, pd, 5, TimeUnit.HOURS);
             }
             log.info("Cached {} product details in Redis", productDetails.size());
-            lastRunCompleted = LocalDateTime.now();
+            lastRunCompleted = java.time.LocalDateTime.now();
         } catch (Exception e) {
             log.error("Error occurred during ProductDetailCronJob: {}", e.getMessage());
         }
@@ -78,6 +78,9 @@ public class ProductDetailCronJob {
             }
             // check deleted products
 
+            // singleton pattern cho phép lastRunCompleted không bị mất giá trị cũ,
+            // nhưng nó không thread safe, tranh race condition nên cho nó là volatile
+            lastRunCompleted = java.time.LocalDateTime.now();
         } catch (Exception e) {
             log.error("Error occurred during ProductDetailCronJob: {}", e.getMessage());
         }

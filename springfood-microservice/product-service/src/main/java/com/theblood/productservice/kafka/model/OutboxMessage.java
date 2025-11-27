@@ -3,6 +3,7 @@ package com.theblood.productservice.kafka.model;
 import com.theblood.common.enums.MessageStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -11,6 +12,7 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "outbox_messages")
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class OutboxMessage {

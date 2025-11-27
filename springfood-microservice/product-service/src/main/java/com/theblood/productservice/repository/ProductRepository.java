@@ -1,5 +1,6 @@
 package com.theblood.productservice.repository;
 
+import com.theblood.common.dto.response.ProductDetail;
 import com.theblood.productservice.model.Product;
 import com.theblood.productservice.repository.projection.ProductProjection;
 import org.springframework.data.domain.Page;
@@ -75,4 +76,8 @@ public interface ProductRepository extends
     Optional<ProductProjection> findProductProjectionById(@Param("productId") UUID productId);
 
     List<Product> findAllByUpdatedAtGreaterThan(LocalDateTime updatedAtIsGreaterThan);
+
+    @Query("SELECT new com.theblood.common.dto.response.ProductDetail(p.id, p.name, p.description, p.price, p.images, p.quantity, p.msg, p.exp, p.averageRating,  p.totalFeedbacks) FROM Product p WHERE p.id = :productId ")
+    Optional<ProductDetail> findProductDetailById(@Param("productId") UUID productId);
+
 }

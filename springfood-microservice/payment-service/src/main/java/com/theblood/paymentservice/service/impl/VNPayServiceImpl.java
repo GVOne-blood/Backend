@@ -2,10 +2,8 @@ package com.theblood.paymentservice.service.impl;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.theblood.common.enums.PaymentMethod;
-import com.theblood.common.exception.custom.InvalidDataException;
-import com.theblood.paymentservice.common.enums.TransactionStatus;
 import com.theblood.paymentservice.config.VNPayConfig;
+import com.theblood.paymentservice.dto.request.VNPayPaymentRequest;
 import com.theblood.paymentservice.service.PaymentService;
 import com.theblood.paymentservice.service.VNPayService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -18,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.*;
 import java.net.HttpURLConnection;
+import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
@@ -32,7 +31,7 @@ import java.util.*;
 public class VNPayServiceImpl implements VNPayService {
 
     PaymentService paymentService;
-    OrderRepository orderRepository;
+    //OrderRepository orderRepository;
 
     private String generateSecureHash(Map<String, String> params, String secretKey) throws UnsupportedEncodingException {
         // Theo sample của VNPay: sắp xếp tham số, nối field=value với GIÁ TRỊ ĐƯỢC URL-ENCODE UTF-8
@@ -266,57 +265,57 @@ public class VNPayServiceImpl implements VNPayService {
     }
 
 
-    @Transactional
-    @Override
-    public String handlePaymentCheckingStatus(HttpServletRequest request, String userId, String orderId) throws IOException {
-
-        Order order = orderRepository.findById(orderId).orElseThrow(() -> new InvalidDataException("Order Not Found"));
-        String transactionStatus = "";
-        String paymentMethod = order.getPaymentMethod().getId();
-        if (paymentMethod.equals(PaymentMethod.VNPAY.name())) {
-
-            Map<String, String> response =
-                    queryTransactionStatus(orderId, order.getPaymentTransactions().getTransactionNo(), order.getCreatedAt(), VNPayConfig.getIpAddress(request));
-
-            if (response.get("vnp_ResponseCode").equals("00")) {
-                transactionStatus = VNPayUtil.getTransactionStatusDescription(response.get("vnp_TransactionStatus"));
-
-            } else transactionStatus = "Send request fail: " + response.get("vnp_Message");
-        } else if (paymentMethod.equals(PaymentMethod.COD.name())) {
-        } //bla bla
-
-        return transactionStatus;
-    }
-
-    @Transactional
-    @Override
-    public String handlePaymentRefund(HttpServletRequest request, String userId, String orderId) throws IOException {
-        Order order = orderRepository.findById(orderId).orElseThrow(() -> new InvalidDataException("Order Not Found"));
-        String transactionStatus = "";
-        String paymentMethod = order.getPaymentMethod().getId();
-        if (!paymentMethod.equals(PaymentMethod.VNPAY.name()) || !order.getPaymentTransactions().getStatus().equals(TransactionStatus.PAID))
-            throw new NotActiveException("User haven't paid yet");
-
-        VNPayPaymentRequest vnpayRequest = new VNPayPaymentRequest();
-        vnpayRequest.setAmount(order.getFinalPrice().longValue());
-        // TxnRef = paymentTransaction.Id
-        vnpayRequest.setTxnRef(order.getPaymentTransactions().getId());
-        vnpayRequest.setTransferDate(order.getCreatedAt());
-        vnpayRequest.setPaymentMethod(PaymentMethod.VNPAY);
-        vnpayRequest.setUserId(userId);
-        vnpayRequest.setTransactionNo(order.getPaymentTransactions().getTransactionNo());
-        Map<String, String> response =
-                queryRefund(vnpayRequest, VNPayConfig.getIpAddress(request));
-
-
-        if (response.get("vnp_ResponseCode").equals("00")) {
-            transactionStatus = "Hoàn tiền thành công!";
-            paymentService.updatePaymentTransaction(order.getPaymentTransactions().getId(), order.getPaymentTransactions().getTransactionNo(), TransactionStatus.REFUNDED);
-
-        } else transactionStatus = "Hoàn tiền thất bại:  " + response.get("vnp_Message");
-
-        return transactionStatus;
-    }
+//    @Transactional
+//    @Override
+//    public String handlePaymentCheckingStatus(HttpServletRequest request, String userId, String orderId) throws IOException {
+//
+//        Order order = orderRepository.findById(orderId).orElseThrow(() -> new InvalidDataException("Order Not Found"));
+//        String transactionStatus = "";
+//        String paymentMethod = order.getPaymentMethod().getId();
+//        if (paymentMethod.equals(PaymentMethod.VNPAY.name())) {
+//
+//            Map<String, String> response =
+//                    queryTransactionStatus(orderId, order.getPaymentTransactions().getTransactionNo(), order.getCreatedAt(), VNPayConfig.getIpAddress(request));
+//
+//            if (response.get("vnp_ResponseCode").equals("00")) {
+//                transactionStatus = VNPayUtil.getTransactionStatusDescription(response.get("vnp_TransactionStatus"));
+//
+//            } else transactionStatus = "Send request fail: " + response.get("vnp_Message");
+//        } else if (paymentMethod.equals(PaymentMethod.COD.name())) {
+//        } //bla bla
+//
+//        return transactionStatus;
+//    }
+//
+//    @Transactional
+//    @Override
+//    public String handlePaymentRefund(HttpServletRequest request, String userId, String orderId) throws IOException {
+//        Order order = orderRepository.findById(orderId).orElseThrow(() -> new InvalidDataException("Order Not Found"));
+//        String transactionStatus = "";
+//        String paymentMethod = order.getPaymentMethod().getId();
+//        if (!paymentMethod.equals(PaymentMethod.VNPAY.name()) || !order.getPaymentTransactions().getStatus().equals(TransactionStatus.PAID))
+//            throw new NotActiveException("User haven't paid yet");
+//
+//        VNPayPaymentRequest vnpayRequest = new VNPayPaymentRequest();
+//        vnpayRequest.setAmount(order.getFinalPrice().longValue());
+//        // TxnRef = paymentTransaction.Id
+//        vnpayRequest.setTxnRef(order.getPaymentTransactions().getId());
+//        vnpayRequest.setTransferDate(order.getCreatedAt());
+//        vnpayRequest.setPaymentMethod(PaymentMethod.VNPAY);
+//        vnpayRequest.setUserId(userId);
+//        vnpayRequest.setTransactionNo(order.getPaymentTransactions().getTransactionNo());
+//        Map<String, String> response =
+//                queryRefund(vnpayRequest, VNPayConfig.getIpAddress(request));
+//
+//
+//        if (response.get("vnp_ResponseCode").equals("00")) {
+//            transactionStatus = "Hoàn tiền thành công!";
+//            paymentService.updatePaymentTransaction(order.getPaymentTransactions().getId(), order.getPaymentTransactions().getTransactionNo(), TransactionStatus.REFUNDED);
+//
+//        } else transactionStatus = "Hoàn tiền thất bại:  " + response.get("vnp_Message");
+//
+//        return transactionStatus;
+//    }
 
     @Override
     @Transactional

@@ -1,7 +1,7 @@
 package com.theblood.productservice.background.process;
 
+import com.theblood.common.dto.response.ProductDetail;
 import com.theblood.common.exception.custom.InvalidDataException;
-import com.theblood.productservice.dto.response.ProductDetail;
 import com.theblood.productservice.mapper.ProductMapper;
 import com.theblood.productservice.repository.FeedbackRepository;
 import com.theblood.productservice.repository.ProductRepository;

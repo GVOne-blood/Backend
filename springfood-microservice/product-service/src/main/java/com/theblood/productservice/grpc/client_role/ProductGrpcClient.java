@@ -1,5 +1,9 @@
-package com.theblood.productservice.grpc;
+package com.theblood.productservice.grpc.client_role;
 
+
+import com.theblood.common.grpc.ProductServiceGrpc;
+import com.theblood.common.grpc.ValidateProductCreationRequest;
+import com.theblood.common.grpc.ValidateProductCreationResponse;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +23,7 @@ public class ProductGrpcClient {
                 .build();
         this.stub = ProductServiceGrpc.newBlockingStub(channel);
     }
+
 
     public ValidateProductCreationResponse validateProduct(String sku, String shopId, String username, String categoryNames) {
         ValidateProductCreationRequest request = ValidateProductCreationRequest.newBuilder()

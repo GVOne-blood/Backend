@@ -1,4 +1,4 @@
-package com.theblood.productservice.dto.response;
+package com.theblood.common.dto.response;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -23,5 +23,6 @@ public class ProductDetail {
     LocalDate exp;
     Double averageRating;
     Long totalFeedbacks;
+
 
 }

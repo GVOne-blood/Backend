@@ -2,10 +2,12 @@ package com.theblood.productservice.controller;
 
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.theblood.common.dto.request.CustomUserPrincipal;
+import com.theblood.common.dto.response.ProductDetail;
 import com.theblood.common.dto.response.ResponseData;
 import com.theblood.common.exception.custom.InvalidDataException;
 import com.theblood.productservice.dto.request.ProductRequest;
-import com.theblood.productservice.dto.response.ProductDetail;
+import com.theblood.productservice.dto.response.ProductImageResponse;
 import com.theblood.productservice.model.Product;
 import com.theblood.productservice.service.ProductService;
 import jakarta.validation.Valid;
@@ -17,8 +19,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.UUID;
@@ -66,30 +71,46 @@ public class ProductController {
                     new ResponseData<>(400, "Create product failed: " + e.getMessage(), null), HttpStatus.BAD_REQUEST);
         }
     }
-//
-//    @PutMapping("/{id}")
-//    public ResponseEntity<ResponseData<Product>> updateProduct(@PathVariable("id") String id, @RequestBody @Valid ProductRequest productRequest) {
-//        try {
-//            Product updatedProduct = productService.updateProduct(id, productRequest);
-//            return new ResponseEntity<>(
-//                    new ResponseData<>(200, "Update product successfully", updatedProduct), HttpStatus.OK);
-//        } catch (Exception e) {
-//            return new ResponseEntity<>(
-//                    new ResponseData<>(400, "Update product failed: " + e.getMessage(), null), HttpStatus.BAD_REQUEST);
-//        }
-//    }
-//
-//    @DeleteMapping("/{id}")
-//    public ResponseEntity<ResponseData<Void>> deleteProduct(@PathVariable("id") String id) {
-//        try {
-//            productService.deleteProduct(id);
-//            return new ResponseEntity<>(
-//                    new ResponseData<>(200, "Delete product successfully", null), HttpStatus.OK);
-//        } catch (Exception e) {
-//            return new ResponseEntity<>(
-//                    new ResponseData<>(400, "Delete product failed: " + e.getMessage(), null), HttpStatus.BAD_REQUEST);
-//        }
-//    }
+
+    @PreAuthorize("hasAnyRole('ADMIN', 'CUSTOMER')")
+    @PostMapping("/img")
+    public ResponseData<ProductImageResponse> uploadProductImages(
+            @AuthenticationPrincipal CustomUserPrincipal user,
+            @RequestParam(value = "productId", required = false) UUID productId,
+            @RequestBody List<MultipartFile> files
+    ) {
+
+        ProductImageResponse res = productService.uploadImages(user.getUserId(), productId, files);
+        try {
+            return new ResponseData<>(200, "Upload image successfully", res);
+        } catch (Exception e) {
+            return new ResponseData<>(400, "Upload image failed: " + e.getMessage(), res);
+        }
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ResponseData<Product>> updateProduct(@PathVariable("id") UUID id, @RequestBody @Valid ProductRequest productRequest) {
+        try {
+            Product updatedProduct = productService.updateProduct(id, productRequest);
+            return new ResponseEntity<>(
+                    new ResponseData<>(200, "Update product successfully", updatedProduct), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(
+                    new ResponseData<>(400, "Update product failed: " + e.getMessage(), null), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ResponseData<Void>> deleteProduct(@PathVariable("id") UUID id) {
+        try {
+            productService.deleteProduct(id);
+            return new ResponseEntity<>(
+                    new ResponseData<>(204, "Delete product successfully", null), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(
+                    new ResponseData<>(400, "Delete product failed: " + e.getMessage(), null), HttpStatus.BAD_REQUEST);
+        }
+    }
 //
 //    @GetMapping("/search/price")
 //    public ResponseEntity<ResponseData<Page<ProductDetail>>> searchByPrice(@RequestParam String from,

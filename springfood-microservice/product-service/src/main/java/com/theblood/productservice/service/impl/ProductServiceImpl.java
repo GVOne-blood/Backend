@@ -2,27 +2,32 @@ package com.theblood.productservice.service.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.theblood.common.dto.response.ProductDetail;
+import com.theblood.common.enums.FileStatus;
 import com.theblood.common.exception.custom.InvalidDataException;
+import com.theblood.common.grpc.ValidateProductCreationResponse;
+import com.theblood.minio.core.MinioClient;
+import com.theblood.minio.response.MinIOResponse;
+import com.theblood.productservice.dto.UploadResult;
 import com.theblood.productservice.dto.request.ProductRequest;
 import com.theblood.productservice.dto.request.RelateProductRequest;
-import com.theblood.productservice.dto.response.ProductDetail;
-import com.theblood.productservice.grpc.ProductGrpcClient;
-import com.theblood.productservice.grpc.ValidateProductCreationResponse;
+import com.theblood.productservice.dto.response.ProductImageResponse;
+import com.theblood.productservice.grpc.client_role.ProductGrpcClient;
 import com.theblood.productservice.kafka.consumer.ProductServiceConsumer;
 import com.theblood.productservice.kafka.service.OutboxService;
 import com.theblood.productservice.mapper.ProductMapper;
 import com.theblood.productservice.model.Categories;
 import com.theblood.productservice.model.Product;
 import com.theblood.productservice.model.ProductCategory;
+import com.theblood.productservice.model.ProductImages;
 import com.theblood.productservice.repository.*;
 import com.theblood.productservice.repository.projection.ProductProjection;
 import com.theblood.productservice.service.ProductService;
 import jakarta.transaction.Transactional;
-import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -30,40 +35,50 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+
 @Slf4j
 public class ProductServiceImpl implements ProductService {
 
+
+    @Qualifier("uploadFileExecutor")
+    private final ExecutorService uploadFileExecutor;
+    private final ProductImagesRepository productImagesRepository;
+    private final KafkaTemplate<String, Object> kafkaTemplate;
+    private final MinioClient minioClient;
+    private final ProductRepository productRepository;
+    private final CategoryRepository categoryRepository;
+    private final ProductMapper productMapper;
+    private final ProductServiceConsumer productServiceConsumer;
+    private final ProductCategoryRepository productCategoryRepository;
+    private final ProductJDBCRepository productJDBCRepository;
+    private final RedisServiceWrapper redisServiceWrapper;
+    private final ProductCacheManager productCacheManager;
+    private final ProductCacheService productCacheService;
+    private final OutboxService outboxService;
+    private final FeedbackRepository feedbackRepository;
+    private final ProductGrpcClient productGrpcClient;
+    @Qualifier("redisObjectMapper")
+    private final ObjectMapper objectMapper;
+    @Value("${minio.bucket}")
+    String MINIO_BUCKET_NAME;
+    @Value("${minio.max-file-size}")
+    Long MINIO_MAX_FILE_SIZE = 52428800L; // 50MB
     String REDIS_CACHE_RELATE_RESULT = "related_product:";
     String REDIS_CACHE_KEY = "product_relate_request_queue";
-
-    KafkaTemplate<String, Object> kafkaTemplate;
-    ProductRepository productRepository;
-    CategoryRepository categoryRepository;
-    ProductMapper productMapper;
-    ProductServiceConsumer productServiceConsumer;
-    ProductCategoryRepository productCategoryRepository;
-    ProductJDBCRepository productJDBCRepository;
-    RedisServiceWrapper redisServiceWrapper;
-    ProductCacheManager productCacheManager;
-    ProductCacheService productCacheService;
-    OutboxService outboxService;
-    FeedbackRepository feedbackRepository;
-    ProductGrpcClient productGrpcClient;
-    @Qualifier("redisObjectMapper")
-    ObjectMapper objectMapper;
+    int MAX_FILES_PER_PRODUCT = 11;
 
     @Override
     public Page<ProductDetail> getAllProductDetails(Pageable pageable) {
@@ -335,19 +350,123 @@ public class ProductServiceImpl implements ProductService {
         return updatedProduct;
     }
 
-//    @PreAuthorize("hasRole('SHOP_OWNER') and hasAuthority('product:delete')")
-//    @Override
-//    @Transactional
-//    public void deleteProduct(UUID productId) {
-//        if (productRepository.findProductDetailById(productId).isPresent()) {
-//            productRepository.deleteProductById(productId);
-//
-//            // Invalidate cache after successful deletion
-//            productCacheManager.invalidateProductCache(productId);
-//        } else {
-//            throw new InvalidDataException("Product not found");
-//        }
-//    }
+    @PreAuthorize("hasRole('SHOP_OWNER') and hasAuthority('product:delete')")
+    @Override
+    @Transactional
+    public void deleteProduct(UUID productId) {
+        if (productRepository.findProductDetailById(productId).isPresent()) {
+            productRepository.deleteProductById(productId);
+
+            // Invalidate cache after successful deletion
+            productCacheManager.invalidateProductCache(productId);
+        } else {
+            throw new InvalidDataException("Product not found");
+        }
+    }
+
+    @Override
+    public ProductImageResponse uploadImages(UUID userId, UUID productId, List<MultipartFile> files) {
+
+
+        validateProductImages(files, productId);
+
+        List<Future<UploadResult>> futures = new ArrayList<>();
+        List<MinIOResponse> uploadedUrls = new ArrayList<>();
+        List<String> failedFiles = new ArrayList<>();
+        for (MultipartFile file : files) {
+
+            try {
+                ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+                outputStream.write(file.getBytes());
+                String objectName = "products/" + productId + "/" + "_" + file.getOriginalFilename();
+                String originalFilename = file.getOriginalFilename();
+                if (minioClient.objectExists(objectName)) throw new IllegalArgumentException("Object already exists");
+                Future<UploadResult> future = uploadFileExecutor.submit(() -> {
+                    try {
+                        MinIOResponse response = minioClient.upload(outputStream, objectName);
+                        return new UploadResult(response, originalFilename, response.getMessage(), response.getContentType());
+                    } catch (Exception e) {
+                        log.error("Failed to upload file: {}", originalFilename, e);
+                        throw new RuntimeException("Upload failed", e);
+                    }
+                });
+
+                futures.add(future);
+
+            } catch (IOException e) {
+                log.error("Failed to read file: {}", file.getOriginalFilename(), e);
+                failedFiles.add(file.getOriginalFilename());
+            }
+        }
+        // Đợi kết quả
+        for (Future<UploadResult> future : futures) {
+            ProductImages productImages = new ProductImages();
+            productImages.setProduct_id(productId);
+            productImages.setUploadedBy(userId);
+            productImages.setBucketName(MINIO_BUCKET_NAME);
+            try {
+                UploadResult response = future.get(60, TimeUnit.SECONDS);
+                productImages.setImageUrl(response.getMinioResponse().getUrl());
+                productImages.setStatus(FileStatus.ACTIVE);
+                productImages.setObjectName(response.getMinioResponse().getObjectKey());
+                productImages.setFileSize(response.getMinioResponse().getSize());
+                productImages.setOriginalFileName(response.getOriginFileName());
+                uploadedUrls.add(response.getMinioResponse()); // hoặc thuộc tính phù hợp
+
+            } catch (Exception e) {
+                productImages.setStatus(FileStatus.ARCHIVED);
+                log.error("Upload execution failed", e);
+                failedFiles.add(e.getMessage());
+            }
+            productImagesRepository.save(productImages);
+        }
+
+        return ProductImageResponse.builder()
+                .minIOResponses(uploadedUrls)
+                .saveAt(LocalDateTime.now())
+                .productId(productId)
+                .build();
+    }
+
+    @Override
+    public void deleteProductImage(UUID productImagesId) {
+        ProductImages productImages = productImagesRepository.findById(productImagesId).orElse(null);
+        if (productImages == null) {
+            throw new InvalidDataException("Product image not found with ID: " + productImagesId);
+        }
+        boolean res = minioClient.deleteObject(productImages.getObjectName());
+        if (res) {
+            productImagesRepository.deleteById(productImagesId);
+        } else {
+            throw new InvalidDataException("Failed to delete image from storage for ID: " + productImagesId);
+        }
+    }
+
+
+    private void validateProductImages(List<MultipartFile> files, UUID productId) {
+
+        for (MultipartFile file : files) {
+            if (file.getName().length() > 255) {
+                throw new InvalidDataException("File name too long: " + file.getName());
+            }
+            String contentType = file.getContentType();
+            if (contentType == null || (!contentType.equals("image/jpeg") && !contentType.equals("image/png") && !contentType.equals("image/gif"))) {
+                throw new InvalidDataException("Invalid file type: " + contentType);
+            }
+            if (file.getSize() > MINIO_MAX_FILE_SIZE) { // 50MB
+                throw new InvalidDataException("File size exceeds limit (50MB): " + file.getName());
+            }
+            if (file.isEmpty()) {
+                throw new InvalidDataException("File is empty: " + file.getName());
+            }
+        }
+        int totalExistFiles = productImagesRepository.totalFileCurrentStore(productId);
+        if (files.size() + totalExistFiles > MAX_FILES_PER_PRODUCT) ;
+        {
+            throw new InvalidDataException("Exceeds maximum number of images per product: " + MAX_FILES_PER_PRODUCT);
+        }
+
+    }
 //
 //    @Override
 //    public Page<ProductDetail> findByPrice(String from, String to, Pageable pageable) {

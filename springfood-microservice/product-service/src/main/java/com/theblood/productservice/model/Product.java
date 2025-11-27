@@ -63,6 +63,12 @@ public class Product extends AbstractEntity {
     @Column(name = "images", columnDefinition = "jsonb")
     private String images;
 
+    @Column(name = "total_feedbacks")
+    Long totalFeedbacks;
+
+    @Column(name = "average_rating")
+    Double averageRating;
+
     //    @OneToMany(mappedBy = "product")
 //    private List<OrderItem> orderItems = new ArrayList<>();
 //

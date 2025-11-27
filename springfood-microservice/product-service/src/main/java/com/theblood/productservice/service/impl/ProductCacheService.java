@@ -3,7 +3,6 @@ package com.theblood.productservice.service.impl;
 import com.theblood.productservice.background.process.ProductDetailProcess;
 import com.theblood.productservice.background.process.ProductRelateProcess;
 import com.theblood.productservice.dto.request.RelateProductRequest;
-import com.theblood.productservice.dto.response.ProductDetail;
 import com.theblood.productservice.mapper.ProductMapper;
 import com.theblood.productservice.repository.FeedbackRepository;
 import com.theblood.productservice.repository.ProductCategoryRepository;
@@ -13,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;

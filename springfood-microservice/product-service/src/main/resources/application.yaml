@@ -1,5 +1,7 @@
 server:
   port: 8085
+  # Buộc server lắng nghe trên localhost để đảm bảo gateway có thể kết nối qua localhost
+  address: 127.0.0.1
 
 spring:
   application:
@@ -45,7 +47,8 @@ eureka:
     service-url:
       defaultZone: http://localhost:8761/eureka/
   instance:
-    prefer-ip-address: true
+    prefer-ip-address: false     # Đổi thành false
+    hostname: localhost          # Thêm dòng này
 
 
   cache:
@@ -65,11 +68,20 @@ security:
         roles: X-User-Roles
 
 grpc:
+  server:
+    port: 9095
   client:
     shop-service:
-      address: static://localhost:9090
+      address: 'static://localhost:9093'
       negotiation-type: plaintext
-    
+
+minio:
+  endpoint: http://localhost:9000
+  accessKey: minioadmin
+  secretKey: minioadmin
+  bucket: prod-images
+  max-file-size: 52428800  # 50MB
+
 logging:
   level:
     org.springframework.security: DEBUG

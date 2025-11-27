@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "com.theblood.common.grpc";
+
+service ShopService {
+  rpc ValidateShop (ShopValidationRequest) returns (ShopValidationResponse);
+}
+
+message ShopValidationRequest{
+  string shopId = 1;
+  string shippingMethod = 2;
+  string shippingFee = 3;
+  string shopVoucher = 4;
+  string note = 5;
+}
+
+message ShopValidationResponse{
+  bool isValid = 1;
+  string message = 2;
+}
