@@ -1,7 +1,9 @@
 package com.theblood.orderservice.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.theblood.orderservice.common.enums.OrderStatus;
+import com.theblood.common.dto.response.ProductDetail;
+import com.theblood.common.enums.OrderStatus;
+import com.theblood.orderservice.common.enums.TransactionStatus;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -9,6 +11,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Setter
 @Getter
@@ -18,9 +21,9 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class OrderDetailResponse implements Serializable {
 
-    String orderId;
-    String userId;
-    String shopId;
+    UUID orderId;
+    UUID userId;
+    UUID shopId;
     LocalDateTime orderDate;
     BigDecimal subtotalAmount;
     BigDecimal discount;

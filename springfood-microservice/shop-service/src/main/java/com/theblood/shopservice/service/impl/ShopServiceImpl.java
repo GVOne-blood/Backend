@@ -24,6 +24,7 @@ public class ShopServiceImpl implements ShopService {
     ShopMemberRepository shopMemberRepository;
     ShopMapper shopMapper;
 
+
     @Override
     public Page<ShopResponse> getAllShops(Pageable pageable) {
         return shopRepository.findAll(pageable).map(shopMapper::toShopResponse);

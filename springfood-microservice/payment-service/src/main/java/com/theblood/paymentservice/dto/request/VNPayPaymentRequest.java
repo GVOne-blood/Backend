@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -15,7 +16,7 @@ import java.time.LocalDateTime;
 public class VNPayPaymentRequest {
 
     // all
-    String userId; // user transfer /
+    UUID userId; // user transfer /
     String userEmail; // support vnpay send mail to notify
     PaymentMethod paymentMethod;
     Long amount;

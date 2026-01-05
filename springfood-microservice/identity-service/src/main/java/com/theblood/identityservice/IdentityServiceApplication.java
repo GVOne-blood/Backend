@@ -3,9 +3,8 @@ package com.theblood.identityservice;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
-import org.springframework.context.annotation.ComponentScan;
 
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = {"com.theblood.common", "com.theblood.identityservice"})
 // Annotation này báo cho Spring Cloud biết rằng ứng dụng này cần phải
 // tìm và đăng ký với một Discovery Server (như Eureka, Consul...).
 @EnableDiscoveryClient

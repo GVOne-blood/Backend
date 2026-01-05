@@ -18,6 +18,12 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 10MB        # Max size cho 1 file
+      max-request-size: 50MB     # Max size cho cả request
+      file-size-threshold: 2KB   # Threshold để ghi vào disk
   redis:
     # Redis Cluster 1 - Shared cho các read-heavy services
     shared:

@@ -9,7 +9,11 @@ spring:
   # Cấu hình Gateway Routes
   cloud:
     gateway:
-      # Cú pháp này đã được cập nhật, không cần server.webflux nữa nếu bạn dùng phiên bản Spring Cloud mới
+      httpclient:
+        # Thời gian chờ khi kết nối tới downstream service (ms)
+        connect-timeout: 10000
+        # Thời gian chờ cho response (cú pháp có thể yêu cầu Duration)
+        response-timeout: 5s
       routes:
         # === Route 1: Định tuyến đến User Service ===
         - id: identity-service-user
@@ -23,6 +27,13 @@ spring:
           uri: lb://IDENTITY-SERVICE
           predicates:
             - Path=/api/v1/auth/**
+          filters:
+            - StripPrefix=2
+
+        - id: identity-service-address
+          uri: lb://IDENTITY-SERVICE
+          predicates:
+            - Path=/api/v1/profile/addr/**
           filters:
             - StripPrefix=2
 
@@ -57,31 +68,31 @@ spring:
     discovery:
       locator:
         enabled: true
-        # Chuyển tên service từ dạng CAMEL_CASE sang lower-case-hyphen
         lower-case-service-id: true
 
-  # ← Redis configuration cho Gateway
+  # Redis configuration cho Gateway
   data:
     redis:
       port: 6379
       host: localhost
-      connect-timeout: 2000ms
-# SỬA LẠI CẤU TRÚC EUREKA
+      connect-timeout: 10000ms
+
+# Buộc Gateway ưu tiên hostname (không dùng IP) khi lấy instance từ Eureka
 eureka:
   instance:
-    # Đặt instance-id ở đây
+    prefer-ip-address: false
     instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
   client:
     service-url:
       defaultZone: http://localhost:8761/eureka/
 
-
+# JWT Configuration
 app:
   jwt:
-    cookie-max-age: 3600000  # 1 hour cho cookie
-    accessTokenExpiration: 3600000  # 1 hour cho access token (test)
-    refreshTokenExpiration: 604800000  # 7 ngày cho refresh token
-    resetTokenExpiration: 300000  # 5 phút cho reset token
+    cookie-max-age: 3600000
+    accessTokenExpiration: 3600000
+    refreshTokenExpiration: 604800000
+    resetTokenExpiration: 300000
     secretKey: 4dVgNvOxWTz2PKJZqCYFoh+AXX0l2OVHoCTfN9ZdXGs=
     resetKey: 4dVgNvOxWTz2PKJZqCYFoh+AXX0l2OVHoCTfN9ZdXGs=
     refreshKey: RKyKtM34VufukHK6sSPlQdDA8wBOHCYUygwIp6Fekco=

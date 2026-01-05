@@ -10,7 +10,7 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL) // Quan trọng: Các trường null sẽ không được serialize ra JSON
 public class OrderPaymentResponse {
 
-    private String transactionId;
+    private String referenceId;
 
     private String paymentUrl;
 

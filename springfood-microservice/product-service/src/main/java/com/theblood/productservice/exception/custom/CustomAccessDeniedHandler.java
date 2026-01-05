@@ -1,4 +1,4 @@
-package com.theblood.productservice.exception;
+package com.theblood.productservice.exception.custom;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;

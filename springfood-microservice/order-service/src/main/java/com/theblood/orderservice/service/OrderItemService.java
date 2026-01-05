@@ -1,4 +1,9 @@
 package com.theblood.orderservice.service;
 
-public class OrderItemService {
+import com.theblood.orderservice.model.OrderItem;
+
+public interface OrderItemService {
+    void addOrderItem();
+
+    OrderItem updateOrderItem();
 }

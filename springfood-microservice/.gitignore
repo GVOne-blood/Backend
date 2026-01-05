@@ -36,3 +36,12 @@ build/
 
 ### Mac OS ###
 .DS_Store
+
+### Tools ###
+.kiro
+.serena
+.env
+.log
+.md
+.sql
+.csv

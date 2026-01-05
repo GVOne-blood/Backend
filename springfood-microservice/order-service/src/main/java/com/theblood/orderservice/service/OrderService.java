@@ -1,11 +1,13 @@
 package com.theblood.orderservice.service;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.theblood.orderservice.dto.request.OrderRequest;
 import com.theblood.orderservice.dto.request.OrdersUpdateRequest;
 import com.theblood.orderservice.dto.response.OrderDetailResponse;
 import com.theblood.orderservice.dto.response.OrderPaymentResponse;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.transaction.TransactionRolledbackException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -20,7 +22,7 @@ public interface OrderService {
     Page<OrderDetailResponse> getListOrderForUser(Pageable pageable, String userId);
 
 
-    OrderPaymentResponse createOrders(HttpServletRequest request, OrderRequest orderRequest, String user) throws UnsupportedEncodingException;
+    OrderPaymentResponse createOrders(HttpServletRequest request, OrderRequest orderRequest, String user) throws UnsupportedEncodingException, TransactionRolledbackException, JsonProcessingException;
 
     OrderPaymentResponse updatePendingOrders(HttpServletRequest request, OrdersUpdateRequest updateRequest) throws UnsupportedEncodingException;
 

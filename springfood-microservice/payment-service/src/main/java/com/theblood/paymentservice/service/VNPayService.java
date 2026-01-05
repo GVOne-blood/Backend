@@ -7,12 +7,13 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.UUID;
 
 public interface VNPayService {
 
-    String handlePaymentRefund(HttpServletRequest request, String userId, String orderId) throws IOException;
+    String handlePaymentRefund(HttpServletRequest request, UUID userId, UUID referenceId) throws IOException;
 
-    String handlePaymentCheckingStatus(HttpServletRequest request, String userId, String orderId) throws IOException;
+    String handlePaymentCheckingStatus(HttpServletRequest request, UUID userId, UUID paymentTransactionId) throws IOException;
 
     String createPaymentUrl(HttpServletRequest request, VNPayPaymentRequest paymentRequest) throws UnsupportedEncodingException;
 

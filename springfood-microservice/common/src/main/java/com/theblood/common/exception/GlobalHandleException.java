@@ -128,7 +128,6 @@ public class GlobalHandleException {
         return errorResponse;
     }
 
-
     @ExceptionHandler(HttpMessageNotReadableException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseError handleJsonParseException(HttpMessageNotReadableException e, WebRequest request) {

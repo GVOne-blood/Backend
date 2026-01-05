@@ -25,6 +25,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
@@ -69,6 +70,19 @@ public class ProductController {
         } catch (InvalidDataException | JsonProcessingException e) {
             return new ResponseEntity<>(
                     new ResponseData<>(400, "Create product failed: " + e.getMessage(), null), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PreAuthorize("hasAnyRole('SHOP_OWNER', 'ADMIN')")
+    @PostMapping("/batch")
+    public ResponseEntity<ResponseData<List<ProductDetail>>> createProducts(
+            @RequestBody MultipartFile file
+    ) {
+        try {
+            List<ProductDetail> newProducts = productService.addProductsByExcel(file);
+            return new ResponseEntity<>(new ResponseData<>(201, "Import products successfully", newProducts), HttpStatus.CREATED);
+        } catch (RuntimeException | IOException e) {
+            return new ResponseEntity<>(new ResponseData<>(400, "Import products failed: " + e.getMessage(), null), HttpStatus.BAD_REQUEST);
         }
     }
 

@@ -4,14 +4,17 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.theblood.common.dto.response.ProductDetail;
 import com.theblood.common.enums.FileStatus;
+import com.theblood.common.enums.MimeType;
 import com.theblood.common.exception.custom.InvalidDataException;
 import com.theblood.common.grpc.ValidateProductCreationResponse;
+import com.theblood.common.util.ApachePoiUtil;
 import com.theblood.minio.core.MinioClient;
 import com.theblood.minio.response.MinIOResponse;
 import com.theblood.productservice.dto.UploadResult;
 import com.theblood.productservice.dto.request.ProductRequest;
 import com.theblood.productservice.dto.request.RelateProductRequest;
 import com.theblood.productservice.dto.response.ProductImageResponse;
+import com.theblood.productservice.exception.custom.InvalidExcelFormatException;
 import com.theblood.productservice.grpc.client_role.ProductGrpcClient;
 import com.theblood.productservice.kafka.consumer.ProductServiceConsumer;
 import com.theblood.productservice.kafka.service.OutboxService;
@@ -26,6 +29,11 @@ import com.theblood.productservice.service.ProductService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -79,6 +87,8 @@ public class ProductServiceImpl implements ProductService {
     String REDIS_CACHE_RELATE_RESULT = "related_product:";
     String REDIS_CACHE_KEY = "product_relate_request_queue";
     int MAX_FILES_PER_PRODUCT = 11;
+
+    List<String> EXCEL_HEADRES = List.of("shopId", "categoryName", "name", "description", "price", "images", "quantity", "sku", "msg", "exp", "wholesalePrice");
 
     @Override
     public Page<ProductDetail> getAllProductDetails(Pageable pageable) {
@@ -288,6 +298,86 @@ public class ProductServiceImpl implements ProductService {
         return productRepository.save(product);
     }
 
+    @Transactional
+    public List<ProductDetail> addProductsBatch(List<ProductRequest> productRequests) {
+        List<Product> products = new ArrayList<>();
+
+        for (ProductRequest request : productRequests) {
+            Product product = productMapper.toProduct(request);
+            // Thêm logic validation, set relationships, etc.
+            products.add(product);
+        }
+
+        List<Product> savedProducts = productRepository.saveAll(products);
+
+        return savedProducts.stream()
+                .map(productMapper::toProductDetail)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public List<ProductDetail> addProductsByExcel(MultipartFile file) throws IOException {
+        validateExcelFile(file);
+        Workbook workbook = new XSSFWorkbook(file.getInputStream());
+        Sheet dataSheet = workbook.getSheetAt(0);
+        validateExcelHeader(dataSheet.getRow(0));
+
+        List<ProductRequest> productRequests = new ArrayList<>();
+
+        for (int i = 1; i < dataSheet.getLastRowNum(); i++) {
+            Row row = dataSheet.getRow(i);
+            if (row.toString().isEmpty()) continue;
+            String rawImages = "";
+            Cell imageCell = row.getCell(5);
+            if (imageCell != null) {
+                rawImages = imageCell.getStringCellValue();
+            }
+
+            // 2. Chuyển đổi thành JSON String hợp lệ
+            // Logic: Tách chuỗi bằng dấu phẩy (nếu có), trim khoảng trắng, đưa vào List
+            List<String> imageList = new ArrayList<>();
+            if (rawImages != null && !rawImages.isBlank()) {
+                if (rawImages.contains(",")) {
+                    // Trường hợp nhiều ảnh: "url1, url2, url3"
+                    String[] splitImages = rawImages.split(",");
+                    for (String img : splitImages) {
+                        imageList.add(img.trim());
+                    }
+                } else {
+                    // Trường hợp 1 ảnh duy nhất
+                    imageList.add(rawImages.trim());
+                }
+            }
+
+            // 3. Serialize List thành JSON String: ["url1", "url2"]
+            // Lưu ý: objectMapper đã được inject sẵn trong class của bạn
+            String jsonImagesObj = objectMapper.writeValueAsString(imageList);
+            try {
+
+                ProductRequest productRequest = ProductRequest.builder()
+                        .shopId(ApachePoiUtil.CellUtils.getCellValueAsUUID(row.getCell(0)))
+                        .categoryNames(row.getCell(1).getStringCellValue())
+                        .name(row.getCell(2).getStringCellValue())
+                        .description(row.getCell(3).getStringCellValue())
+                        .price(row.getCell(4).getStringCellValue())
+                        .images(jsonImagesObj)
+                        .quantity(ApachePoiUtil.CellUtils.getCellValueAsInteger(row.getCell(6)))
+                        .sku(row.getCell(7).getStringCellValue())
+                        .msg(ApachePoiUtil.CellUtils.getCellValueAsLocalDate(row.getCell(8)))
+                        .exp(ApachePoiUtil.CellUtils.getCellValueAsLocalDate(row.getCell(9)))
+                        .wholesalePrice(row.getCell(10).getStringCellValue())
+                        .avgRate(ApachePoiUtil.CellUtils.getCellValueAsBigDecimal(row.getCell(11)))
+                        .build();
+                productRequests.add(productRequest);
+            } catch (InvalidDataException e) {
+                log.error(e.getMessage());
+                throw new InvalidDataException(e.getMessage());
+            }
+        }
+        return addProductsBatch(productRequests);
+
+    }
+
     @Override
     @PreAuthorize("hasRole('SHOP_OWNER') and hasAuthority('product:upadte')")
     @Transactional
@@ -364,6 +454,7 @@ public class ProductServiceImpl implements ProductService {
         }
     }
 
+
     @Override
     public ProductImageResponse uploadImages(UUID userId, UUID productId, List<MultipartFile> files) {
 
@@ -402,7 +493,7 @@ public class ProductServiceImpl implements ProductService {
         for (Future<UploadResult> future : futures) {
             ProductImages productImages = new ProductImages();
             productImages.setProduct_id(productId);
-            productImages.setUploadedBy(userId);
+            productImages.setUploadedBy(String.valueOf(userId));
             productImages.setBucketName(MINIO_BUCKET_NAME);
             try {
                 UploadResult response = future.get(60, TimeUnit.SECONDS);
@@ -442,6 +533,38 @@ public class ProductServiceImpl implements ProductService {
         }
     }
 
+
+    private void validateExcelHeader(Row headerRow) {
+        if (headerRow == null) throw new InvalidExcelFormatException("Excel header rows is null");
+        ProductRequest productRequest = new ProductRequest();
+
+        for (int i = 0; i < EXCEL_HEADRES.size(); i++) {
+            Cell cell = headerRow.getCell(i);
+            String headerValue = cell != null ? cell.getStringCellValue().trim() : null;
+            if (!headerValue.equals(EXCEL_HEADRES.get(i))) {
+                throw new InvalidExcelFormatException("Excel header  " + headerValue + " are not equal with expected " + EXCEL_HEADRES.get(i - 1));
+            }
+        }
+
+    }
+
+    private void validateExcelFile(MultipartFile file) {
+        if (file.isEmpty() || file.getSize() == 0)
+            throw new InvalidDataException("Excel file size is null or empty");
+
+        String contentType = file.getContentType();
+        if (contentType == null ||
+                (!contentType.equals(MimeType.CSV.getMimeType()) &&
+                        !contentType.equals(MimeType.XLSX.getMimeType()) &&
+                        !contentType.equals(MimeType.XLS.getMimeType()))) {
+            throw new InvalidDataException("Invalid file type: " + contentType);
+        }
+
+        if (file.getOriginalFilename().length() > 255)
+            throw new InvalidDataException("Excel file name is longer than 255 characters");
+
+
+    }
 
     private void validateProductImages(List<MultipartFile> files, UUID productId) {
 

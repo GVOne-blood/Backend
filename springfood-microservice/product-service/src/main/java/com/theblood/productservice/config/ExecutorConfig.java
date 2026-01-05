@@ -22,4 +22,15 @@ public class ExecutorConfig {
                 new ThreadPoolExecutor.CallerRunsPolicy()
         );
     }
+
+    @Bean(name = "excelTaskExecutor")
+    public ExecutorService excelTaskExecutor() {
+        return new ThreadPoolExecutor(
+                1,
+                3,
+                30L, TimeUnit.SECONDS,
+                new LinkedBlockingQueue<>(100),
+                new ThreadPoolExecutor.CallerRunsPolicy()
+        );
+    }
 }

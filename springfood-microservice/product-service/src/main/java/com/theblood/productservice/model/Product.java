@@ -54,7 +54,7 @@ public class Product extends AbstractEntity {
     private BigDecimal wholesalePrice;
 
     @Column(name = "avg_rate")
-    private BigDecimal avgRate;
+    private BigDecimal avgRate = BigDecimal.ZERO;
 
     @Column(nullable = false)
     private Integer quantity = 0;
@@ -64,10 +64,10 @@ public class Product extends AbstractEntity {
     private String images;
 
     @Column(name = "total_feedbacks")
-    Long totalFeedbacks;
+    Long totalFeedbacks = 0L;
 
     @Column(name = "average_rating")
-    Double averageRating;
+    Double averageRating = 0.0;
 
     //    @OneToMany(mappedBy = "product")
 //    private List<OrderItem> orderItems = new ArrayList<>();

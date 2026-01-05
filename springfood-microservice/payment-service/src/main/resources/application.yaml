@@ -32,10 +32,43 @@ eureka:
   instance:
     prefer-ip-address: true
 
+vnpay:
+  # URL để chuyển hướng người dùng đến cổng thanh toán
+  pay-url: https://sandbox.vnpayment.vn/paymentv2/vpcpay.html
+
+  # URL để VNPay gọi lại sau khi người dùng thanh toán xong (phải khớp với endpoint trong controller)
+  # Lưu ý: Phần domain sẽ được lấy tự động từ request, ở đây chỉ cần path
+  return-url: /api/payment/vnpay-payment-return/
+
+  # Mã website (Terminal ID) do VNPay cung cấp
+  #tmn-code: T2NFMFM4
+  #tmn-code: EEIFB4OW
+  tmn-code: HXTJXVB0
+
+  # Chuỗi bí mật (Hash Secret) do VNPay cung cấp
+  #hash-secret: W27ZTGD9MHB8GNEOLFZPLUI2NNWD1UUX
+  #hash-secret: IJCIOEJ17JGYD7VCCC63NCHA2ID5TV2E
+  hash-secret: ICSSV3402R1F5XMADPMRKDXZM8ZW27EO
+  # API URL để thực hiện các thao tác khác như truy vấn, hoàn tiền (nếu cần)
+  api-url: https://sandbox.vnpayment.vn/merchant_webapi/api/transaction
+
+  # Phiên bản API đang sử dụng
+  version: 2.1.0
+
 security:
   internal:
     auth:
       enabled: false  # Set false để disable authentication (dev only)
       header:
+        id: X-User-ID
         username: X-User-Username
         roles: X-User-Roles
+
+
+grpc:
+  server:
+    port: 9096
+  client:
+    product-service:
+      address: 'static://localhost:9095'
+      negotiationType: PLAINTEXT

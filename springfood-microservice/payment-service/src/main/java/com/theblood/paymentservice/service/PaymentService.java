@@ -4,15 +4,18 @@ import com.theblood.paymentservice.common.enums.TransactionStatus;
 import com.theblood.paymentservice.dto.request.PaymentInfoRequest;
 import com.theblood.paymentservice.model.PaymentTransactions;
 
-import java.util.List;
+import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.UUID;
 
 public interface PaymentService {
 
 
-    PaymentTransactions createPaymentTransaction(PaymentInfoRequest paymentInfoRequest, List<Order> orders);
+    PaymentTransactions createPaymentTransaction(PaymentInfoRequest paymentInfoRequest);
 
-    void updatePaymentTransaction(String id, String transactionNo, TransactionStatus transactionStatus);
+    void updateCodPaymentTransaction();
+
+    void updatePaymentTransaction(UUID id, String transactionNo, TransactionStatus transactionStatus, LocalDateTime transferSuccessAt);
 
     void handlePaymentReturnSuccess(Map<String, String> response);
 

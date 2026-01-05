@@ -1,8 +1,8 @@
 package com.theblood.orderservice.model;
 
+import com.theblood.common.enums.OrderStatus;
 import com.theblood.common.enums.PaymentMethod;
 import com.theblood.common.model.AbstractEntity;
-import com.theblood.orderservice.common.enums.OrderStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -30,8 +30,11 @@ public class Order extends AbstractEntity {
     @Column(name = "shipper_id")
     UUID shipperId;
 
+    // id tham chiếu đến payment transaction.
+    // Một list các đơn hàng có thể được thanh toán nhiều lần (tất nhiên thanh toán thành công thì sẽ thôi),
+    // vậy nên sẽ có nhiều bản ghi payment transaction được tạo ra, muốn tìm đến các order được thanh toán của những lần đó ta có referenId
     @Column(name = "payment_transaction_id")
-    UUID paymentTransactionId;
+    UUID referenceId;
 
     @Column(name = "order_status")
     @Enumerated(EnumType.STRING)
@@ -71,4 +74,6 @@ public class Order extends AbstractEntity {
     @Enumerated(EnumType.STRING)
     PaymentMethod paymentMethod;
 
+    @Column(name = "paid_at")
+    LocalDateTime paidAt;
 }

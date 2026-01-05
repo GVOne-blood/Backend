@@ -23,5 +23,14 @@ public class KafkaTopicConfig {
                 .replicas(1)
                 .build();
     }
+
+    @Bean
+    public NewTopic codOrderPaymentTopic(){
+        return TopicBuilder.name("cod-transaction-event")
+                .partitions(5)
+                .replicas(2)
+                .build();
+    }
+
 }
 

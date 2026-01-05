@@ -1,4 +1,9 @@
 package com.theblood.cartservice.service.impl;
 
-public interface CartServiceImpl {
+import com.theblood.cartservice.service.CartService;
+import org.springframework.stereotype.Service;
+
+@Service
+public class CartServiceImpl implements CartService {
+
 }

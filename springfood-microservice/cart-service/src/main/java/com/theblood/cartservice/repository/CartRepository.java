@@ -1,4 +1,10 @@
 package com.theblood.cartservice.repository;
 
-public class CartRepository {
+import com.theblood.cartservice.model.Cart;
+import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface CartRepository extends MongoRepository<Cart, String> {
+
 }

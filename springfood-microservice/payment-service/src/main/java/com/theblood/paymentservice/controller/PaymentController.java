@@ -1,7 +1,6 @@
 package com.theblood.paymentservice.controller;
 
 
-import com.theblood.common.dto.response.ResponseData;
 import com.theblood.common.enums.PaymentMethod;
 import com.theblood.paymentservice.dto.request.VNPayPaymentRequest;
 import com.theblood.paymentservice.service.PaymentService;
@@ -12,15 +11,17 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.view.RedirectView;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.io.IOException;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/payment")
+@RequestMapping("/payment")
 @Validated
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -31,22 +32,22 @@ public class PaymentController {
     PaymentService paymentService;
 
 
-    @GetMapping("/status/{orderId}")
-    public ResponseEntity<ResponseData<?>> handlePaymentStatus(HttpServletRequest request,
-                                                               @PathVariable String orderId,
-                                                               @AuthenticationPrincipal User user) throws IOException {
-        String message = vnPayService.handlePaymentCheckingStatus(request, user.getId(), orderId);
-        return ResponseEntity.ok(new ResponseData<>(200, "call api checking payment status successfully", message));
-    }
+//    @GetMapping("/status/{orderId}")
+//    public ResponseEntity<ResponseData<?>> handlePaymentStatus(HttpServletRequest request,
+//                                                               @PathVariable String orderId,
+//                                                               @AuthenticationPrincipal CustomUserPrincipal user) throws IOException {
+//        String message = vnPayService.handlePaymentCheckingStatus(request, user.getUserId(), orderId);
+//        return ResponseEntity.ok(new ResponseData<>(200, "call api checking payment status successfully", message));
+//    }
 
-    @GetMapping("/refund/{orderId}")
-    @PreAuthorize("hasAnyRole({'ADMIN', 'CUSTOMER', 'SHOP_OWNER', 'STAFF'})")
-    public ResponseEntity<ResponseData<?>> refundPaymentForOrder(HttpServletRequest request,
-                                                                 @PathVariable String orderId,
-                                                                 @AuthenticationPrincipal User user) throws IOException {
-        String message = vnPayService.handlePaymentRefund(request, user.getId(), orderId);
-        return ResponseEntity.ok(new ResponseData<>(200, "call api refund successfully", message));
-    }
+//    @GetMapping("/refund/{orderId}")
+//    @PreAuthorize("hasAnyRole({'ADMIN', 'CUSTOMER', 'SHOP_OWNER', 'STAFF'})")
+//    public ResponseEntity<ResponseData<?>> refundPaymentForOrder(HttpServletRequest request,
+//                                                                 @PathVariable String orderId,
+//                                                                 @AuthenticationPrincipal CustomUserPrincipal user) throws IOException {
+//        String message = vnPayService.handlePaymentRefund(request, user.getUserId(), orderId);
+//        return ResponseEntity.ok(new ResponseData<>(200, "call api refund successfully", message));
+//    }
 
     // Endpoint này client sẽ gọi để lấy URL thanh toán
     @PreAuthorize("hasAnyRole({'ADMIN', 'CUSTOMER', 'SHOP_OWNER', 'STAFF'})")
@@ -65,24 +66,24 @@ public class PaymentController {
 
     // Endpoint này VNPay sẽ redirect về sau khi thanh toán
     // Nó phải khớp với `vnp_Returnurl` trong config
-    // @PreAuthorize("hasAnyRole({'ADMIN', 'CUSTOMER', 'SHOP_OWNER', 'STAFF'})")
-    @GetMapping("/vnpay-payment-return/")
-    public RedirectView handleVnpayReturn(HttpServletRequest request) {
-        int paymentStatus = vnPayService.processVNPayReturn(request);
-
-        // Dựa vào kết quả, redirect người dùng đến trang thành công hoặc thất bại trên frontend
-        String redirectUrl;
-        if (paymentStatus == 1) {
-            redirectUrl = "http://localhost:3000/payment-success"; // URL của trang thành công trên frontend
-            log.info("payment complete without error");
-        } else if (paymentStatus == 0) {
-            redirectUrl = "http://localhost:3000/payment-failure"; // URL của trang thất bại trên frontend
-            log.warn("payment return a unreachable error");
-        } else {
-            redirectUrl = "http://localhost:3000/payment-invalid"; // URL của trang chữ ký không hợp lệ
-            log.error("invalid signature");
-        }
-
-        return new RedirectView(redirectUrl);
-    }
+//    // @PreAuthorize("hasAnyRole({'ADMIN', 'CUSTOMER', 'SHOP_OWNER', 'STAFF'})")
+//    @GetMapping("/vnpay-payment-return/")
+//    public RedirectView handleVnpayReturn(HttpServletRequest request) {
+//        int paymentStatus = vnPayService.processVNPayReturn(request);
+//
+//        // Dựa vào kết quả, redirect người dùng đến trang thành công hoặc thất bại trên frontend
+//        String redirectUrl;
+//        if (paymentStatus == 1) {
+//            redirectUrl = "http://localhost:3000/payment-success"; // URL của trang thành công trên frontend
+//            log.info("payment complete without error");
+//        } else if (paymentStatus == 0) {
+//            redirectUrl = "http://localhost:3000/payment-failure"; // URL của trang thất bại trên frontend
+//            log.warn("payment return a unreachable error");
+//        } else {
+//            redirectUrl = "http://localhost:3000/payment-invalid"; // URL của trang chữ ký không hợp lệ
+//            log.error("invalid signature");
+//        }
+//
+//        return new RedirectView(redirectUrl);
+//    }
 }

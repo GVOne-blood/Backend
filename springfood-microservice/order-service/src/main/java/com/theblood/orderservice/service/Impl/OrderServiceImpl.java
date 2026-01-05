@@ -1,30 +1,46 @@
 package com.theblood.orderservice.service.Impl;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.theblood.common.dto.kafka.Event;
+import com.theblood.common.dto.kafka.OrderCreationEvent;
+import com.theblood.common.dto.request.ItemRequest;
+import com.theblood.common.dto.request.ShopOrderRequest;
+import com.theblood.common.dto.response.ProductDetail;
+import com.theblood.common.enums.MessageStatus;
+import com.theblood.common.enums.OrderStatus;
 import com.theblood.common.enums.PaymentMethod;
-import com.theblood.common.enums.ProductStatus;
+import com.theblood.common.enums.kafka.SagaOrderEventType;
 import com.theblood.common.exception.custom.InvalidDataException;
-import com.theblood.orderservice.common.enums.OrderStatus;
 import com.theblood.orderservice.common.util.OrderStatusValidationUtil;
-import com.theblood.orderservice.dto.request.ItemRequest;
 import com.theblood.orderservice.dto.request.OrderRequest;
 import com.theblood.orderservice.dto.request.OrdersUpdateRequest;
 import com.theblood.orderservice.dto.request.SingleOrderRequest;
 import com.theblood.orderservice.dto.response.OrderDetailResponse;
 import com.theblood.orderservice.dto.response.OrderPaymentResponse;
+import com.theblood.orderservice.grpc.client_role.OrderTranfer;
+import com.theblood.orderservice.grpc.client_role.OrderValidation;
+import com.theblood.orderservice.kafka.consumer.OrderServiceConsumer;
+import com.theblood.orderservice.kafka.event.OrderAddressEvent;
+import com.theblood.orderservice.kafka.model.OutboxMessage;
 import com.theblood.orderservice.mapper.OrderMapper;
 import com.theblood.orderservice.model.Order;
 import com.theblood.orderservice.model.OrderItem;
 import com.theblood.orderservice.repository.OrderItemRepository;
 import com.theblood.orderservice.repository.OrderRepository;
+import com.theblood.orderservice.repository.OutboxMessageRepository;
 import com.theblood.orderservice.service.OrderService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.transaction.TransactionRolledbackException;
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.io.UnsupportedEncodingException;
@@ -32,25 +48,32 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class OrderServiceImpl implements OrderService {
 
-    ProductService productService;
-    ProductRepository productRepository;
-    OrderRepository orderRepository;
-    AddressRepository addressRepository;
-    PaymentRepository paymentRepository;
-    PaymentService paymentService;
-    ShopService shopService;
-    OrderItemRepository orderItemRepository;
-    VNPayService vnPayService;
-
-    ProductMapper productMapper;
     OrderMapper orderMapper;
-    UserRepository userRepository;
+    OrderRepository orderRepository;
+    OrderItemRepository orderItemRepository;
+    OutboxMessageRepository outboxMessageRepository;
+    ObjectMapper objectMapper;
+    OrderTranfer orderTranfer;
+    KafkaTemplate<String, Object> kafkaTemplate;
+    OrderServiceConsumer orderServiceConsumer;
+    OrderValidation orderValidation;
+//    ProductService productService;
+//    ProductRepository productRepository;
+//    AddressRepository addressRepository;
+//    PaymentRepository paymentRepository;
+//    PaymentService paymentService;
+//    ShopService shopService;
+//    VNPayService vnPayService;
+//    ProductMapper productMapper;
+//    UserRepository userRepository;
 
     @Override
     public Page<OrderDetailResponse> getListOrderForAdmin(Pageable pageable, String userId) {
@@ -82,11 +105,9 @@ public class OrderServiceImpl implements OrderService {
      */
     @Transactional
     @Override
-    public OrderPaymentResponse createOrders(HttpServletRequest request, OrderRequest orderRequest, String userId) throws UnsupportedEncodingException {
+    public OrderPaymentResponse createOrders(HttpServletRequest request, OrderRequest orderRequest, String userId) throws UnsupportedEncodingException, TransactionRolledbackException, JsonProcessingException {
 
-        PaymentTransactions paymentTransaction = new PaymentTransactions();
         List<OrderDetailResponse> orderDetailResponseList = new ArrayList<>();
-        OrderDetailResponse orderDetailResponse = new OrderDetailResponse();
         List<ShopOrderRequest> shops = orderRequest.getShopOrderItems();
         List<Order> allOrders = new ArrayList<>();
         //   BigDecimal finalPrice = new BigDecimal(0);
@@ -98,115 +119,109 @@ public class OrderServiceImpl implements OrderService {
         StringBuilder orderPaymentInfo = new StringBuilder();
         StringBuilder notes = new StringBuilder();
 
-        Optional<Address> addr = addressRepository.findByUserId(orderRequest
-                .getShippingAddressId(), userId);
+        //check shop
+        if (!orderValidation.shopValidation(shops)) throw new InvalidDataException("Shop Validation Failed");
 
-        if (addr.isEmpty()) throw new InvalidDataException("Invalid Shipping Address");
+        //check product in shop
+
+        // add address
+        OrderAddressEvent addressEvent = OrderAddressEvent.builder()
+                .userId(UUID.fromString(userId))
+                .addressId(orderRequest.getShippingAddressId())
+                .build();
+
+        kafkaTemplate.send("order-address-request", addressEvent);
+//        Optional<Address> addr = addressRepository.findByUserId(orderRequest
+//                .getShippingAddressId(), userId);
+//
+//        if (addr.isEmpty()) throw new InvalidDataException("Invalid Shipping Address");
+
 
         for (ShopOrderRequest shop : shops) {
-            if (!shopService.isShopExists(shop.getShopId())) throw new InvalidDataException("Shop does not exist");
             items = shop.getItems();
             List<Order> orders = new ArrayList<>();
+            OrderDetailResponse orderDetailResponse = new OrderDetailResponse();
             Order order = new Order();
             List<ProductDetail> productList = new ArrayList<>();
             BigDecimal subtotalPrice = BigDecimal.ZERO;
             List<OrderItem> orderItems = new ArrayList<>();
-            User user = userRepository.findById(userId).get();
-            order.setUser(user);
+            order.setUserId(UUID.fromString(userId));
+            order.setOrderStatus(OrderStatus.PROCESSING);
+            order.setCustomerNotes(shop.getNote());
+            if (orderRequest.getPaymentMethod().equals(PaymentMethod.COD.name()))
+                order.setPaymentMethod(PaymentMethod.COD);
+            else if (orderRequest.getPaymentMethod().equals(PaymentMethod.VNPAY.name()))
+                order.setPaymentMethod(PaymentMethod.VNPAY);
+            else throw new InvalidDataException("Unsupported PaymentMethod ");
 
-            // Set shop for order
-            Shop shopEntity = shopService.getShopById(shop.getShopId());
-            order.setShop(shopEntity);
+            //address
+            // order.setAddress(addr.get());
+            //shipping fee
+            orderRepository.save(order);
 
-            for (ItemRequest item : items) {
-                if (productService.isProductExists(item.getProductId())) {
-                    Product product =
-                            productRepository.
-                                    findById(item.getProductId()).orElseThrow(() -> new InvalidDataException("product not found"));
-                    //check quantity
-                    if (product.getQuantity() < item.getQuantity() || product.getQuantity() <= 0)
-                        throw new InvalidDataException("quantity must be less than stock");
-                    //check available
-                    if (product.getProductStatus() != ProductStatus.AVAILABLE)
-                        throw new InvalidDataException("product status no longer AVAILABLE");
+            //start choreography saga
+            String transactionId = UUID.randomUUID().toString();
+            OrderCreationEvent payload = OrderCreationEvent.builder()
+                    .orderId(order.getId())
+                    .userId(order.getUserId()).products(items)
+                    .build();
 
-                    OrderItem orderItem = new OrderItem();
-                    product.setQuantity(product.getQuantity() - item.getQuantity());
-                    orderItem.setProduct(product);
-                    orderItem.setQuantity(item.getQuantity());
-                    orderItem.setOrder(order);
-                    productList.add(productMapper.toProductDetail(product, item.getQuantity()));
-                    //discount amount default
-                    orderItem.setDiscountAmount(BigDecimal.ZERO);
+            OutboxMessage outboxMessage = new OutboxMessage();
+            outboxMessage.setTopic("order-creation-saga");
+            outboxMessage.setStatus(MessageStatus.PENDING);
+            outboxMessage.setMessageId(transactionId); // Đảm bảo các event cùng 1 luồng distributed transaction cùng 1 partition để được xử lý đồng bộ
+            outboxMessage.setPayload(objectMapper.writeValueAsString(Event.builder()
+                    .eventType(SagaOrderEventType.ORDER_CREATED.name())
+                    .transactionId(transactionId)
+                    .payload(payload)
+                    .build()));
+            outboxMessageRepository.save(outboxMessage);
 
-                    BigDecimal itemPrice = product.getPrice().multiply(BigDecimal.valueOf(item.getQuantity()));
-                    orderItem.setPriceAtBooking(itemPrice);
+            // caculate price after saga transaction complete
+            order.setShippingFee(BigDecimal.ZERO);
+            order.setSubtotalAmount(subtotalPrice);
+            //discount
+            order.setDiscount(BigDecimal.ZERO);
+            BigDecimal finalPrice = (subtotalPrice.add(order.getShippingFee().add(distanceFee)).subtract(order.getDiscount()));
+            //total price
+            order.setFinalPrice(finalPrice);
 
-                    orderItems.add(orderItem);
+            //payment with gRPC
+//            kafkaTemplate.send("order-creation-saga", Event.builder()
+//                    .eventType(SagaOrderEventType.ORDER_CREATED.name())
+//                    .transactionId(transactionId)
+//                    .payload(payload)
+//                    .build()
+//            );
 
-                    subtotalPrice = subtotalPrice.add(itemPrice);
-                }
-            }
-
+            // Set shop for single order
+            order.setShopId(UUID.fromString(shop.getShopId()));
 
             // Đảm bảo có ít nhất 1 sản phẩm trong order
             if (orderItems.isEmpty()) {
                 throw new InvalidDataException("Order must contain at least one valid item");
             }
 
-            // Set các orderItems vào order
-            order.setBookingItems(orderItems);
-
-            //note
-            order.setCustomerNotes(shop.getNote());
-            // payment method
-            Payment payment = paymentRepository.findById(orderRequest.getPaymentMethod().name()).orElseThrow(() -> new InvalidDataException("Invalid Payment method"));
-
-            if (!payment.getIsActive()) throw new InvalidDataException("Payment method is not active");
-            order.setPaymentMethod(payment);
-            //order status và payment status
-            if (!payment.getId().equals(PaymentMethod.COD.name())) {
-                order.setOrderStatus(OrderStatus.PENDING_PAYMENT);
-            } else {
-                order.setOrderStatus(OrderStatus.PENDING);
-            }
-
-
-            //address
-            order.setAddress(addr.get());
-            //shipping fee
-            order.setShippingFee(BigDecimal.ZERO);
-
-            order.setSubtotalAmount(subtotalPrice);
-
-            //discount
-            order.setDiscount(BigDecimal.ZERO);
-
-            BigDecimal finalPrice = (subtotalPrice.add(order.getShippingFee().add(distanceFee)).subtract(order.getDiscount()));
-            //total price
-            order.setFinalPrice(finalPrice);
-
             // orderRepository.save(order);
             orders.add(order);
             allOrders.add(order);
 
-
-            for (OrderItem item : orderItems) {
-                item.setOrder(order);
-                //  orderItemRepository.save(item);
-            }
+//            for (OrderItem item : orderItems) {
+//                item.setOrder(order);
+//                //  orderItemRepository.save(item);
+//            }
 
             orderDetailResponse = orderMapper.toOrderDetail(order);
             orderDetailResponse.setOrderId(order.getId());
             orderDetailResponse.setOrderDate(order.getCreatedAt());
             orderDetailResponse.setShippingFee(distanceFee);
-            orderDetailResponse.setPaymentMethod(order.getPaymentMethod().getId());
-            orderDetailResponse.setUserId(order.getUser().getId());
+            orderDetailResponse.setPaymentMethod(order.getPaymentMethod().name());
+            orderDetailResponse.setUserId(order.getUserId());
             //   orderDetailResponse.setItems(productMapper.toProductDetail(order.getBookingItems()));
             orderDetailResponse.setItems(productList);
-            orderDetailResponse.setShopId(order.getShop().getId());
-            orderDetailResponse.
-                    setShippingAddress((addr.get().getAddressDetail() + " " + addr.get().getStreet()).trim() + ", " + addr.get().getWard() + ", " + addr.get().getCity());
+            orderDetailResponse.setShopId(order.getShopId());
+//            orderDetailResponse.
+//                    setShippingAddress((addr.get().getAddressDetail() + " " + addr.get().getStreet()).trim() + ", " + addr.get().getWard() + ", " + addr.get().getCity());
             orderDetailResponseList.add(orderDetailResponse);
 
 
@@ -223,33 +238,30 @@ public class OrderServiceImpl implements OrderService {
             //- orderRequest.getGlobalVoucher()
         }
 
-        PaymentInfoRequest paymentInfo = new PaymentInfoRequest();
-        paymentInfo.setAmount(amount);
-        paymentInfo.setUserId(userId);
-        paymentInfo.setPaymentMethod(PaymentMethod.VNPAY);
-        paymentInfo.setStatus(TransactionStatus.PENDING);
-        paymentTransaction = paymentService.createPaymentTransaction(paymentInfo, allOrders);
 
         OrderPaymentResponse orderPaymentResponse = new OrderPaymentResponse();
         orderPaymentResponse.setOrderDetails(orderDetailResponseList);
         orderPaymentResponse.setAmount(amount);
         orderPaymentResponse.setTotalShippingFee(totalShippingFee);
-        orderPaymentResponse.setTransactionId(paymentTransaction.getTransactionNo());
-
-        if (orderDetailResponse.getPaymentMethod().equals(PaymentMethod.VNPAY.name())) {
-            VNPayPaymentRequest vnPayPaymentRequest = new VNPayPaymentRequest();
-            vnPayPaymentRequest.setOrderInfo(orderPaymentInfo.toString());
-            vnPayPaymentRequest.setUserId(userId);
-            // maybe cái này không quan trọng vì nó là trans tổng thể
-            vnPayPaymentRequest.setTxnRef(paymentTransaction.getId());
-            vnPayPaymentRequest.setAmount(amount);
-            vnPayPaymentRequest.setTransactionNo(paymentTransaction.getTransactionNo());
-            orderPaymentResponse.setPaymentUrl(vnPayService.createPaymentUrl(request, vnPayPaymentRequest));
+// tạo paymment transaction id để chuẩn bị thanh toan
+        String referenceId = null;
+        if (orderRequest.getPaymentMethod().name().equals(PaymentMethod.COD.name())) {
+            referenceId = orderTranfer.creationPaymentTransactionRequest(UUID.fromString(userId), amount, OrderStatus.PENDING, orderDetailResponseList.get(0).getPaymentMethod());
         }
+        referenceId = orderTranfer.creationPaymentTransactionRequest(UUID.fromString(userId), amount, OrderStatus.PENDING_PAYMENT, orderDetailResponseList.get(0).getPaymentMethod());
+        if (referenceId.isBlank()) throw new InvalidDataException("reference Id is Blank");
+
+// lưu dấu liên kết với payment transaction vào tất cả order của các shop
+        for (Order order : allOrders) {
+            order.setReferenceId(UUID.fromString(referenceId));
+        }
+        orderPaymentResponse.setReferenceId(referenceId);
+
         return orderPaymentResponse;
     }
 
     /**
+     * method chưa sẵn sang
      * REQUIRE : Tất cả các order phải thuộc cùng 1 giỏ hàng(cùng 1 transactionId), các order phải được thanh toán cùng lúc (thanh toán sản phẩm trong giỏ hàng)
      * NOTE : Hàm dùng để update order, nhưng khi update order lên trạng thái mới sẽ buộc phải kèm theo các event liên quan đến nghiệp vụ
      * nên dữ liệu trả về của hàm sẽ là một order cha (OrderPaymentResponse) đã được cập nhật
@@ -266,13 +278,13 @@ public class OrderServiceImpl implements OrderService {
 
         OrderPaymentResponse response = new OrderPaymentResponse();
 
-        List<SingleOrderRequest> modifyFields = updateRequest.getOrder();
+        List<SingleOrderRequest> modifyFields = (List<SingleOrderRequest>) updateRequest.getOrder();
         List<String>
                 ids = new ArrayList<>();
         for (SingleOrderRequest x : modifyFields) {
-            if (addressRepository.findById(x.getAddressId()).isEmpty()) {
-                throw new InvalidDataException("Address of order " + x.getOrderId() + "not found");
-            }
+//            if (addressRepository.findById(x.getAddressId()).isEmpty()) {
+//                throw new InvalidDataException("Address of order " + x.getOrderId() + "not found");
+//            }
             ids.add(x.getOrderId());
         }
 
@@ -290,9 +302,9 @@ public class OrderServiceImpl implements OrderService {
         // đổi phương thức thanh toán từ COD -> online transfer
         if (requestOrderStatus.equals(OrderStatus.PENDING_PAYMENT)) {
 
-            if (updateRequest.getPaymentMethod().name().equals(PaymentMethod.VNPAY.name())) {
-                response.setPaymentUrl(getVNPayReturnUrl(request, orders));
-            }
+//            if (updateRequest.getPaymentMethod().name().equals(PaymentMethod.VNPAY.name())) {
+//                response.setPaymentUrl(getVNPayReturnUrl(request, orders));
+//            }
             for (int i = 0; i < orders.size(); i++) {
                 if (!orders.get(i).getId().equals(modifyFields.get(i).getOrderId())) {
 
@@ -314,7 +326,12 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional
     public OrderPaymentResponse updatePaymentPendingOrders(OrdersUpdateRequest updateRequest) {
+        List<Order> orders = (List<Order>) updateRequest.getOrder();
+        orders.forEach(order -> {
+            order.setOrderStatus(OrderStatus.CONFIRMED);
+        });
         return null;
     }
 
@@ -358,15 +375,15 @@ public class OrderServiceImpl implements OrderService {
 
         order.get().setOrderStatus(OrderStatus.DELETED);
     }
-
-    private String getVNPayReturnUrl(HttpServletRequest request, List<Order> orders) throws UnsupportedEncodingException {
-        VNPayPaymentRequest vnPayPaymentRequest = new VNPayPaymentRequest();
-        vnPayPaymentRequest.setOrderInfo("Thanh toan cho don hang " + orders.get(0).getPaymentTransactions().getId());
-        vnPayPaymentRequest.setPaymentMethod(PaymentMethod.VNPAY);
-        vnPayPaymentRequest.setAmount(getTotalAmount(orders));
-        vnPayPaymentRequest.setTxnRef(orders.get(0).getPaymentTransactions().getId());
-        return vnPayService.createPaymentUrl(request, vnPayPaymentRequest);
-    }
+//
+//    private String getVNPayReturnUrl(HttpServletRequest request, List<Order> orders) throws UnsupportedEncodingException {
+//        VNPayPaymentRequest vnPayPaymentRequest = new VNPayPaymentRequest();
+//        vnPayPaymentRequest.setOrderInfo("Thanh toan cho don hang " + orders.get(0).getPaymentTransactions().getId());
+//        vnPayPaymentRequest.setPaymentMethod(PaymentMethod.VNPAY);
+//        vnPayPaymentRequest.setAmount(getTotalAmount(orders));
+//        vnPayPaymentRequest.setTxnRef(orders.get(0).getPaymentTransactions().getId());
+//        return vnPayService.createPaymentUrl(request, vnPayPaymentRequest);
+//    }
 
     private Long getTotalAmount(List<Order> orders) {
 

@@ -22,6 +22,8 @@
         <module>identity-service</module>
         <module>api-gateway</module>
         <module>product-service</module>
+        <module>payment-service</module>
+        <module>cart-service</module>
         <module>order-service</module>
         <module>common</module>
         <module>grpc</module>

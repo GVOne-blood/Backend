@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -32,6 +33,8 @@ public interface ProductService {
     //List<ProductDetail> getListProductsRelated(UUID productId, int limit);
 
     Product addProduct(ProductRequest productRequest) throws JsonProcessingException;
+
+    List<ProductDetail> addProductsByExcel(MultipartFile file) throws IOException;
 
     //    Product addProduct(ProductRequest productRequest);
 //

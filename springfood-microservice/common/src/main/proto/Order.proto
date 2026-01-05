@@ -5,8 +5,21 @@ option java_package = "com.theblood.common.grpc";
 //option java_outer_classname = "ProductProto";
 
 service OrderService {
+  rpc OrderUpdate (OrderUpdateRequest) returns (OrderUpdateResponse);
 }
 
+message OrderUpdateRequest{
+  string referenceId = 1;
+  string successTransactionId = 2;
+  string paymentMethod = 3;
+  string orderStatusUpdate = 4;
+  string transactionStatus = 5;
+}
+
+message OrderUpdateResponse{
+  bool success = 1;
+  string message = 2;
+}
 message OrderPaymentRequest{
 
 }
