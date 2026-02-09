@@ -1,0 +1,4 @@
+org.springframework.test.context.ContextCustomizerFactory = \
+    com.theblood.notification.config.\
+    SqlTestContainersSpringContextCustomizerFactory,com.theblood.notification.\
+    config.RedisTestContainersSpringContextCustomizerFactory

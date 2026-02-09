@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package com.viettel.client.authentication;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+import "google/protobuf/any.proto";
+import "google/protobuf/empty.proto";
+
+import "authentication/common.proto";
+
+option java_multiple_files = true;
+option java_package = "com.viettel.client.authentication";
+
+service PassConfigService {
+  rpc saveConfig (PassConfigDTO) returns (PassConfigDTO) {
+  }
+
+  rpc getAllConfigs (PageRequest) returns (PageablePassConfigDTO) {
+  }
+}
+
+message PageablePassConfigDTO {
+  repeated PassConfigDTO data = 1;
+  optional int64 totalElement = 2;
+  optional int32 totalPage = 3;
+}

@@ -1,0 +1,151 @@
+syntax = "proto3";
+
+package com.viettel.client.authorization;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/any.proto";
+import "google/protobuf/wrappers.proto";
+import "authorization/author-common.proto";
+import "authorization/tenant.proto";
+import "authorization/policy.proto";
+import "authorization/resource.proto";
+import "authorization/scope.proto";
+
+option java_multiple_files = true;
+option java_package = "com.viettel.client.authorization";
+option java_outer_classname = "AuthorServicePermission";
+
+service PermissionService {
+  rpc createPermission (PermissionGrpcDTO) returns (PermissionGrpcDTO) {
+  }
+
+  rpc partialUpdatePermission (PermissionGrpcDTO) returns (PermissionGrpcDTO) {
+  }
+
+  rpc getPermission (CustomPojoRetrieverGrpc) returns (PermissionGrpcDTO) {
+  }
+
+  rpc doSearch (SearchParamGrpc) returns (PermissionSearchResultGrpc) {
+  }
+
+  rpc deletePermission (CustomPojoRetrieverGrpc) returns (google.protobuf.Empty) {
+  }
+
+  rpc deleteListPermission (CustomPojoRetrieverGrpc) returns (google.protobuf.Empty) {
+  }
+
+  rpc checkAuthor (CheckAuthorizationGrpcDTO) returns (google.protobuf.BoolValue) {
+  }
+
+  rpc checkListAuthor (CheckListAuthorizationGrpcDTO) returns (CheckListAuthorResultWrapped) {
+  }
+
+  rpc checkListConferenceAuthor (CheckListConferenceAuthorizationGrpcDTO) returns (CheckListAuthorResultWrapped) {
+  }
+
+  rpc getMenu (CheckAuthorizationGrpcDTO) returns (ResourceTreeGrpcListWrapped) {
+  }
+  rpc filterUserAddDocuments(CheckAuthorizationUserAddDocumentGrpcDTO) returns(ResourceAccountAddDocumentListWrapped){
+  }
+  rpc getMenuAll (CheckAuthorizationGrpcDTO) returns (ResourceGrpcDTOListWrapped) {
+  }
+}
+
+message PermissionGrpcDTO {
+  optional string id = 1;
+  optional string permissionName = 2;
+  optional string permissionCode = 3;
+  optional string description = 4;
+  optional int32 resourceType = 5;
+  optional int32 status = 6;
+  optional string createdBy = 7;
+  optional google.protobuf.Timestamp createdDate = 8;
+  optional string lastModifiedBy = 9;
+  optional google.protobuf.Timestamp lastModifiedDate = 10;
+  repeated ResourceGrpcDTO resources = 11;
+  repeated ScopeGrpcDTO scopes = 12;
+  repeated PolicyGrpcDTO policies = 13;
+  repeated TenantGrpcDTO tenants = 14;
+  repeated int64 listId = 15;
+  repeated ResourceTreeGrpc resourceTree = 16;
+}
+
+message PermissionReplyGrpc {
+  optional int32 code = 1;
+  optional string message = 2;
+  oneof response {
+    PermissionGrpcDTO detail = 3;
+    string detailErrorMessage = 4;
+  }
+}
+
+message PermissionSearchResultGrpc {
+  repeated PermissionGrpcDTO data = 1;
+  optional int32 total = 2;
+  optional int32 activeTotal = 3;
+  optional int32 inactiveTotal = 4;
+}
+
+message AuthenticationGrpcDTO {
+  optional string id = 1;
+  optional string userName = 2;
+  optional string fullName = 3;
+  optional string email = 4;
+  optional int32 isActivate = 5;
+  optional string phoneNumber = 6;
+  optional string jobTitle = 7;
+  optional string appCode = 8;
+  optional string orgCode = 9;
+  repeated string roles = 10;
+  optional string context = 11;
+  optional string shopId = 12;
+  repeated string roleIds = 13;
+}
+
+message CheckAuthorizationGrpcDTO {
+  optional string resourceUrl = 1;
+  optional string scope = 2;
+  optional AuthenticationGrpcDTO authenticationDTO = 3;
+}
+message CheckAuthorizationUserAddDocumentGrpcDTO {
+  optional string resourceUrl = 1;
+  optional string scope = 2;
+  repeated AuthenticationGrpcDTO authenticationDTO = 3;
+}
+
+message ResourceScopeItemGrpcDTO {
+  optional string resourceUrl = 1;
+  optional string method = 2;
+}
+
+//message ResourceScopeItemConferenceGrpcDTO {
+//  optional string resourceUrl = 1;
+//  optional string scope = 2;
+//  optional string conferenceId = 3;
+//}
+
+message CheckListAuthorizationGrpcDTO {
+  repeated ResourceScopeItemGrpcDTO resourceScopeItemDTOList = 1;
+  optional AuthenticationGrpcDTO authenticationDTO = 2;
+}
+
+message CheckListAuthorResultWrapped {
+  repeated google.protobuf.BoolValue data = 1;
+}
+
+message ListAuthorResult {
+  repeated AuthorResult data = 1;
+}
+
+message AuthorResult {
+  optional string resourceUrl = 1;
+  optional bool havePermission = 2;
+}
+
+message CheckListConferenceAuthorizationGrpcDTO {
+  repeated ResourceScopeItemGrpcDTO resourceScopeItemDTOList = 1;
+  optional AuthenticationGrpcDTO authenticationDTO = 2;
+  optional string conferenceId = 3;
+}
+

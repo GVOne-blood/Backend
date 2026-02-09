@@ -56,6 +56,7 @@ docker-compose down -v
 - **Bucket:** images (auto-created)
 
 **Access Console:**
+
 1. Mở browser: http://localhost:9001
 2. Login với minioadmin/minioadmin
 3. Bucket "images" đã được tạo sẵn với public access
@@ -66,13 +67,13 @@ docker-compose down -v
 - **Port:** 5432
 - **Username:** postgres
 - **Password:** 123456
-- **Databases:** 
-  - identity_service
-  - product_service
-  - cart_service
-  - order_service
-  - payment_service
-  - shop_service
+- **Databases:**
+    - identity_service
+    - product_service
+    - cart_service
+    - order_service
+    - payment_service
+    - shop_service
 
 ### Redis
 
@@ -81,6 +82,7 @@ docker-compose down -v
 - **Password:** 123456
 
 **Test connection:**
+
 ```bash
 docker exec -it springfood-redis redis-cli -a 123456
 > ping
@@ -93,6 +95,7 @@ PONG
 - **Zookeeper:** localhost:2181
 
 **Create topic:**
+
 ```bash
 docker exec -it springfood-kafka kafka-topics --create \
   --bootstrap-server localhost:9092 \
@@ -141,7 +144,7 @@ spring.datasource.url: jdbc:postgresql://localhost:5432/product_service
 # Redis
 spring.redis.host: localhost
 spring.redis.port: 6379
-spring.redis.password: 123456
+spring.redis.password: ${DEFAULT_DATABASE_PASSWORD}
 
 # MinIO
 minio.url: http://localhost:9000

@@ -1,0 +1,45 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: authentication
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: ${DEFAULT_DATABASE_URL:jdbc:postgresql://localhost:5432/springfood}
+    username: ${DEFAULT_DATABASE_USERNAME:postgres}
+    password: ${DEFAULT_DATABASE_PASSWORD:123456}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    prefer-ip-address: true
+
+jwt:
+  cookie-max-age: 3600000  # 1 hour cho cookie
+  accessTokenExpiration: 3600000  # 1 hour cho access token (test)
+  refreshTokenExpiration: 604800000  # 7 ngày cho refresh token
+  resetTokenExpiration: 300000  # 5 phút cho reset token
+  secretKey: 4dVgNvOxWTz2PKJZqCYFoh+AXX0l2OVHoCTfN9ZdXGs=
+  resetKey: 4dVgNvOxWTz2PKJZqCYFoh+AXX0l2OVHoCTfN9ZdXGs=
+  refreshKey: RKyKtM34VufukHK6sSPlQdDA8wBOHCYUygwIp6Fekco=
+
+app:
+  jwt:
+    secretKey: ${jwt.secretKey}
+    refreshKey: ${jwt.refreshKey}
+    resetKey: ${jwt.resetKey}
+logging:
+  level:
+    org.springframework.security: DEBUG
+    org.springframework.security.web.FilterChainProxy: DEBUG
+    org.springframework.security.web.access.ExceptionTranslationFilter: DEBUG
+    org.springframework.security.authentication: DEBUG

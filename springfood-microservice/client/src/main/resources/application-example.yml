@@ -1,0 +1,100 @@
+springfood:
+  client:
+    enabled: true
+    default-protocol: rest
+
+    defaults:
+      connect-timeout: 10s
+      read-timeout: 30s
+      write-timeout: 30s
+      max-retries: 3
+      enable-metrics: true
+      enable-tracing: true
+
+    service-discovery:
+      enabled: false
+      type: consul
+      namespace: default
+      metadata:
+        version: v1
+        environment: dev
+
+    resilience:
+      circuit-breaker:
+        enabled: true
+        failure-rate-threshold: 50
+        slow-call-rate-threshold: 100
+        slow-call-duration-threshold: 60s
+        sliding-window-size: 100
+        minimum-number-of-calls: 20
+        wait-duration-in-open-state: 60s
+
+      retry:
+        enabled: true
+        max-attempts: 3
+        wait-duration: 500ms
+        exponential-backoff: true
+        exponential-backoff-multiplier: 2.0
+        max-wait-duration: 5s
+
+      bulkhead:
+        enabled: false
+        max-concurrent-calls: 25
+        max-wait-duration: 0s
+
+      rate-limiter:
+        enabled: false
+        limit-for-period: 50
+        limit-refresh-period: 1s
+        timeout-duration: 5s
+
+    observability:
+      metrics-enabled: true
+      tracing-enabled: true
+      logging-enabled: true
+      metrics-prefix: springfood.client
+
+    services:
+      party-member-service:
+        name: party-member-service
+        protocol: rest
+        url: http://localhost:8081
+        base-path: /api
+        enabled: true
+
+        rest:
+          log-requests: true
+          log-responses: true
+          log-level: FULL
+          follow-redirects: true
+          decode-404: false
+
+        grpc:
+          use-plaintext: true
+          max-inbound-message-size: 4194304
+          max-inbound-metadata-size: 8192
+          keep-alive-time: 5m
+          keep-alive-timeout: 20s
+          keep-alive-without-calls: false
+          negotiation-type: PLAINTEXT
+          enable-retry: true
+          max-retry-attempts: 5
+
+      author-service:
+        name: author-service
+        protocol: grpc
+        host: localhost
+        port: 9090
+        enabled: true
+
+        grpc:
+          use-plaintext: true
+          negotiation-type: PLAINTEXT
+
+        resilience:
+          circuit-breaker:
+            enabled: true
+            failure-rate-threshold: 30
+          retry:
+            enabled: true
+            max-attempts: 5

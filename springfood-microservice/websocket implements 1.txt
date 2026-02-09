@@ -1,0 +1,242 @@
+Báo cáo Nghiên cứu Chuyên sâu: Thiết kế và Triển khai Hệ thống Chat Real-time Phân tán trên nền tảng Microservices với Java Spring Boot, WebSocket và Apache Kafka
+1. Cơ sở Lý luận và Kiến trúc Tổng thể
+Trong bối cảnh phát triển phần mềm hiện đại, nhu cầu về khả năng giao tiếp thời gian thực (real-time communication) đã chuyển dịch từ một tính năng bổ trợ sang một yêu cầu cốt lõi đối với nhiều nền tảng doanh nghiệp, mạng xã hội và hệ thống chăm sóc khách hàng. Việc triển khai một dịch vụ chat không chỉ đơn thuần là việc truyền tải văn bản từ điểm A đến điểm B, mà còn liên quan đến các thách thức phức tạp về tính nhất quán của dữ liệu (data consistency), khả năng mở rộng theo chiều ngang (horizontal scalability), và độ trễ thấp (low latency). Báo cáo này đi sâu vào việc phân tích và thiết kế một hệ thống chat phân tán sử dụng Java Spring Boot cho lớp dịch vụ, WebSocket (STOMP) cho giao thức kết nối, và Apache Kafka làm xương sống (backbone) điều phối sự kiện.
+1.1. Sự Dịch chuyển từ Monolith sang Microservices trong Ứng dụng Real-time
+Trong kiến trúc nguyên khối (monolithic) truyền thống, việc triển khai WebSocket tương đối đơn giản vì trạng thái phiên (session state) của người dùng được lưu trữ trong bộ nhớ của một quy trình ứng dụng duy nhất. Khi Người dùng A gửi tin nhắn cho Người dùng B, máy chủ chỉ cần tra cứu phiên kết nối của Người dùng B trong bản đồ bộ nhớ (memory map) cục bộ và đẩy tin nhắn đi. Tuy nhiên, kiến trúc này gặp giới hạn nghiêm trọng về khả năng mở rộng. Khi số lượng kết nối đồng thời vượt quá giới hạn của một máy chủ (ví dụ: 10.000 kết nối - vấn đề C10k), hệ thống buộc phải mở rộng sang nhiều máy chủ.1
+Sự chuyển dịch sang kiến trúc Microservices đặt ra bài toán "Split-Brain" trong quản lý phiên WebSocket. Khi hệ thống được triển khai trên cụm (cluster) gồm nhiều instance (bản sao) của dịch vụ chat, Người dùng A có thể kết nối tới Instance 1, trong khi Người dùng B kết nối tới Instance 2. Instance 1 hoàn toàn không có quyền truy cập vào không gian bộ nhớ của Instance 2, do đó không thể gửi tin nhắn trực tiếp qua socket cho Người dùng B.3 Đây là điểm nghẽn kỹ thuật buộc chúng ta phải đưa vào một lớp trung gian (middleware) đóng vai trò là Message Broker để đồng bộ hóa trạng thái và định tuyến tin nhắn giữa các instance.
+1.2. Vai trò Chiến lược của Apache Kafka
+Mặc dù có nhiều lựa chọn cho lớp Message Broker như RabbitMQ hay ActiveMQ, Apache Kafka được lựa chọn trong kiến trúc này nhờ vào đặc tính của một Distributed Commit Log. Khác với các hàng đợi tin nhắn truyền thống thường xóa tin nhắn ngay sau khi tiêu thụ (acknowledgment), Kafka lưu trữ tin nhắn trên đĩa theo trật tự thời gian và cho phép nhiều Consumer Group đọc lại dữ liệu.2
+Trong ngữ cảnh của dịch vụ chat, Kafka giải quyết ba vấn đề cốt lõi:
+Đồng bộ hóa phiên phân tán: Kafka hoạt động như một kênh quảng bá (broadcasting channel), đảm bảo rằng khi một tin nhắn được gửi đi, nó có thể được định tuyến đến đúng instance đang giữ kết nối của người nhận.4
+Đảm bảo thứ tự tin nhắn (Message Ordering): Thông qua cơ chế Partition Key, Kafka đảm bảo rằng các tin nhắn trong cùng một cuộc hội thoại luôn được xử lý tuần tự, ngăn chặn tình trạng câu trả lời xuất hiện trước câu hỏi.7
+Tách biệt việc ghi và đọc (Decoupling): Kafka cho phép tách biệt luồng xử lý real-time (gửi tin nhắn ngay lập tức qua WebSocket) và luồng lưu trữ (persist tin nhắn vào database để xem lại lịch sử), giúp tối ưu hóa độ trễ cho người dùng cuối.9
+1.3. Mô hình Kiến trúc Event-Driven và CQRS
+Hệ thống được thiết kế dựa trên mô hình Hướng sự kiện (Event-Driven Architecture - EDA) kết hợp với CQRS (Command Query Responsibility Segregation).
+Command Side (Ghi): Xử lý việc nhận tin nhắn từ WebSocket, xác thực, và đẩy vào Kafka topic. Đây là luồng ưu tiên tốc độ ghi cao.1
+Query Side (Đọc): Các consumer lắng nghe Kafka topic để cập nhật trạng thái hiển thị cho người dùng hoặc phục vụ các API lấy lịch sử tin nhắn.
+Sự kết hợp giữa Spring Boot (xử lý logic nghiệp vụ và quản lý kết nối), WebSocket (kênh giao tiếp hai chiều full-duplex), và Kafka (kênh trung chuyển tin cậy) tạo nên một hệ thống chat cấp độ doanh nghiệp (enterprise-grade) với khả năng chịu lỗi và mở rộng cao.1
+2. Giao thức WebSocket và STOMP: Công nghệ Cốt lõi
+Để hiểu sâu về quy trình triển khai, cần phân tích kỹ thuật công nghệ cốt lõi là WebSocket và giao thức con STOMP (Simple Text Oriented Messaging Protocol).
+2.1. Tại sao lại là WebSocket kết hợp STOMP?
+WebSocket là một giao thức truyền thông máy tính, cung cấp các kênh giao tiếp song công hoàn toàn (full-duplex) qua một kết nối TCP duy nhất. Khác với HTTP là giao thức request-response (mỗi lần giao tiếp phải mở kết nối mới hoặc tái sử dụng nhưng vẫn theo mô hình hỏi-đáp), WebSocket cho phép server chủ động đẩy dữ liệu xuống client (Server-Sent Events) mà không cần client phải gửi yêu cầu (polling).12
+Tuy nhiên, WebSocket chỉ là một giao thức vận chuyển (transport protocol). Nó định nghĩa cách các byte stream được truyền đi nhưng không định nghĩa cấu trúc của nội dung tin nhắn (ví dụ: làm sao để biết tin nhắn này là gửi cho user A hay user B, hay là yêu cầu subscribe vào một topic). Đây là lúc STOMP phát huy tác dụng. STOMP định nghĩa một định dạng tin nhắn dựa trên văn bản (text-based frames) bao gồm các lệnh như CONNECT, SEND, SUBSCRIBE, UNSUBSCRIBE, ACK.
+Việc sử dụng STOMP trên nền WebSocket trong Spring Boot mang lại lợi ích to lớn:
+Cơ chế Pub/Sub tích hợp: STOMP định nghĩa rõ ràng về các đích đến (destinations) như /topic/.. hay /queue/.., giúp việc định tuyến tin nhắn trở nên rõ ràng và chuẩn hóa.12
+Spring Integration: Spring Framework cung cấp module spring-messaging và spring-websocket hỗ trợ STOMP "out-of-the-box", bao gồm việc marshalling/unmarshalling tin nhắn tự động và tích hợp với Spring Security.15
+2.2. Vòng đời của một Kết nối WebSocket
+Quy trình thiết lập và duy trì một kết nối WebSocket trong Spring Boot trải qua các giai đoạn sau:
+Handshake (Bắt tay): Client gửi một HTTP Request với header Upgrade: websocket và Connection: Upgrade. Server phản hồi với mã 101 Switching Protocols. Tại bước này, các Interceptor của Spring (như HandshakeInterceptor) có thể can thiệp để kiểm tra điều kiện kết nối.13
+Connection Established: Kết nối TCP được giữ mở. Spring Boot tạo ra một phiên (Session) đại diện cho kết nối này.
+STOMP Connect: Client gửi frame CONNECT của STOMP, có thể kèm theo thông tin xác thực (Passcode/Token).
+Subscription: Client gửi frame SUBSCRIBE đến các topic cụ thể (ví dụ: /user/queue/messages để nhận tin nhắn riêng).
+Communication: Trao đổi các frame SEND và MESSAGE.
+Heartbeat & Disconnect: Hệ thống gửi các gói tin heartbeat định kỳ để phát hiện kết nối chết (zombie connection). Nếu không nhận được phản hồi, kết nối bị đóng và sự kiện SessionDisconnectEvent được kích hoạt.16
+3. Quy trình Triển khai Chi tiết: Từ Cấu hình đến Tính năng
+Phần này trình bày chi tiết các bước kỹ thuật để xây dựng dịch vụ, đi từ cấu hình nền tảng đến logic nghiệp vụ phức tạp.
+3.1. Bước 1: Khởi tạo Project và Dependencies
+Việc xây dựng bắt đầu với việc thiết lập một dự án Spring Boot (phiên bản 3.x trở lên được khuyến nghị để hỗ trợ Jakarta EE và Java 17+). Các dependency quan trọng trong pom.xml bao gồm:
+
+Dependency
+Mục đích
+spring-boot-starter-websocket
+Cung cấp thư viện WebSocket và STOMP, bao gồm cả SockJS fallback.
+spring-kafka
+Cung cấp KafkaTemplate cho producer và @KafkaListener cho consumer.
+spring-boot-starter-security
+Quản lý xác thực và phân quyền truy cập vào các kênh chat.
+spring-boot-starter-data-mongodb
+(Tùy chọn) Để lưu trữ lịch sử tin nhắn (NoSQL phù hợp cho dữ liệu chat write-heavy).
+reactor-kafka
+Nếu muốn xây dựng theo hướng Reactive (Non-blocking I/O).18
+
+Cấu hình YAML: Cần thiết lập cấu hình kết nối Kafka trong application.yml. Điểm quan trọng là cấu hình consumer.group-id. Trong mô hình chat phân tán, việc cấu hình Group ID sai có thể dẫn đến việc tin nhắn không được gửi đến người nhận (sẽ phân tích kỹ ở phần 3.5).4
+3.2. Bước 2: Cấu hình WebSocket Message Broker
+Lớp cấu hình WebSocketConfig đóng vai trò trung tâm, thực thi giao diện WebSocketMessageBrokerConfigurer.
+
+Java
+
+
+@Configuration
+@EnableWebSocketMessageBroker
+public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
+
+    @Override
+    public void registerStompEndpoints(StompEndpointRegistry registry) {
+        registry.addEndpoint("/ws")
+               .setAllowedOriginPatterns("*") // Cần cấu hình chặt chẽ hơn trong Production
+               .withSockJS(); // Fallback cho client không hỗ trợ WebSocket thuần
+    }
+
+    @Override
+    public void configureMessageBroker(MessageBrokerRegistry registry) {
+        registry.setApplicationDestinationPrefixes("/app"); // Prefix cho tin nhắn gửi lên server
+        registry.enableSimpleBroker("/topic", "/queue"); // Broker in-memory để đẩy tin xuống client
+        registry.setUserDestinationPrefix("/user"); // Prefix cho tin nhắn riêng tư
+    }
+}
+
+
+Phân tích chuyên sâu về cấu hình:
+SockJS Fallback: Mặc dù WebSocket đã phổ biến, nhiều mạng doanh nghiệp (Corporate Firewalls) hoặc Proxy vẫn chặn các kết nối không phải HTTP chuẩn. withSockJS() cho phép client tự động hạ cấp xuống các phương thức như HTTP Long Polling hoặc XHR Streaming nếu không thể thiết lập WebSocket, đảm bảo tính sẵn sàng cao của dịch vụ.20
+Simple Broker vs. External Broker: Cấu hình trên sử dụng enableSimpleBroker, nghĩa là một broker in-memory chạy ngay trong quy trình Java. Trong kiến trúc Microservices kết hợp Kafka, chúng ta không nhất thiết phải dùng enableStompBrokerRelay (để nối trực tiếp với RabbitMQ/ActiveMQ). Thay vào đó, chúng ta dùng Kafka làm "bus" vận chuyển dữ liệu giữa các instance, và mỗi instance dùng Simple Broker để đẩy tin nhắn xuống các client kết nối trực tiếp với nó. Đây là mô hình tối ưu cho Kafka vì Kafka không hỗ trợ giao thức STOMP trực tiếp.6
+3.3. Bước 3: Cơ chế Bảo mật và Xác thực (Authentication Flow)
+Bảo mật WebSocket phức tạp hơn HTTP REST API vì trình duyệt không cho phép tùy chỉnh header (như Authorization: Bearer...) trong yêu cầu bắt tay WebSocket tiêu chuẩn.
+Giải pháp Channel Interceptor: Chúng ta phải sử dụng cơ chế xác thực qua tham số truy vấn (query param) hoặc qua STOMP header trong frame CONNECT. Phương pháp an toàn và chuẩn mực nhất là sử dụng ChannelInterceptor để chặn frame CONNECT của STOMP.22
+Client khởi tạo kết nối STOMP và gửi JWT token trong header Authorization của frame CONNECT.
+Trên server, WebSocketSecurityConfig đăng ký một ChannelInterceptor.
+Trong phương thức preSend của interceptor:
+Kiểm tra nếu StompHeaderAccessor.getCommand() là CONNECT.
+Trích xuất Token từ header.
+Sử dụng JwtDecoder hoặc UserDetailsService để xác thực token.
+Nếu hợp lệ, tạo đối tượng UsernamePasswordAuthenticationToken và gán vào accessor.setUser(user).
+Nếu không hợp lệ, ném ngoại lệ AccessDeniedException để ngắt kết nối ngay lập tức.
+Việc gán User vào accessor là cực kỳ quan trọng vì nó định danh phiên làm việc (Session Principal). Spring sử dụng định danh này để định tuyến các tin nhắn cá nhân (/user/queue/...).24
+3.4. Bước 4: Luồng xử lý Tin nhắn (Message Flow) - Từ Client đến Kafka
+Khi người dùng gửi một tin nhắn, luồng dữ liệu đi qua Controller và được đẩy vào Kafka.
+Controller Implementation:
+
+Java
+
+
+@Controller
+public class ChatController {
+
+    @Autowired
+    private KafkaTemplate<String, ChatMessage> kafkaTemplate;
+
+    @MessageMapping("/chat.sendMessage")
+    public void sendMessage(@Payload ChatMessage chatMessage, SimpMessageHeaderAccessor headerAccessor) {
+        // Bổ sung metadata
+        chatMessage.setSessionId(headerAccessor.getSessionId());
+        chatMessage.setTimestamp(Instant.now());
+        
+        // Gửi vào Kafka thay vì gửi trực tiếp xuống WebSocket
+        // Partition Key là conversationId hoặc roomId để đảm bảo thứ tự
+        kafkaTemplate.send("chat-topic", chatMessage.getRoomId(), chatMessage);
+    }
+}
+
+
+Phân tích về Partition Key: Việc sử dụng roomId hoặc conversationId làm Key cho Kafka record là bắt buộc. Kafka đảm bảo thứ tự tin nhắn (FIFO) trong phạm vi một Partition. Nếu không có Key, tin nhắn sẽ được phân phối Round-robin qua các partition, dẫn đến khả năng Consumer đọc tin nhắn theo thứ tự sai lệch (ví dụ: tin nhắn trả lời đến trước tin nhắn hỏi). Việc sử dụng Key đảm bảo mọi tin nhắn của cùng một cuộc hội thoại luôn nằm trong cùng một partition và được xử lý tuần tự bởi một consumer.7
+3.5. Bước 5: Luồng xử lý Tin nhắn - Từ Kafka đến Client (The Broadcasting Problem)
+Đây là bước phức tạp nhất trong kiến trúc phân tán. Khi một tin nhắn được tiêu thụ từ Kafka, làm sao để biết gửi nó cho instance nào đang giữ kết nối của người nhận?
+Vấn đề Consumer Group:
+Nếu tất cả các instance của Microservice Chat đều dùng chung một group-id (ví dụ: chat-service-group), Kafka sẽ chia tải các partition cho các instance này.
+Ví dụ: Instance A giữ partition 0, Instance B giữ partition 1.
+Nếu User X đang kết nối tới Instance A, nhưng tin nhắn cho User X lại nằm ở partition 1 (do Instance B quản lý), thì Instance B sẽ nhận được tin nhắn nhưng không tìm thấy User X trong bộ nhớ của mình. Tin nhắn sẽ bị mất đối với User X.5
+Giải pháp: Consumer Group Động (Dynamic/Unique Consumer Group):
+Để giải quyết, chúng ta cần mô hình Broadcasting (Quảng bá). Mọi instance đều phải nhận được tất cả tin nhắn từ topic chat-topic để kiểm tra xem người nhận có đang kết nối với mình không.
+Cấu hình mỗi instance với một group-id là duy nhất và ngẫu nhiên khi khởi động (ví dụ: chat-service-${randomUUID}).
+Khi đó, Kafka coi mỗi instance là một thuê bao độc lập và gửi bản sao của mọi tin nhắn cho tất cả các instance.5
+Logic tại Consumer:
+
+Java
+
+
+@KafkaListener(topics = "chat-topic", groupId = "#{T(java.util.UUID).randomUUID().toString()}")
+public void consume(ChatMessage message) {
+    // Kiểm tra xem User đích có đang kết nối với Instance này không
+    if (simpUserRegistry.getUser(message.getRecipient())!= null) {
+        // Nếu có, đẩy tin nhắn xuống qua WebSocket
+        simpMessagingTemplate.convertAndSendToUser(
+            message.getRecipient(), 
+            "/queue/messages", 
+            message
+        );
+    }
+    // Nếu không, bỏ qua (Instance khác sẽ xử lý hoặc user đang offline)
+}
+
+
+Việc sử dụng SimpUserRegistry cho phép kiểm tra danh sách user đang kết nối cục bộ một cách hiệu quả mà không cần truy vấn database.4
+3.6. Bước 6: Quản lý Trạng thái Online/Offline (Presence System)
+Trong ứng dụng chat, việc biết user đang Online hay Offline là rất quan trọng.
+Sự kiện Kết nối/Ngắt kết nối: Sử dụng @EventListener để lắng nghe SessionConnectedEvent và SessionDisconnectEvent của Spring.
+Xử lý Phân tán: Khi Instance A nhận được sự kiện User X online, nó cần thông báo cho toàn bộ hệ thống. Instance A sẽ gửi một sự kiện UserStatusEvent vào một Kafka Topic riêng (ví dụ: user-presence-topic).
+State Store: Các instance khác hoặc một dịch vụ "Presence Service" riêng biệt sẽ tiêu thụ topic này và cập nhật trạng thái vào một bộ nhớ chia sẻ tốc độ cao như Redis.
+Heartbeat: Để xử lý trường hợp ngắt kết nối đột ngột (mất điện, rớt mạng) mà không gửi được frame DISCONNECT, cần cấu hình Heartbeat (ping/pong) trong WebSocket Config. Nếu server không nhận được ping từ client sau khoảng thời gian quy định (ví dụ: 60s), nó sẽ tự động đóng kết nối và kích hoạt sự kiện Disconnect.4
+4. Phân tích Dữ liệu và Chiến lược Lưu trữ (Persistence Strategy)
+Một trong những sai lầm phổ biến là thực hiện ghi tin nhắn vào cơ sở dữ liệu (Database) ngay trong luồng xử lý của Controller WebSocket. Điều này tạo ra độ trễ (latency) không cần thiết cho trải nghiệm người dùng, đặc biệt khi Database bị quá tải.
+Chiến lược Tách biệt (Decoupling) và Write-Behind:
+Hệ thống nên áp dụng mô hình "Kafka First".
+Tin nhắn từ WebSocket -> Kafka (Rất nhanh, độ trễ thấp).
+Consumer 1 (Real-time): Đẩy tin nhắn xuống WebSocket cho người nhận (như mô tả ở 3.5).
+Consumer 2 (Persistence): Một service riêng biệt hoặc một thread pool riêng biệt thuộc consumer group khác (ví dụ: chat-archiver-group) sẽ đọc tin nhắn từ Kafka và ghi vào Database (MongoDB/Cassandra/MySQL) theo lô (batch).
+Lợi ích của chiến lược này:
+Khả năng chịu lỗi (Fault Tolerance): Nếu Database bị sập, hệ thống chat vẫn hoạt động bình thường (người dùng vẫn gửi/nhận được tin). Tin nhắn được Kafka lưu trữ trong log và Consumer 2 sẽ ghi bù vào Database khi nó hoạt động trở lại.9
+Hiệu năng: Việc ghi batch vào DB hiệu quả hơn nhiều so với ghi từng dòng lẻ tẻ.
+Bảng 1: So sánh các chiến lược lưu trữ trong Chat System
+Chiến lược
+Cơ chế
+Ưu điểm
+Nhược điểm
+Khuyên dùng
+Synchronous Write
+Controller -> DB -> Kafka -> Client
+Đảm bảo dữ liệu đã lưu trước khi gửi
+Độ trễ cao, DB sập làm sập cả chat
+Không (trừ hệ thống nhỏ)
+Kafka First (Async)
+Controller -> Kafka -> (Consumer -> DB) & (Consumer -> Client)
+Độ trễ cực thấp, High Availability
+Có thể mất tin nhắn nếu Kafka config sai (ack=0)
+Có (Enterprise Standard)
+Dual Write
+Controller -> DB & Kafka (Song song)
+Đơn giản hơn Async
+Khó đảm bảo tính nhất quán (Consistency) giữa DB và Kafka
+Hạn chế
+
+5. Các Vấn đề Nâng cao và Tối ưu hóa
+5.1. Xử lý "Acknowledgemnt" (ACK) và "Read Receipts"
+Trong giao thức STOMP, client có thể yêu cầu receipt để server xác nhận đã nhận được tin nhắn.14 Tuy nhiên, để thực hiện tính năng "Đã xem" (Read Receipt) ở cấp độ ứng dụng (User B đã đọc tin của User A):
+Client của User B gửi một tin nhắn đặc biệt (Type: READ_RECEIPT, Payload: messageId) lên server.
+Server đẩy sự kiện này vào Kafka.
+Consumer xử lý sự kiện này: Cập nhật trạng thái tin nhắn trong DB thành "Read" và đẩy thông báo xuống WebSocket của User A để cập nhật UI (chuyển tick xanh).
+5.2. Tối ưu hóa băng thông với định tuyến thông minh
+Mô hình "Unique Consumer Group" (Broadcasting) đơn giản nhưng gây lãng phí băng thông mạng khi số lượng instance tăng lên hàng trăm (vì tin nhắn được nhân bản cho mọi instance).
+Với quy mô lớn (Facebook/Zalo scale), cần chuyển sang mô hình User Routing:
+Sử dụng Redis để lưu map: UserId -> InstanceId.
+Kafka Consumer (ở tầng Dispatcher) đọc tin nhắn, tra cứu Redis để biết User B đang ở Instance nào.
+Gửi tin nhắn trực tiếp đến Instance đó (qua HTTP internal call hoặc Kafka Topic riêng cho từng Instance). Tuy nhiên, với quy mô dưới 50 instances, mô hình Broadcasting vẫn là sự lựa chọn tối ưu về chi phí vận hành và độ phức tạp.28
+5.3. Xử lý tin nhắn Offline
+Khi Consumer phát hiện User B không online (kiểm tra SimpUserRegistry trả về null trên tất cả instance), tin nhắn vẫn được lưu vào DB bởi Persistence Consumer. Khi User B online trở lại, Client sẽ gọi REST API /api/chat/history để tải lại các tin nhắn chưa đọc từ DB. Một cách tiếp cận hiện đại hơn là sử dụng "Kafka Compacted Topics" hoặc "KTable" để lưu trữ trạng thái inbox, nhưng truy vấn DB truyền thống thường dễ triển khai và linh hoạt hơn cho tính năng lịch sử.10
+6. Kết luận
+Việc triển khai dịch vụ chat real-time với Spring Boot, WebSocket và Kafka là một minh chứng điển hình cho sức mạnh của kiến trúc Microservices hướng sự kiện. Quy trình triển khai không chỉ dừng lại ở việc cấu hình thư viện, mà đòi hỏi tư duy sâu sắc về luồng dữ liệu phân tán.
+Điểm mấu chốt của sự thành công nằm ở việc:
+Hiểu rõ vòng đời WebSocket: Để quản lý kết nối và bảo mật chặt chẽ.
+Sử dụng Kafka đúng cách: Tận dụng Consumer Group động để giải quyết bài toán định tuyến (routing) mà không cần xây dựng cơ chế discovery phức tạp.
+Partition Key: Đảm bảo tính thứ tự của hội thoại.
+Decoupling: Tách biệt luồng nóng (chat) và luồng lạnh (lưu trữ) để hệ thống luôn phản hồi nhanh (responsive).
+Hệ thống được thiết kế theo quy trình này có khả năng mở rộng tuyến tính: muốn chịu tải nhiều user hơn, chỉ cần thêm instance WebSocket; muốn xử lý nhiều tin nhắn hơn, chỉ cần thêm partition cho Kafka và instance cho Persistence Service. Đây là nền tảng vững chắc cho các ứng dụng giao tiếp hiện đại đòi hỏi độ tin cậy và trải nghiệm người dùng tối ưu.
+Nguồn trích dẫn
+Morteza363831/spring-boot-chat-messenger - GitHub, truy cập vào tháng 2 9, 2026, https://github.com/Morteza363831/spring-boot-chat-messenger
+Scaling Kafka with WebSockets - Ably Realtime, truy cập vào tháng 2 9, 2026, https://ably.com/blog/scaling-kafka-with-websockets
+Websocket use session but how can manage those session on multiple instance, truy cập vào tháng 2 9, 2026, https://stackoverflow.com/questions/79448896/websocket-use-session-but-how-can-manage-those-session-on-multiple-instance
+Spring Boot, Kafka, and WebSocket: A Practical Approach to Real-Time Messaging, truy cập vào tháng 2 9, 2026, https://umar-fajar14.medium.com/spring-boot-kafka-and-websocket-a-practical-approach-to-real-time-messaging-6169f5995fe1
+Kafka: Broadcasting Messages Without Consumer Groups | by Ravi ..., truy cập vào tháng 2 9, 2026, https://medium.com/@ravisharma911993/kafka-broadcasting-messages-without-consumer-groups-5a374fcfb7bc
+WebSocket with Kafka/Active Mq/Rabbit Mq | Spring - Stack Overflow, truy cập vào tháng 2 9, 2026, https://stackoverflow.com/questions/79183202/websocket-with-kafka-active-mq-rabbit-mq-spring
+Ensuring Message Ordering in Kafka: Strategies and Configurations | Baeldung, truy cập vào tháng 2 9, 2026, https://www.baeldung.com/kafka-message-ordering
+Apache Kafka Partition Key: A Comprehensive Guide - Confluent, truy cập vào tháng 2 9, 2026, https://www.confluent.io/learn/kafka-partition-key/
+Building WebSocket Based Chat Server With Kafka | by Li Pei ..., truy cập vào tháng 2 9, 2026, https://lip17.medium.com/building-chat-server-with-kafka-2c988f74beb8
+Building a Scalable Chat App Using WebSockets, Redis, Kafka, and PostgreSQL - Medium, truy cập vào tháng 2 9, 2026, https://medium.com/@indraneelsarode22neel/building-a-scalable-real-time-chat-app-from-single-server-to-distributed-powerhouse-614bb3391fa8
+Kafka and WebSocket Integration: Building Efficient Real-Time Applications with Seamless Communication, truy cập vào tháng 2 9, 2026, https://callmezydd.medium.com/kafka-and-websocket-integration-building-efficient-real-time-applications-with-seamless-4b1e88342478
+Getting Started | Using WebSocket to build an interactive web application - Spring, truy cập vào tháng 2 9, 2026, https://spring.io/guides/gs/messaging-stomp-websocket/
+Build a Secure App Using Spring Boot and WebSockets - DZone, truy cập vào tháng 2 9, 2026, https://dzone.com/articles/build-a-secure-app-using-spring-boot-and-websocket
+WebSockets With Spring, Part 3: STOMP Over WebSocket | by Aliaksandr Liakh - Medium, truy cập vào tháng 2 9, 2026, https://medium.com/swlh/websockets-with-spring-part-3-stomp-over-websocket-3dab4a21f397
+Flow of Messages :: Spring Framework, truy cập vào tháng 2 9, 2026, https://docs.spring.io/spring-framework/reference/web/websocket/stomp/message-flow.html
+The Mechanics Behind How Spring Boot Handles WebSockets with STOMP Messaging, truy cập vào tháng 2 9, 2026, https://medium.com/@AlexanderObregon/the-mechanics-behind-how-spring-boot-handles-websockets-with-stomp-messaging-0128ba5e600d
+STOMP Client :: Spring Framework, truy cập vào tháng 2 9, 2026, https://docs.spring.io/spring-framework/reference/web/websocket/stomp/client.html
+Realtime Chat app using Kafka, SpringBoot, ReactJS, and WebSockets - DEV Community, truy cập vào tháng 2 9, 2026, https://dev.to/subhransu/realtime-chat-app-using-kafka-springboot-reactjs-and-websockets-lc
+Building a simple chat application using springboot + kafka | by ivan willy artdian | Medium, truy cập vào tháng 2 9, 2026, https://medium.com/@ivan.willy.artdian/building-a-simple-chat-application-using-springboot-kafka-c2696e05d6d1
+Implementing Real-Time Chat with WebSocket in Spring Boot: A Step-by-Step Guide | by Anshul Chouhan | Medium, truy cập vào tháng 2 9, 2026, https://medium.com/@anshulchouhan302/implementing-real-time-chat-with-websocket-in-spring-boot-a-step-by-step-guide-c67e5a9c48e4
+Spring boot Websocket scaling - Stack Overflow, truy cập vào tháng 2 9, 2026, https://stackoverflow.com/questions/63438391/spring-boot-websocket-scaling
+Spring Security WebSocket Authentication with JWT - STOMP Connection Fails with "Failed to send message to ExecutorSubscribableChannel" : r/SpringBoot - Reddit, truy cập vào tháng 2 9, 2026, https://www.reddit.com/r/SpringBoot/comments/1l8zj76/spring_security_websocket_authentication_with_jwt/
+JSON Web Token (JWT) with Spring based SockJS / STOMP Web Socket - Stack Overflow, truy cập vào tháng 2 9, 2026, https://stackoverflow.com/questions/30887788/json-web-token-jwt-with-spring-based-sockjs-stomp-web-socket
+Spring Boot 3: Authenticate Websocket Connections With JWT ..., truy cập vào tháng 2 9, 2026, https://medium.com/@poojithairosha/spring-boot-3-authenticate-websocket-connections-with-jwt-tokens-2b4ff60532b6
+How to authenticate Web Socket endpoints with JWT and Spring Boot, truy cập vào tháng 2 9, 2026, https://community.broadcom.com/tanzu/question/how-to-authenticate-web-socket-endpoints-with-jwt-and-spring-boot
+Kafka Keys, Partitions and Message Ordering - Lydtech Consulting, truy cập vào tháng 2 9, 2026, https://www.lydtechconsulting.com/blog/kafka-message-keys
+Spring Cloud Bus Kafka: Ensuring All Instances Receive Events Without Unique Consumer Groups - Stack Overflow, truy cập vào tháng 2 9, 2026, https://stackoverflow.com/questions/79386678/spring-cloud-bus-kafka-ensuring-all-instances-receive-events-without-unique-con
+Scaling a Websocket server with a Kafka consumer : r/ExperiencedDevs - Reddit, truy cập vào tháng 2 9, 2026, https://www.reddit.com/r/ExperiencedDevs/comments/1g2vhdz/scaling_a_websocket_server_with_a_kafka_consumer/
+Routing messages from Kafka to web socket clients connected to application server cluster, truy cập vào tháng 2 9, 2026, https://stackoverflow.com/questions/58385826/routing-messages-from-kafka-to-web-socket-clients-connected-to-application-serve
+Building a Real-Time Chat Application with WebSockets, Kafka and Redis | Manubhav Jain, truy cập vào tháng 2 9, 2026, https://www.manubhavjain.in/Chatapp/chatapp-blog-page.html

@@ -1,0 +1,7 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+com.theblood.springfood.client.autoconf.ClientConfiguration,\
+com.theblood.springfood.client.autoconf.UserContextHttpConfiguration,\
+com.theblood.springfood.client.autoconf.feign.FeignClientAutoConfiguration
+org.springframework.context.ApplicationContextInitializer=\
+com.theblood.springfood.client.config.ClientConfigurationImporter
+

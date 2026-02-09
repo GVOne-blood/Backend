@@ -1,0 +1,78 @@
+{
+  "annotations": {
+    "changelogDate": "20260204095357"
+  },
+  "applications": "*",
+  "clientRootFolder": "chat",
+  "databaseType": "sql",
+  "documentation": "MessageReport - Report messages",
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "reportId",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"],
+      "options": {
+        "id": true
+      }
+    },
+    {
+      "fieldName": "reporterId",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "messageId",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "documentation": "Reason: SPAM, HARASSMENT, INAPPROPRIATE_CONTENT, SCAM, OTHER",
+      "fieldName": "reason",
+      "fieldType": "String",
+      "fieldValidateRules": ["maxlength", "required"],
+      "fieldValidateRulesMaxlength": "30"
+    },
+    {
+      "fieldName": "details",
+      "fieldType": "String",
+      "fieldValidateRules": ["maxlength"],
+      "fieldValidateRulesMaxlength": "1000"
+    },
+    {
+      "documentation": "Status: PENDING, REVIEWED, RESOLVED, DISMISSED",
+      "fieldName": "status",
+      "fieldType": "String",
+      "fieldValidateRules": ["maxlength", "required"],
+      "fieldValidateRulesMaxlength": "20"
+    },
+    {
+      "fieldName": "reviewedBy",
+      "fieldType": "String",
+      "fieldValidateRules": ["maxlength"],
+      "fieldValidateRulesMaxlength": "100"
+    },
+    {
+      "fieldName": "reviewedAt",
+      "fieldType": "Instant"
+    },
+    {
+      "fieldName": "reviewNotes",
+      "fieldType": "String",
+      "fieldValidateRules": ["maxlength"],
+      "fieldValidateRulesMaxlength": "1000"
+    },
+    {
+      "fieldName": "actionTaken",
+      "fieldType": "String",
+      "fieldValidateRules": ["maxlength"],
+      "fieldValidateRulesMaxlength": "500"
+    }
+  ],
+  "microserviceName": "chat",
+  "name": "MessageReport",
+  "pagination": "pagination",
+  "relationships": [],
+  "searchEngine": "no",
+  "service": "serviceClass"
+}

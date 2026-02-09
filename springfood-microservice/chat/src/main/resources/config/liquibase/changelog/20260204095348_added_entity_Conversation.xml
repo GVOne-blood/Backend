@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <!--
+        Added the entity Conversation.
+    -->
+    <changeSet id="20260204095348-1" author="jhipster">
+        <createTable tableName="conversation" remarks="Conversation - Chat room/thread">
+            <column name="conversation_id" type="varchar(255)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="conversation_type" type="varchar(30)" remarks="Type: DIRECT, GROUP, ORDER_SUPPORT, SHOP_SUPPORT">
+                <constraints nullable="false" />
+            </column>
+            <column name="name" type="varchar(100)">
+                <constraints nullable="true" />
+            </column>
+            <column name="description" type="varchar(500)">
+                <constraints nullable="true" />
+            </column>
+            <column name="avatar_url" type="varchar(500)">
+                <constraints nullable="true" />
+            </column>
+            <column name="reference_type" type="varchar(50)">
+                <constraints nullable="true" />
+            </column>
+            <column name="reference_id" type="varchar(100)">
+                <constraints nullable="true" />
+            </column>
+            <column name="last_message_preview" type="varchar(200)">
+                <constraints nullable="true" />
+            </column>
+            <column name="last_message_at" type="${datetimeType}">
+                <constraints nullable="true" />
+            </column>
+            <column name="last_message_sender_id" type="varchar(100)">
+                <constraints nullable="true" />
+            </column>
+            <column name="message_count" type="bigint">
+                <constraints nullable="true" />
+            </column>
+            <column name="is_archived" type="integer">
+                <constraints nullable="true" />
+            </column>
+            <column name="is_pinned" type="integer">
+                <constraints nullable="true" />
+            </column>
+            <column name="settings_settings_id" type="varchar(255)">
+                <constraints nullable="true" unique="true" uniqueConstraintName="ux_conversation__settings_settings_id" />
+            </column>
+            <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here -->
+        </createTable>
+        <dropDefaultValue tableName="conversation" columnName="last_message_at" columnDataType="${datetimeType}"/>
+    </changeSet>
+
+    <!-- jhipster-needle-liquibase-add-changeset - JHipster will add changesets here -->
+
+    <!--
+        Load sample data generated with Faker.js
+        - This data can be easily edited using a CSV editor (or even MS Excel) and
+          is located in the 'src/main/resources/config/liquibase/fake-data' directory
+        - By default this data is applied when running with the JHipster 'dev' profile.
+          This can be customized by adding or removing 'faker' in the 'spring.liquibase.contexts'
+          Spring Boot configuration key.
+    -->
+    <changeSet id="20260204095348-1-data" author="jhipster" context="faker">
+        <loadData
+                  file="config/liquibase/fake-data/conversation.csv"
+                  separator=";"
+                  tableName="conversation"
+                  usePreparedStatements="true">
+            <column name="conversation_id" type="string"/>
+            <column name="conversation_type" type="string"/>
+            <column name="name" type="string"/>
+            <column name="description" type="string"/>
+            <column name="avatar_url" type="string"/>
+            <column name="reference_type" type="string"/>
+            <column name="reference_id" type="string"/>
+            <column name="last_message_preview" type="string"/>
+            <column name="last_message_at" type="date"/>
+            <column name="last_message_sender_id" type="string"/>
+            <column name="message_count" type="numeric"/>
+            <column name="is_archived" type="numeric"/>
+            <column name="is_pinned" type="numeric"/>
+            <!-- jhipster-needle-liquibase-add-loadcolumn - JHipster (and/or extensions) can add load columns here -->
+        </loadData>
+    </changeSet>
+</databaseChangeLog>

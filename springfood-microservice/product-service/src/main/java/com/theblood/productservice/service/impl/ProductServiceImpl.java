@@ -7,24 +7,24 @@ import com.theblood.common.enums.FileStatus;
 import com.theblood.common.enums.MimeType;
 import com.theblood.common.exception.custom.InvalidDataException;
 import com.theblood.common.grpc.ValidateProductCreationResponse;
-import com.theblood.common.util.ApachePoiUtil;
+import com.theblood.productservice.util.ProductExcelUtil;
 import com.theblood.minio.core.MinioClient;
 import com.theblood.minio.response.MinIOResponse;
+import com.theblood.productservice.domain.Categories;
+import com.theblood.productservice.domain.Product;
+import com.theblood.productservice.domain.ProductCategory;
+import com.theblood.productservice.domain.ProductImages;
 import com.theblood.productservice.dto.UploadResult;
 import com.theblood.productservice.dto.request.ProductRequest;
 import com.theblood.productservice.dto.request.RelateProductRequest;
 import com.theblood.productservice.dto.response.ProductImageResponse;
 import com.theblood.productservice.exception.custom.InvalidExcelFormatException;
-import com.theblood.productservice.grpc.client_role.ProductGrpcClient;
 import com.theblood.productservice.kafka.consumer.ProductServiceConsumer;
 import com.theblood.productservice.kafka.service.OutboxService;
 import com.theblood.productservice.mapper.ProductMapper;
-import com.theblood.productservice.model.Categories;
-import com.theblood.productservice.model.Product;
-import com.theblood.productservice.model.ProductCategory;
-import com.theblood.productservice.model.ProductImages;
 import com.theblood.productservice.repository.*;
 import com.theblood.productservice.repository.projection.ProductProjection;
+import com.theblood.productservice.resources.grpc.client_role.ProductGrpcClient;
 import com.theblood.productservice.service.ProductService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -355,18 +355,18 @@ public class ProductServiceImpl implements ProductService {
             try {
 
                 ProductRequest productRequest = ProductRequest.builder()
-                        .shopId(ApachePoiUtil.CellUtils.getCellValueAsUUID(row.getCell(0)))
+                        .shopId(ProductExcelUtil.CellUtils.getCellValueAsUUID(row.getCell(0)))
                         .categoryNames(row.getCell(1).getStringCellValue())
                         .name(row.getCell(2).getStringCellValue())
                         .description(row.getCell(3).getStringCellValue())
                         .price(row.getCell(4).getStringCellValue())
                         .images(jsonImagesObj)
-                        .quantity(ApachePoiUtil.CellUtils.getCellValueAsInteger(row.getCell(6)))
+                        .quantity(ProductExcelUtil.CellUtils.getCellValueAsInteger(row.getCell(6)))
                         .sku(row.getCell(7).getStringCellValue())
-                        .msg(ApachePoiUtil.CellUtils.getCellValueAsLocalDate(row.getCell(8)))
-                        .exp(ApachePoiUtil.CellUtils.getCellValueAsLocalDate(row.getCell(9)))
+                        .msg(ProductExcelUtil.CellUtils.getCellValueAsLocalDate(row.getCell(8)))
+                        .exp(ProductExcelUtil.CellUtils.getCellValueAsLocalDate(row.getCell(9)))
                         .wholesalePrice(row.getCell(10).getStringCellValue())
-                        .avgRate(ApachePoiUtil.CellUtils.getCellValueAsBigDecimal(row.getCell(11)))
+                        .avgRate(ProductExcelUtil.CellUtils.getCellValueAsBigDecimal(row.getCell(11)))
                         .build();
                 productRequests.add(productRequest);
             } catch (InvalidDataException e) {

@@ -5,9 +5,9 @@ spring:
     name: product-service
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/payment_service
-    username: postgres
-    password: 123456
+    url: ${DEFAULT_DATABASE_URL}
+    username: ${DEFAULT_DATABASE_USERNAME}
+    password: ${DEFAULT_DATABASE_PASSWORD}
   jpa:
     hibernate:
       ddl-auto: update
@@ -36,7 +36,7 @@ vnpay:
   # URL để chuyển hướng người dùng đến cổng thanh toán
   pay-url: https://sandbox.vnpayment.vn/paymentv2/vpcpay.html
 
-  # URL để VNPay gọi lại sau khi người dùng thanh toán xong (phải khớp với endpoint trong controller)
+  # URL để VNPay gọi lại sau khi người dùng thanh toán xong (phải khớp với endpoint trong resources)
   # Lưu ý: Phần domain sẽ được lấy tự động từ request, ở đây chỉ cần path
   return-url: /api/payment/vnpay-payment-return/
 

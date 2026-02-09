@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "com.viettel.dvs.actionlog.web.grpc";
+option java_outer_classname = "ExportProto";
+
+package util;
+
+message CarboneResponseDataProto {
+  string etag = 1;
+  string version_id = 2;
+  string file_name = 3;
+  string bucket_name = 4;
+  string url = 5;
+  string view_url = 6;
+}
+
+message ImportProto {
+  string file_url = 1;
+}

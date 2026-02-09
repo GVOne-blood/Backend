@@ -6,9 +6,9 @@ spring:
     name: shop-service
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/shop_service
-    username: postgres
-    password: 123456
+    url: ${DEFAULT_DATABASE_URL}
+    username: ${DEFAULT_DATABASE_USERNAME}
+    password: ${DEFAULT_DATABASE_PASSWORD}
     hikari:
       maximum-pool-size: 10
   jpa:
@@ -35,7 +35,7 @@ eureka:
 
 grpc:
   server:
-    port: 0
+    port: 9090
   client:
     product-service:
       address: 'static://localhost:9095'

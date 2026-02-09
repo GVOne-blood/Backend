@@ -1,0 +1,74 @@
+{
+  "annotations": {
+    "changelogDate": "20260204095354"
+  },
+  "applications": "*",
+  "clientRootFolder": "chat",
+  "databaseType": "sql",
+  "documentation": "UserPresence - Online status tracking",
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "presenceId",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"],
+      "options": {
+        "id": true
+      }
+    },
+    {
+      "fieldName": "userId",
+      "fieldType": "String",
+      "fieldValidateRules": ["required", "unique"]
+    },
+    {
+      "documentation": "Status: ONLINE, AWAY, BUSY, OFFLINE",
+      "fieldName": "status",
+      "fieldType": "String",
+      "fieldValidateRules": ["maxlength", "required"],
+      "fieldValidateRulesMaxlength": "20"
+    },
+    {
+      "fieldName": "statusMessage",
+      "fieldType": "String",
+      "fieldValidateRules": ["maxlength"],
+      "fieldValidateRulesMaxlength": "100"
+    },
+    {
+      "fieldName": "lastSeenAt",
+      "fieldType": "Instant",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "activeConversationId",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "deviceType",
+      "fieldType": "String",
+      "fieldValidateRules": ["maxlength"],
+      "fieldValidateRulesMaxlength": "50"
+    },
+    {
+      "fieldName": "deviceId",
+      "fieldType": "String",
+      "fieldValidateRules": ["maxlength"],
+      "fieldValidateRulesMaxlength": "100"
+    },
+    {
+      "fieldName": "sessionId",
+      "fieldType": "String",
+      "fieldValidateRules": ["maxlength"],
+      "fieldValidateRulesMaxlength": "100"
+    },
+    {
+      "fieldName": "lastActivityAt",
+      "fieldType": "Instant"
+    }
+  ],
+  "microserviceName": "chat",
+  "name": "UserPresence",
+  "relationships": [],
+  "searchEngine": "no",
+  "service": "serviceClass"
+}

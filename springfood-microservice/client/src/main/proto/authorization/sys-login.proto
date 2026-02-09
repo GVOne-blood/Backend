@@ -1,0 +1,65 @@
+syntax = "proto3";
+
+package com.viettel.client.authorization;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+import "authorization/author-common.proto";
+import "authorization/application.proto";
+import "authorization/tenant.proto";
+
+option java_multiple_files = true;
+option java_package = "com.viettel.client.authorization";
+option java_outer_classname = "AuthorServiceSysLogin";
+
+service SysLoginService {
+
+  rpc updateSysLogin (SysLoginGrpcDTO) returns (SysLoginGrpcDTO) {
+  }
+
+  rpc getAllSysLogins (google.protobuf.Empty) returns (SysLoginGrpcDTO) {
+  }
+
+}
+
+message SysLoginGrpcDTO {
+  optional string id = 1;
+  optional string name = 2;
+  optional string description = 3;
+  optional string copyright = 4;
+  optional string image = 5;
+  optional string image_logo = 6;
+  optional string image_logo_nav = 7;
+  optional string config_login = 8;
+  optional int64 status = 9;
+  optional string tenant_id = 10;
+  optional string created_by = 11;
+  optional google.protobuf.Timestamp created_date = 12;
+  optional string last_modified_by = 13;
+  optional google.protobuf.Timestamp last_modified_date = 14;
+  repeated LanguageSysResGrpc language_sys_tenant = 15;
+}
+
+message LanguageSysResGrpc {
+  optional string id = 1;
+  optional string lang_name = 2;
+  optional string lang_code = 3;
+  optional int64 default_lang = 4;
+}
+
+message UpdateSysLoginDTOGrpc {
+  optional FileGrpc file = 1;
+  optional FileGrpc fileLogo = 2;
+  optional FileGrpc fileLogoNav = 3;
+  optional string dataString = 4;
+}
+
+message SysLoginReplyGrpc {
+  optional int32 code = 1;
+  optional string message = 2;
+  oneof response {
+    SysLoginGrpcDTO detail = 3;
+    string detailErrorMessage = 4;
+  }
+}
+

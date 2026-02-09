@@ -1,0 +1,22 @@
+entity Notification {
+  @Id notificationId String       required
+  tableName String
+  objectId String
+  notificationType String       required maxlength(255)
+  eventId String
+  receiveId String
+  isActive Integer      required
+  title String       required maxlength(2000)
+  body String       maxlength(2000)
+  actionUrl String       maxlength(200)
+  isViewed Integer      required
+  isClicked Integer      required
+  lastModifiedDate Instant
+  lastModifiedBy String       maxlength(50)
+  createdBy String       maxlength(50)
+  createdDate Instant
+}
+
+paginate Notification with no
+dto Notification with mapstruct
+service Notification with serviceClass

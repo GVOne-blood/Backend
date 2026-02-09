@@ -1,0 +1,32 @@
+/**
+ * Action Log entity
+ * Lưu nhật ký hệ thống
+ */
+entity LogActionAnnualUpdate {
+  accountId Long
+  userName String maxlength(50)
+  organizationId Long
+  actionType ActionType required
+  oldValue TextBlob
+  newValue TextBlob
+  description TextBlob
+  ipAddress String maxlength(50)
+  userAgent TextBlob
+  tableName TextBlob
+  objectId String maxlength(50)
+  affectCurrent Integer
+}
+
+enum ActionType {
+  CREATE
+  UPDATE
+  DELETE
+  LOGIN
+  LOGOUT
+  EXPORT
+}
+
+paginate * with pagination
+dto * with mapstruct
+service * with serviceClass
+filter LogActionAnnualUpdate

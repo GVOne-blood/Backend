@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <!--
+        Added the entity MessageReport.
+    -->
+    <changeSet id="20260204095357-1" author="jhipster">
+        <createTable tableName="message_report" remarks="MessageReport - Report messages">
+            <column name="report_id" type="varchar(255)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="reporter_id" type="varchar(255)">
+                <constraints nullable="false" />
+            </column>
+            <column name="message_id" type="varchar(255)">
+                <constraints nullable="false" />
+            </column>
+            <column name="reason" type="varchar(30)" remarks="Reason: SPAM, HARASSMENT, INAPPROPRIATE_CONTENT, SCAM, OTHER">
+                <constraints nullable="false" />
+            </column>
+            <column name="details" type="varchar(1000)">
+                <constraints nullable="true" />
+            </column>
+            <column name="status" type="varchar(20)" remarks="Status: PENDING, REVIEWED, RESOLVED, DISMISSED">
+                <constraints nullable="false" />
+            </column>
+            <column name="reviewed_by" type="varchar(100)">
+                <constraints nullable="true" />
+            </column>
+            <column name="reviewed_at" type="${datetimeType}">
+                <constraints nullable="true" />
+            </column>
+            <column name="review_notes" type="varchar(1000)">
+                <constraints nullable="true" />
+            </column>
+            <column name="action_taken" type="varchar(500)">
+                <constraints nullable="true" />
+            </column>
+            <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here -->
+        </createTable>
+        <dropDefaultValue tableName="message_report" columnName="reviewed_at" columnDataType="${datetimeType}"/>
+    </changeSet>
+
+    <!-- jhipster-needle-liquibase-add-changeset - JHipster will add changesets here -->
+
+    <!--
+        Load sample data generated with Faker.js
+        - This data can be easily edited using a CSV editor (or even MS Excel) and
+          is located in the 'src/main/resources/config/liquibase/fake-data' directory
+        - By default this data is applied when running with the JHipster 'dev' profile.
+          This can be customized by adding or removing 'faker' in the 'spring.liquibase.contexts'
+          Spring Boot configuration key.
+    -->
+    <changeSet id="20260204095357-1-data" author="jhipster" context="faker">
+        <loadData
+                  file="config/liquibase/fake-data/message_report.csv"
+                  separator=";"
+                  tableName="message_report"
+                  usePreparedStatements="true">
+            <column name="report_id" type="string"/>
+            <column name="reporter_id" type="string"/>
+            <column name="message_id" type="string"/>
+            <column name="reason" type="string"/>
+            <column name="details" type="string"/>
+            <column name="status" type="string"/>
+            <column name="reviewed_by" type="string"/>
+            <column name="reviewed_at" type="date"/>
+            <column name="review_notes" type="string"/>
+            <column name="action_taken" type="string"/>
+            <!-- jhipster-needle-liquibase-add-loadcolumn - JHipster (and/or extensions) can add load columns here -->
+        </loadData>
+    </changeSet>
+</databaseChangeLog>

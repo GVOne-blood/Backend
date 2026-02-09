@@ -14,8 +14,8 @@ import java.io.InputStream;
 /**
  * Example Controller demonstrating MinIO library usage
  * This is just an example - copy to your project and modify as needed
- * 
- * NOTE: This controller is in main/java for reference only.
+ * <p>
+ * NOTE: This resources is in main/java for reference only.
  * It will not be auto-loaded unless you scan this package.
  */
 @RestController
@@ -33,13 +33,13 @@ public class MinioExampleController {
     public ResponseEntity<String> uploadFile(
             @RequestParam("file") MultipartFile file,
             @RequestParam(value = "folder", required = false, defaultValue = "") String folder) {
-        
+
         try {
             String fileName = file.getOriginalFilename();
             String objectKey = folder.isEmpty() ? fileName : folder + "/" + fileName;
-            
+
             String url = minioClient.upload(file, objectKey);
-            
+
             return ResponseEntity.ok("File uploaded successfully: " + url);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Upload failed: " + e.getMessage());
@@ -54,7 +54,7 @@ public class MinioExampleController {
     public ResponseEntity<InputStreamResource> downloadFile(@PathVariable String objectKey) {
         try {
             InputStream inputStream = minioClient.getObject(objectKey);
-            
+
             return ResponseEntity.ok()
                     .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + objectKey + "\"")
                     .contentType(MediaType.APPLICATION_OCTET_STREAM)
@@ -72,7 +72,7 @@ public class MinioExampleController {
     public ResponseEntity<String> getPresignedUrl(
             @PathVariable String objectKey,
             @RequestParam(value = "expiry", defaultValue = "3600") int expirySeconds) {
-        
+
         try {
             String url = minioClient.getPresignedUrl(objectKey, expirySeconds);
             return ResponseEntity.ok(url);
@@ -88,7 +88,7 @@ public class MinioExampleController {
     @DeleteMapping("/{objectKey}")
     public ResponseEntity<String> deleteFile(@PathVariable String objectKey) {
         boolean deleted = minioClient.deleteObject(objectKey);
-        
+
         if (deleted) {
             return ResponseEntity.ok("File deleted successfully");
         } else {
@@ -114,9 +114,9 @@ public class MinioExampleController {
     public ResponseEntity<String> moveFile(
             @RequestParam("source") String sourceKey,
             @RequestParam("destination") String destKey) {
-        
+
         boolean moved = minioClient.moveObject(sourceKey, destKey);
-        
+
         if (moved) {
             return ResponseEntity.ok("File moved successfully");
         } else {

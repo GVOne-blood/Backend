@@ -1,0 +1,55 @@
+syntax = "proto3";
+
+package com.viettel.client.authorization;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+import "authorization/author-common.proto";
+import "authorization/tenant.proto";
+
+option java_multiple_files = true;
+option java_package = "com.viettel.client.authorization";
+option java_outer_classname = "AuthorServiceAppVersionHistory";
+
+service AppVersionHistoryService {
+  rpc createAppVersion (AppVersionHistoryGrpcDTO) returns (AppVersionHistoryGrpcDTO) {
+  }
+
+  rpc updateAppVersion (AppVersionHistoryGrpcDTO) returns (AppVersionHistoryGrpcDTO) {
+  }
+
+  rpc getAppVersion (CustomPojoRetrieverGrpc) returns (AppVersionHistoryGrpcDTO) {
+  }
+
+  rpc deleteAppVersion (CustomPojoRetrieverGrpc) returns (EmptyOrError) {
+  }
+}
+
+message AppVersionHistoryGrpcDTO {
+  optional string id = 1;
+  optional string applicationId = 2;
+  optional string version = 3;
+  optional string versionInfo = 4;
+  optional int32 isActive = 5;
+  optional string description = 6;
+  optional string createdBy = 7;
+  optional google.protobuf.Timestamp createdDate = 8;
+  optional string lastModifiedBy = 9;
+  optional google.protobuf.Timestamp lastModifiedDate = 10;
+}
+
+message AppVersionHistoryReplyGrpc {
+  optional int32 code = 1;
+  optional string message = 2;
+  oneof response {
+    AppVersionHistoryGrpcDTO detail = 3;
+    string detailErrorMessage = 4;
+  }
+}
+
+message AppVersionHistorySearchResultGrpc {
+  repeated AppVersionHistoryGrpcDTO data = 1;
+  optional int32 total = 2;
+  optional int32 activeTotal = 3;
+  optional int32 inactiveTotal = 4;
+}

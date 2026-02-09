@@ -1,7 +1,7 @@
 package com.theblood.productservice.repository;
 
 
-import com.theblood.productservice.model.Product;
+import com.theblood.productservice.domain.Product;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;

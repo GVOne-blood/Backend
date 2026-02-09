@@ -1,0 +1,61 @@
+/**
+ * Notification entity for managing user notifications
+ */
+entity Notification
+  (
+  notifications
+  ) {
+  /** Unique notification identifier */
+  @Id notificationId String required maxlength(50)
+
+  /** Source table name */
+  tableName String maxlength(50)
+
+  /** Related object identifier */
+  objectId String maxlength(50)
+
+  /** Type of notification */
+  notificationType String maxlength(255)
+
+  /** Event identifier */
+  eventId String maxlength(50)
+
+  /** Receiver identifier */
+  receiveId String maxlength(50)
+
+  /** Active status flag */
+  isActive Integer
+
+  /** Notification title */
+  title String maxlength(2000)
+
+  /** Notification body content */
+  body String maxlength(2000)
+
+  /** Action URL for notification */
+  actionUrl String maxlength(2000)
+
+  /** Viewed status flag */
+  isViewed Integer
+
+  /** Clicked status flag */
+  isClicked Integer
+
+  /** Last modification timestamp */
+  lastModifiedDate Instant
+
+  /** User who last modified */
+  lastModifiedBy String maxlength(50)
+
+  /** Creator user */
+  createdBy String maxlength(50)
+
+  /** Creation timestamp */
+  createdDate Instant
+}
+
+// Entity options
+dto Notification with mapstruct
+service Notification with serviceImpl
+paginate Notification with pagination
+filter Notification

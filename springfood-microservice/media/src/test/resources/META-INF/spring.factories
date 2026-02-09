@@ -1,0 +1,4 @@
+org.springframework.test.context.ContextCustomizerFactory = \
+    com.theblood.springfood.media.config.\
+    SqlTestContainersSpringContextCustomizerFactory,com.theblood.springfood.\
+    media.config.RedisTestContainersSpringContextCustomizerFactory

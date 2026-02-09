@@ -1,0 +1,305 @@
+/**
+ * =====================================================
+ * SPRINGFOOD CHAT SERVICE - JDL SCHEMA
+ * =====================================================
+ * Version: 2.3.0
+ * Author: SpringFood Team
+ * 
+ * NOTE: 
+ * - All @Id fields are String (VARCHAR) with @UuidGenerator
+ * - Enum types are defined in Java code
+ * =====================================================
+ */
+
+// =====================================================
+// ENTITIES
+// =====================================================
+
+/**
+ * Conversation - Chat room/thread
+ */
+entity Conversation {
+  @Id conversationId String required
+
+  /** Type: DIRECT, GROUP, ORDER_SUPPORT, SHOP_SUPPORT */
+  conversationType String maxlength(30) required
+
+  name String maxlength(100)
+  description String maxlength(500)
+  avatarUrl String maxlength(500)
+
+  referenceType String maxlength(50)
+  referenceId String maxlength(100)
+
+  lastMessagePreview String maxlength(200)
+  lastMessageAt Instant
+  lastMessageSenderId String maxlength(100)
+  lastMessageId String
+
+  messageCount Long
+
+  // Optimization for P2P/Shop chats
+  participant1Id String
+  participant2Id String
+
+  isArchived Integer
+  isPinned Integer
+}
+
+/**
+ * ConversationParticipant - Users in conversations
+ */
+entity ConversationParticipant {
+  @Id participantId String required
+
+  userId String required
+  displayName String maxlength(100)
+  avatarUrl String maxlength(500)
+
+  /** Role: OWNER, ADMIN, MEMBER */
+  role String maxlength(20) required
+
+  /** Status: ACTIVE, LEFT, REMOVED, MUTED */
+  status String maxlength(20) required
+
+  nickname String maxlength(50)
+
+  lastReadMessageId String
+  lastReadAt Instant
+  unreadCount Integer
+
+  isMuted Integer
+  muteUntil Instant
+
+  isPinned Integer
+  pinnedAt Instant
+
+  joinedAt Instant required
+  leftAt Instant
+  addedBy String maxlength(100)
+}
+
+/**
+ * Message - Individual chat messages
+ */
+entity Message {
+  @Id messageId String required
+
+  clientMessageId String maxlength(100)
+
+  senderId String required
+  senderName String maxlength(100)
+  senderAvatar String maxlength(500)
+  
+  /** Type: USER, SHOP */
+  senderType String maxlength(10)
+
+  /** Type: TEXT, IMAGE, VIDEO, FILE, AUDIO, LOCATION, STICKER, SYSTEM, ORDER_CARD, PRODUCT_CARD */
+  messageType String maxlength(30) required
+
+  content TextBlob
+  
+  // JSON metadata (image URL, product ID, etc.)
+  metadata TextBlob
+  
+  contentPreview String maxlength(200)
+
+  replyToMessageId String
+  replyToPreview String maxlength(200)
+
+  forwardedFromMessageId String
+  forwardedFromConversationId String
+
+  referenceType String maxlength(50)
+  referenceId String maxlength(100)
+
+  /** Status: SENDING, SENT, DELIVERED, READ, FAILED */
+  status String maxlength(20) required
+  
+  isRead Boolean
+
+  isEdited Integer
+  editedAt Instant
+
+  isDeleted Integer
+  deletedAt Instant
+  deletedBy String maxlength(100)
+
+  reactionCount Integer
+}
+
+/**
+ * ConversationRead - Unread messages tracking
+ */
+entity ConversationRead {
+  @Id readId String required
+  userId String required
+  lastReadMessageId String
+  lastReadAt Instant
+  unreadCount Integer
+}
+
+/**
+ * QuickReply - Canned responses for shops
+ */
+entity QuickReply {
+  @Id quickReplyId String required
+  shopId String required
+  title String maxlength(100) required
+  content TextBlob required
+  sortOrder Integer
+}
+
+/**
+ * AutoReplySettings - Auto reply configuration
+ */
+entity AutoReplySettings {
+  @Id settingId String required
+  shopId String required unique
+  welcomeMessage TextBlob
+  awayMessage TextBlob
+  isAwayEnabled Boolean
+}
+
+/**
+ * MessageAttachment - Media/files attached to messages
+ */
+entity MessageAttachment {
+  @Id attachmentId String required
+  mediaId String required
+  /** Type: IMAGE, VIDEO, AUDIO, DOCUMENT, OTHER */
+  attachmentType String maxlength(20) required
+  fileName String maxlength(255)
+  fileSize Long
+  mimeType String maxlength(100)
+  url String maxlength(1000)
+  thumbnailUrl String maxlength(1000)
+  width Integer
+  height Integer
+  duration Integer
+  displayOrder Integer
+}
+
+/**
+ * MessageReadReceipt - Read tracking (Per message)
+ */
+entity MessageReadReceipt {
+  @Id receiptId String required
+  userId String required
+  readAt Instant required
+  deviceType String maxlength(50)
+}
+
+/**
+ * MessageReaction - Emoji reactions
+ */
+entity MessageReaction {
+  @Id reactionId String required
+  userId String required
+  emoji String maxlength(50) required
+  emojiDisplay String maxlength(20)
+}
+
+/**
+ * UserPresence - Online status tracking
+ */
+entity UserPresence {
+  @Id presenceId String required
+  userId String required unique
+  /** Status: ONLINE, AWAY, BUSY, OFFLINE */
+  status String maxlength(20) required
+  statusMessage String maxlength(100)
+  lastSeenAt Instant required
+  activeConversationId String
+  deviceType String maxlength(50)
+  deviceId String maxlength(100)
+  sessionId String maxlength(100)
+  lastActivityAt Instant
+}
+
+/**
+ * TypingIndicator - Who is typing
+ */
+entity TypingIndicator {
+  @Id indicatorId String required
+  userId String required
+  userName String maxlength(100)
+  conversationId String required
+  startedAt Instant required
+  expiresAt Instant required
+}
+
+/**
+ * BlockedUser - Block list
+ */
+entity BlockedUser {
+  @Id blockId String required
+  blockerId String required
+  blockedUserId String required
+  reason String maxlength(500)
+}
+
+/**
+ * MessageReport - Report messages
+ */
+entity MessageReport {
+  @Id reportId String required
+  reporterId String required
+  messageId String required
+  /** Reason: SPAM, HARASSMENT, INAPPROPRIATE_CONTENT, SCAM, OTHER */
+  reason String maxlength(30) required
+  details String maxlength(1000)
+  /** Status: PENDING, REVIEWED, RESOLVED, DISMISSED */
+  status String maxlength(20) required
+  reviewedBy String maxlength(100)
+  reviewedAt Instant
+  reviewNotes String maxlength(1000)
+  actionTaken String maxlength(500)
+}
+
+/**
+ * ConversationSettings - Per-conversation settings
+ */
+entity ConversationSettings {
+  @Id settingsId String required
+  onlyAdminCanSend Integer
+  onlyAdminCanAddMembers Integer
+  autoDeleteDays Integer
+  allowReactions Integer
+  allowReplies Integer
+  allowAttachments Integer
+  maxAttachmentSizeMb Integer
+  allowedFileTypes String maxlength(500)
+  showReadReceipts Integer
+  showTypingIndicators Integer
+}
+
+// =====================================================
+// RELATIONSHIPS
+// =====================================================
+
+relationship OneToMany {
+  Conversation{participants} to ConversationParticipant{conversation required}
+  Conversation{messages} to Message{conversation required}
+  Conversation{conversationReads} to ConversationRead{conversation required}
+  
+  Message{attachments} to MessageAttachment{message required}
+  Message{readReceipts} to MessageReadReceipt{message required}
+  Message{reactions} to MessageReaction{message required}
+}
+
+relationship OneToOne {
+  Conversation{settings} to ConversationSettings{conversation}
+}
+
+// =====================================================
+// OPTIONS
+// =====================================================
+
+paginate Conversation, Message, ConversationParticipant with pagination
+paginate MessageAttachment, MessageReaction, MessageReadReceipt with pagination
+paginate MessageReport, ConversationRead, QuickReply, AutoReplySettings with pagination
+
+dto * with mapstruct
+service * with serviceClass
+microservice * with chat

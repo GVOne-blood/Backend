@@ -28,4 +28,5 @@ public class ShopController {
         return new ResponseData<>(200, "Success", shopService.getAllShops(pageable));
     }
 
+
 }

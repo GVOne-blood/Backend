@@ -1,0 +1,32 @@
+entity Shop {
+  shopId String maxlength(50) required
+  shopName String maxlength(255)
+  logo String maxlength(255)
+  introduction String maxlength(2000)
+  shopStatus String maxlength(255)
+  totalProduct Integer
+  totalSold Integer
+  createdAt Instant
+  updatedAt Instant
+  shopType String maxlength(50)
+  totalTraffic Integer
+  avgStar BigDecimal
+  totalFeedback Integer
+  totalOrders Integer
+  email String maxlength(50)
+  phoneNumber String maxlength(50)
+  businessType String maxlength(50)
+  taxId String maxlength(50)
+  isBln Integer
+  isActive Integer
+  commission BigDecimal
+  shopAddress String maxlength(255)
+  city String maxlength(50)
+  province String maxlength(50)
+  nationId String maxlength(50)
+  postalCode String maxlength(50)
+  activeHours String maxlength(1000)
+  contractStartDate Instant
+  contractEndDate Instant
+  shopLevel Integer
+}

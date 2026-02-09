@@ -1,0 +1,87 @@
+syntax = "proto3";
+
+package com.viettel.client.authentication;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+import "google/protobuf/any.proto";
+import "google/protobuf/empty.proto";
+
+import "authentication/common.proto";
+
+option java_multiple_files = true;
+option java_package = "com.viettel.client.authentication";
+
+service RoleService {
+  rpc updateRole (UpdateRoleReq) returns (RoleDTO) {
+  }
+
+  rpc getRole (RoleId) returns (RoleDTO) {
+  }
+
+  rpc deleteRole (RoleId) returns (google.protobuf.Empty) {
+  }
+
+  rpc changeStatusRole (RoleId) returns (RoleDTO) {
+  }
+
+  rpc search (RolePageableSearchRequest) returns (PageableRoleDTO) {
+  }
+
+  // TODO: modify response to list wrapper
+  rpc getFromList (GetFromListReq) returns (GetFromListResp) {
+  }
+
+  // TODO: modify response to list wrapper
+  rpc deleteAllList (RoleDTO) returns (DeleteAllListResp) {
+  }
+  rpc findAllById (RoleIdListReq) returns (GetFromListResp) {}
+
+}
+
+message RoleId {
+  optional string id = 1;
+}
+
+message UpdateRoleReq {
+  optional string id = 1;
+  optional RoleDTO roleDTO = 2;
+}
+
+message PageableRoleDTO {
+  repeated RoleDTO data = 1;
+  optional int64 total = 2;
+  optional int64 activeTotal = 3;
+  optional int64 inactiveTotal = 4;
+  optional int64 deletedTotal = 5;
+}
+
+message GetFromListReq {
+  repeated string ids = 1;
+}
+
+message RoleIdListReq {
+  repeated string ids = 1;
+}
+
+message GetFromListResp {
+  repeated RoleDTO data = 1;
+}
+
+message DeleteAllListResp {
+  repeated string data = 1;
+}
+
+message RolePageableSearchRequest {
+  RoleSearchRequest search = 1;
+  PageRequest page = 2;
+}
+
+message RoleSearchRequest {
+  optional string keyword = 1;
+  optional int32 active = 2;
+  optional int32 deleted = 3;
+  optional int32 status = 4;
+  optional bool canSelfAssign = 5;
+  optional int32 isLock = 6;
+}

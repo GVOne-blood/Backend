@@ -1,6 +1,6 @@
 package com.theblood.productservice.repository;
 
-import com.theblood.productservice.model.Feedback;
+import com.theblood.productservice.domain.Feedback;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

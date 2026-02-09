@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+package com.viettel.client.error;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/any.proto";
+import "google/protobuf/empty.proto";
+
+option java_multiple_files = true;
+option java_package = "com.viettel.client.error";
+
+enum ErrorCode {
+  RESERVED = 0;
+  TRANSACTION_SUCCESSFUL = 1;
+  INVALID_JSON_FORMAT_DATA = 2;
+  EXISTED = 3;
+  NOT_EXISTED = 4;
+  UNABLE_TO_CHANGE_STATUS = 5;
+  ERROR_IN_BACKEND = 6;
+  INVALID_INPUT_DATA = 7;
+  UNABLE_TO_DELETE = 8;
+  SOA_TIMEOUT_BACKEND = 9;
+  ERROR_WHEN_CALL_TO_BACKEND = 10;
+  UNABLE_TO_UPDATE_USER_USB_TOKEN = 11;
+  NOT_ACTIVE = 12;
+  SESSION_TIMEOUT = 13;
+  LACK_OF_INPUT_DATA = 14;
+  AUTHENTICATE_FAILED = 15;
+  EXPIRED = 16;
+  SEND_EMAIL_FAILED = 17;
+  TOKEN_EXPIRED = 18;
+  TOKEN_INVALID = 19;
+  UN_EXPIRED = 20;
+  UNABLE_TO_LOGIN_BY_USB_TOKEN = 21;
+  ERROR_EMPTY_DATA = 22;
+  UNABLE_TO_RUN_JOB = 23;
+  FILE_INVALID = 24;
+}
+

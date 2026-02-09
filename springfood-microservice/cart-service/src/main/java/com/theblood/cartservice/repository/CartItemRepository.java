@@ -1,6 +1,6 @@
 package com.theblood.cartservice.repository;
 
-import com.theblood.cartservice.model.CartItem;
+import com.theblood.cartservice.domain.CartItem;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 

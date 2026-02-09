@@ -1,0 +1,83 @@
+{
+  "annotations": {
+    "changelogDate": "20251210070152"
+  },
+  "applications": "*",
+  "clientRootFolder": "customer",
+  "databaseType": "sql",
+  "documentation": "Action Log entity\\nLưu nhật ký hệ thống",
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "accountId",
+      "fieldType": "Long"
+    },
+    {
+      "fieldName": "userName",
+      "fieldType": "String",
+      "fieldValidateRules": [
+        "maxlength"
+      ],
+      "fieldValidateRulesMaxlength": "50"
+    },
+    {
+      "fieldName": "organizationId",
+      "fieldType": "Long"
+    },
+    {
+      "fieldName": "actionType",
+      "fieldType": "ActionType",
+      "fieldValidateRules": [
+        "required"
+      ],
+      "fieldValues": "CREATE,UPDATE,DELETE,LOGIN,LOGOUT"
+    },
+    {
+      "fieldName": "oldValue",
+      "fieldType": "TextBlob"
+    },
+    {
+      "fieldName": "newValue",
+      "fieldType": "TextBlob"
+    },
+    {
+      "fieldName": "description",
+      "fieldType": "TextBlob"
+    },
+    {
+      "fieldName": "ipAddress",
+      "fieldType": "String",
+      "fieldValidateRules": [
+        "maxlength"
+      ],
+      "fieldValidateRulesMaxlength": "50"
+    },
+    {
+      "fieldName": "userAgent",
+      "fieldType": "TextBlob"
+    },
+    {
+      "fieldName": "tableName",
+      "fieldType": "TextBlob"
+    },
+    {
+      "fieldName": "objectId",
+      "fieldType": "String",
+      "fieldValidateRules": [
+        "maxlength"
+      ],
+      "fieldValidateRulesMaxlength": "50"
+    },
+    {
+      "fieldName": "affectCurrent",
+      "fieldType": "Integer"
+    }
+  ],
+  "jpaMetamodelFiltering": true,
+  "microserviceName": "customer",
+  "name": "LogActionAnnualUpdate",
+  "pagination": "pagination",
+  "relationships": [],
+  "searchEngine": "no",
+  "service": "serviceClass"
+}

@@ -1,0 +1,89 @@
+syntax = "proto3";
+
+package com.viettel.client.authorization;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+import "authorization/author-common.proto";
+import "authorization/tenant.proto";
+import "authorization/app-version-history.proto";
+
+option java_multiple_files = true;
+option java_package = "com.viettel.client.authorization";
+option java_outer_classname = "AuthorServiceApplication";
+
+service ApplicationService {
+  rpc createApplication (ApplicationGrpcDTO) returns (ApplicationGrpcDTO) {
+  }
+
+  rpc updateApplication (ApplicationGrpcDTO) returns (ApplicationGrpcDTO) {
+  }
+
+  rpc getApplication (CustomPojoRetrieverGrpc) returns (ApplicationGrpcDTO) {
+  }
+
+  rpc deleteApplication (CustomPojoRetrieverGrpc) returns (EmptyOrError) {
+  }
+
+  rpc changeStateApplication (CustomPojoRetrieverGrpc) returns (google.protobuf.Empty) {
+  }
+
+  rpc doSearch (SearchParamGrpc) returns (ApplicationSearchResultGrpc) {
+  }
+
+  rpc validateDeleteVArea (CustomPojoRetrieverGrpc) returns (ApplicationVerifyToDeleteResultGrpc) {
+  }
+
+  rpc deleteApplicationListId (CustomPojoRetrieverGrpc) returns (google.protobuf.Empty) {
+  }
+
+  rpc deleteTempApplicationListId (CustomPojoRetrieverGrpc) returns (google.protobuf.Empty) {
+  }
+}
+
+message ApplicationGrpcDTO {
+  optional string id = 1;
+  optional string appName = 2;
+  optional string appCode = 3;
+  optional string version = 4;
+  optional string versionInfo = 5;
+  optional string configInfo = 6;
+  optional int32 isActive = 7;
+  optional int32 status = 8;
+  optional string description = 9;
+  optional string apiKey = 10;
+  optional string createdBy = 11;
+  optional google.protobuf.Timestamp createdDate = 12;
+  optional string lastModifiedBy = 13;
+  optional google.protobuf.Timestamp lastModifiedDate = 14;
+  repeated string listId = 15;
+  repeated AppVersionHistoryGrpcDTO appVersionHistories = 16;
+}
+
+message ApplicationReplyGrpc {
+  optional int32 code = 1;
+  optional string message = 2;
+  oneof response {
+    ApplicationGrpcDTO detail = 3;
+    string detailErrorMessage = 4;
+  }
+}
+
+message ApplicationSearchResultGrpc {
+  repeated ApplicationGrpcDTO data = 1;
+  optional int32 total = 2;
+  optional int32 activeTotal = 3;
+  optional int32 inactiveTotal = 4;
+}
+
+message ApplicationVerifyToDeleteResultGrpc {
+  repeated string canDelete = 1;
+  repeated ItemMessageErrorGrpc notDelete = 2;
+}
+
+message ApplicationVerifyToDeleteReplyGrpc {
+  optional int32 code = 1;
+  optional string message = 2;
+  optional ApplicationVerifyToDeleteResultGrpc detail = 3;
+}
+

@@ -1,6 +1,6 @@
 package com.theblood.apigateway.filter;
 
-import com.theblood.apigateway.util.JwtUtil;
+import com.theblood.common.util.JwtUtil;
 import com.theblood.apigateway.util.RouterValidator;
 import com.theblood.common.dto.request.TokenRefreshRequest;
 import com.theblood.common.dto.response.TokenResponse;
@@ -59,7 +59,7 @@ public class AuthenticationFilter implements GlobalFilter, GatewayFilter, Ordere
                         .flatMap(isBlacklisted -> {
                             if (isBlacklisted) {
                                 log.warn("Blacklisted token used on public endpoint, ignoring authentication");
-                                return chain.filter(exchange); // Cho qua nhưng không set headers
+                                return chain.filter(exchange);
                             }
 
                             try {
@@ -70,7 +70,6 @@ public class AuthenticationFilter implements GlobalFilter, GatewayFilter, Ordere
                                     return chain.filter(exchange);
                                 }
 
-                                // Token hợp lệ → populate headers
                                 log.info("Valid token found on public endpoint, populating user headers");
                                 ServerWebExchange newExchange = populateRequestWithHeaders(exchange, accessToken);
                                 return chain.filter(newExchange);
@@ -86,63 +85,59 @@ public class AuthenticationFilter implements GlobalFilter, GatewayFilter, Ordere
                         });
             }
 
-            // Case 2: SECURED ENDPOINT - Token is MANDATORY
-            log.debug("Secured endpoint accessed: {}", path);
+            // Không có token → cho qua luôn
+            log.debug("No token provided for public endpoint, proceeding without authentication");
+            return chain.filter(exchange);
+        }
 
-            // Không có access token
-            if (accessTokenOpt.isEmpty()) {
-                // Không có cả refresh token → reject ngay
-                if (refreshTokenOpt.isEmpty()) {
-                    log.warn("Secured endpoint accessed without tokens: {}", path);
-                    return onError(exchange, "Authentication required. Please login.", HttpStatus.UNAUTHORIZED);
-                }
+        // Case 2: SECURED ENDPOINT - Token is MANDATORY
+        log.debug("Secured endpoint accessed: {}", path);
 
-                // Có refresh token → attempt refresh
-                log.info("Access token missing on secured endpoint, attempting refresh");
-                return handleTokenRefresh(exchange, chain, refreshTokenOpt.get());
+        // Không có access token
+        if (accessTokenOpt.isEmpty()) {
+            if (refreshTokenOpt.isEmpty()) {
+                log.warn("Secured endpoint accessed without tokens: {}", path);
+                return onError(exchange, "Authentication required. Please login.", HttpStatus.UNAUTHORIZED);
             }
 
-            // Có access token → validate
-            String accessToken = accessTokenOpt.get();
-
-            return isTokenBlacklisted(accessToken, TokenType.ACCESS)
-                    .flatMap(isBlacklisted -> {
-                        if (isBlacklisted) {
-                            log.warn("Blacklisted access token used on secured endpoint");
-                            return onError(exchange, "Access token has been revoked", HttpStatus.UNAUTHORIZED);
-                        }
-
-                        try {
-                            jwtUtil.validateToken(accessToken);
-                        } catch (JwtException e) {
-                            if (!jwtUtil.isTokenExpired(accessToken)) {
-                                log.warn("Invalid access token on secured endpoint: {}", e.getMessage());
-                                return onError(exchange, "Invalid access token", HttpStatus.UNAUTHORIZED);
-                            }
-                        }
-
-                        // Check expiration
-                        if (jwtUtil.isTokenExpired(accessToken)) {
-                            log.info("Access token expired on secured endpoint, attempting refresh");
-
-                            if (refreshTokenOpt.isEmpty()) {
-                                log.warn("Access token expired and no refresh token available");
-                                return onError(exchange, "Access token expired. Please login again.", HttpStatus.UNAUTHORIZED);
-                            }
-
-                            return handleTokenRefresh(exchange, chain, refreshTokenOpt.get());
-                        }
-
-                        // Token valid → proceed
-                        log.debug("Valid access token, proceeding with request");
-                        ServerWebExchange newExchange = populateRequestWithHeaders(exchange, accessToken);
-                        return chain.filter(newExchange);
-                    });
-            
+            log.info("Access token missing on secured endpoint, attempting refresh");
+            return handleTokenRefresh(exchange, chain, refreshTokenOpt.get());
         }
-        // Không có token → cho qua luôn
-        log.debug("No token provided for public endpoint, proceeding without authentication");
-        return chain.filter(exchange);
+
+        // Có access token → validate
+        String accessToken = accessTokenOpt.get();
+
+        return isTokenBlacklisted(accessToken, TokenType.ACCESS)
+                .flatMap(isBlacklisted -> {
+                    if (isBlacklisted) {
+                        log.warn("Blacklisted access token used on secured endpoint");
+                        return onError(exchange, "Access token has been revoked", HttpStatus.UNAUTHORIZED);
+                    }
+
+                    try {
+                        jwtUtil.validateToken(accessToken);
+                    } catch (JwtException e) {
+                        if (!jwtUtil.isTokenExpired(accessToken)) {
+                            log.warn("Invalid access token on secured endpoint: {}", e.getMessage());
+                            return onError(exchange, "Invalid access token", HttpStatus.UNAUTHORIZED);
+                        }
+                    }
+
+                    if (jwtUtil.isTokenExpired(accessToken)) {
+                        log.info("Access token expired on secured endpoint, attempting refresh");
+
+                        if (refreshTokenOpt.isEmpty()) {
+                            log.warn("Access token expired and no refresh token available");
+                            return onError(exchange, "Access token expired. Please login again.", HttpStatus.UNAUTHORIZED);
+                        }
+
+                        return handleTokenRefresh(exchange, chain, refreshTokenOpt.get());
+                    }
+
+                    log.debug("Valid access token, proceeding with request");
+                    ServerWebExchange newExchange = populateRequestWithHeaders(exchange, accessToken);
+                    return chain.filter(newExchange);
+                });
     }
 
     /**

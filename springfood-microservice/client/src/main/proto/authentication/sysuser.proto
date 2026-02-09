@@ -1,0 +1,170 @@
+syntax = "proto3";
+
+package com.viettel.client.authentication;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+import "google/protobuf/any.proto";
+import "google/protobuf/empty.proto";
+
+import "authentication/common.proto";
+
+option java_multiple_files = true;
+option java_package = "com.viettel.client.authentication";
+
+service AccountService {
+  rpc createAccount (CreateAccountDTO) returns (AccountDTO) {
+  }
+
+  rpc updateAccount (UpdateAccountReq) returns (AccountDTO) {
+  }
+
+  rpc resetPasswordAccount (AccountId) returns (AccountDTO) {
+  }
+
+  rpc updateRoleAccount (UpdateAccountReq) returns (AccountDTO) {
+  }
+
+  rpc searchAllAccounts (PageableSearchRequest) returns (PageableAccountDTO) {
+  }
+  rpc getAccountsByRole (AccountRoleRequest) returns (AccountDTOList) {
+  }
+  rpc getAccountByOrg (AccountOrgRequest) returns (AccountDTOList) {
+  }
+  // TODO: modify response to list wrapper
+  rpc getAllAccount (google.protobuf.Empty) returns (AccountDTOList) {
+  }
+
+  rpc getAccountsByUserIds (AccountId) returns (AccountDTOList) {
+  }
+
+  // in case of Not Found
+  rpc getAccount (AccountId) returns (AccountDTO) {
+  }
+  rpc getAccountExpertByOrg (AccountExpertRequest) returns (AccountDTOList) {
+  }
+  rpc getAllApproverMeetingAccount(google.protobuf.Empty) returns (AccountDTOList) {
+  }
+
+  // TODO: modify response to list wrapper
+  rpc getAccountFullName (GetAccountFullNameReq) returns (AccountWithFullNameListDTO) {
+  }
+
+  rpc deleteAccount (AccountId) returns (google.protobuf.Empty) {
+  }
+
+  rpc deleteListAccount (AccountDTO) returns (google.protobuf.Empty) {
+  }
+
+  rpc deleteTempListAccount (AccountDTO) returns (google.protobuf.Empty) {
+  }
+
+  rpc recoverListAccount (AccountDTO) returns (google.protobuf.Empty) {
+  }
+
+  // account approval
+  rpc approveAccount (AccountApprovalDTO) returns (AccountDTO){}
+
+  // test reponse ok
+  rpc changeAvatar (ChangeAvatarReq) returns (google.protobuf.StringValue) {
+  }
+
+  rpc changePassword (PasswordChangeDTO) returns (google.protobuf.StringValue) {
+  }
+
+  rpc changePasswordExpired (PasswordChangeDTO) returns (google.protobuf.StringValue) {
+  }
+
+  // unknown resp
+  rpc exportAllAccounts (ExportAllAccountsReq) returns (google.protobuf.Any) {
+  }
+
+  rpc importAllAccounts (ImportDTO) returns (google.protobuf.Any) {
+  }
+
+  rpc downloadTemplate (DownloadTemplateReq) returns (google.protobuf.Any) {
+  }
+
+  rpc unlock (AccountDTO) returns (google.protobuf.Empty) {
+  }
+  rpc getManagerByOrg(AccountOrgRequest) returns (AccountDTO);
+  rpc getSecretaryByAccount(AccountSecretaryRequest) returns (AccountDTO);
+  rpc checkIsManager(AccountId) returns (BooleanMessage);
+  rpc  getUserInfoByIOfficeUser(AccountIOfficeReq) returns (AccountDTOList);
+  rpc  getUserInfosByOrg(OrgReq) returns (AccountDTOList);
+}
+
+message AccountId {
+  optional string id = 1;
+  repeated string ids = 2;
+}
+message AccountIOfficeReq{
+  repeated string ids = 1;
+}
+message OrgReq{
+  repeated string ids = 1;
+}
+
+message UpdateAccountReq {
+  optional string id = 1;
+  optional AccountDTO accountDTO = 2;
+}
+
+message PageableAccountDTO {
+  repeated AccountDTO data = 1;
+  optional int64 total = 2;
+  optional int64 activeTotal = 3;
+  optional int64 inactiveTotal = 4;
+  optional int64 deletedTotal = 5;
+  optional int64 searchTotal = 6;
+  optional int64 waitingTotal = 7;
+}
+
+message AccountDTOList {
+  repeated AccountDTO data = 1;
+}
+
+message GetAccountFullNameReq {
+  repeated string userNames = 1;
+}
+
+message AccountWithFullNameDTO {
+  string id = 1;
+  optional string userName = 2;
+  optional string fullName = 3;
+}
+
+message AccountWithFullNameListDTO {
+  repeated AccountWithFullNameDTO data = 1;
+}
+
+message ChangeAvatarReq {
+  optional string imageUrl = 1;
+}
+
+message PasswordChangeDTO {
+  optional int64 userId = 1;
+  optional string userName = 2;
+  optional string currentPassword = 3;
+  optional string newPassword = 4;
+  optional string confirmPasswordAgain = 5;
+  optional string changePasswordExpiredCode = 6;
+}
+
+message ExportAllAccountsReq {
+  optional string keyword = 1;
+  optional string active = 2;
+  optional string deleted = 3;
+  repeated int64 userId = 4;
+  optional string fullName = 5;
+  optional int64 shopId = 6;
+}
+
+message ImportDTO {
+  repeated string key = 1;
+  optional int64 shopId = 2;
+}
+
+message DownloadTemplateReq {
+  optional bool importToOrg = 1;
+}

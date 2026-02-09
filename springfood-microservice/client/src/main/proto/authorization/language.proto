@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+package com.viettel.client.authorization;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+
+option java_multiple_files = true;
+option java_package = "com.viettel.client.authorization";
+option java_outer_classname = "AuthorServiceLanguage";
+
+// The greeting service definition.
+service LanguageService {
+  // Sends a greeting
+  rpc getAllLanguages (google.protobuf.Empty) returns (LanguageGrpcDTOListWrapped) {
+  }
+
+  rpc createLanguage (LanguageGrpcDTO) returns (LanguageGrpcDTO) {
+  }
+}
+
+message LanguageGrpcDTO {
+  optional string id = 1;
+  optional string langName = 2;
+  optional string langCode = 3;
+  optional int64 status = 4;
+  optional string createdBy = 5;
+  optional google.protobuf.Timestamp createdDate = 6;
+  optional string lastModifiedBy = 7;
+  optional google.protobuf.Timestamp lastModifiedDate = 8;
+}
+
+message LanguageGrpcDTOListWrapped {
+  repeated LanguageGrpcDTO data = 1;
+}

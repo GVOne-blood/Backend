@@ -1,6 +1,6 @@
 package com.theblood.productservice.repository;
 
-import com.theblood.productservice.model.Categories;
+import com.theblood.productservice.domain.Categories;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

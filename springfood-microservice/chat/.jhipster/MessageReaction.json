@@ -1,0 +1,52 @@
+{
+  "annotations": {
+    "changelogDate": "20260204095353"
+  },
+  "applications": "*",
+  "clientRootFolder": "chat",
+  "databaseType": "sql",
+  "documentation": "MessageReaction - Emoji reactions",
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "reactionId",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"],
+      "options": {
+        "id": true
+      }
+    },
+    {
+      "fieldName": "userId",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "emoji",
+      "fieldType": "String",
+      "fieldValidateRules": ["maxlength", "required"],
+      "fieldValidateRulesMaxlength": "50"
+    },
+    {
+      "fieldName": "emojiDisplay",
+      "fieldType": "String",
+      "fieldValidateRules": ["maxlength"],
+      "fieldValidateRulesMaxlength": "20"
+    }
+  ],
+  "microserviceName": "chat",
+  "name": "MessageReaction",
+  "pagination": "pagination",
+  "relationships": [
+    {
+      "otherEntityName": "message",
+      "otherEntityRelationshipName": "reactions",
+      "relationshipName": "message",
+      "relationshipSide": "right",
+      "relationshipType": "many-to-one",
+      "relationshipValidateRules": "required"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "serviceClass"
+}

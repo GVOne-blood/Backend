@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package com.viettel.client.error;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/any.proto";
+import "google/protobuf/empty.proto";
+
+option java_multiple_files = true;
+option java_package = "com.viettel.client.error";
+
+message ErrorInfo {
+  int32 errorCode = 1;
+  string errorMessage = 2;
+  string detailErrorMessage = 3;
+}
+

@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+package com.viettel.client.authorization;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+import "authorization/author-common.proto";
+
+option java_multiple_files = true;
+option java_package = "com.viettel.client.authorization";
+option java_outer_classname = "AuthorServiceTenant";
+
+service TenantService {
+  rpc getTenant (CustomPojoRetrieverGrpc) returns (TenantGrpcDTO) {
+  }
+
+  rpc partialUpdateTenant (TenantGrpcDTO) returns (TenantGrpcDTO) {
+  }
+}
+
+message TenantGrpcDTO {
+  optional string id = 1;
+  optional string tenantName = 2;
+  optional string tenantCode = 3;
+  optional string description = 4;
+  optional string tenantLink = 5;
+  optional string status = 6;
+  optional string logicNoPermission = 7;
+  optional string logicPermission = 8;
+}
+

@@ -1,0 +1,45 @@
+{
+  "gen-jhipster": {
+    "applicationType": "microservice",
+    "authenticationType": "oauth2",
+    "baseName": "customer",
+    "buildTool": "maven",
+    "cacheProvider": "redis",
+    "creationTimestamp": 1750814749639,
+    "databaseType": "sql",
+    "devDatabaseType": "oracle",
+    "enableGrpc": false,
+    "enableHibernateCache": true,
+    "enableSwaggerCodegen": true,
+    "enableTranslation": true,
+    "entities": [
+      "LogAction",
+      "LogActionAnnualUpdate"
+    ],
+    "feignClient": true,
+    "grpcPort": "9081",
+    "jasypt": true,
+    "jasyptEncryptorPassword": "11112222",
+    "jhipsterVersion": "8.8.0-R14",
+    "jwtSecretKey": "NDIwNmM2Nzk5MTdlMDIzNDZkZGRiNDQ2ZDk0ODhhYzUwM2E4YTNkMzg0M2Y2NzM4NmQzYWIxMjJmYWViNTI5MzBiNGU4NTE5N2MwYzI5ZmRiZjhiNzMwN2VmZDc1OGZiNTNlMWI2MjQzYzU5NmYyZTNjNWIyNTA3NThmMDQ1NWU=",
+    "languages": [
+      "en",
+      "vi"
+    ],
+    "lastLiquibaseTimestamp": 1765350112000,
+    "messageBroker": "kafka",
+    "monorepository": true,
+    "nativeLanguage": "en",
+    "packageName": "com.viettel.dvs.actionlog",
+    "prodDatabaseType": "oracle",
+    "reactive": false,
+    "serverPort": "8081",
+    "serviceDiscoveryType": "no",
+    "skipClient": true,
+    "skipCommitHook": true,
+    "skipUserManagement": true,
+    "syncRoutesWithApisix": true,
+    "syncUserWithIdp": false,
+    "testFrameworks": []
+  }
+}

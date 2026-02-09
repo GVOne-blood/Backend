@@ -1,0 +1,54 @@
+syntax = "proto3";
+
+package com.viettel.client.authorization;
+
+import "google/protobuf/any.proto";
+
+message BaseResGrpc {
+  optional int32 code = 1;
+  optional string message = 2;
+  optional string detail = 3;
+}
+
+message SearchParamGrpc {
+  optional int32 page = 1;
+  optional int32 size = 2;
+  optional string sort = 3;
+  optional string keyword = 4;
+  optional string active = 5;
+  optional bool eagerload = 6;
+  optional int32 type = 7;
+  optional string applicationId = 8;
+  optional string id = 9;
+  optional string parentId = 10;
+}
+
+//message UrlParamRetrieverGrpc {
+//  int64 id = 1;
+//}
+
+message CustomPojoRetrieverGrpc {
+  repeated string ids = 1;
+  optional string id = 2;
+  repeated string listId = 3;
+}
+
+message ItemMessageErrorGrpc {
+  optional string id = 1;
+  optional string name = 2;
+  optional string message = 3;
+}
+
+message EmptyOrError {
+  optional int32 code = 1;
+  optional string message = 2;
+  optional string detailErrorMessage = 4;
+}
+
+message FileGrpc {
+  bytes content = 1;
+  optional string name = 2;
+  optional string type = 3;
+}
+
+

@@ -1,0 +1,159 @@
+{
+  "annotations": {
+    "changelogDate": "20260204095350"
+  },
+  "applications": "*",
+  "clientRootFolder": "chat",
+  "databaseType": "sql",
+  "documentation": "Message - Individual chat messages",
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "messageId",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"],
+      "options": {
+        "id": true
+      }
+    },
+    {
+      "fieldName": "clientMessageId",
+      "fieldType": "String",
+      "fieldValidateRules": ["maxlength"],
+      "fieldValidateRulesMaxlength": "100"
+    },
+    {
+      "fieldName": "senderId",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "senderName",
+      "fieldType": "String",
+      "fieldValidateRules": ["maxlength"],
+      "fieldValidateRulesMaxlength": "100"
+    },
+    {
+      "fieldName": "senderAvatar",
+      "fieldType": "String",
+      "fieldValidateRules": ["maxlength"],
+      "fieldValidateRulesMaxlength": "500"
+    },
+    {
+      "documentation": "Type: TEXT, IMAGE, VIDEO, FILE, AUDIO, LOCATION, STICKER, SYSTEM, ORDER_CARD, PRODUCT_CARD",
+      "fieldName": "messageType",
+      "fieldType": "String",
+      "fieldValidateRules": ["maxlength", "required"],
+      "fieldValidateRulesMaxlength": "30"
+    },
+    {
+      "fieldName": "content",
+      "fieldType": "TextBlob"
+    },
+    {
+      "fieldName": "contentPreview",
+      "fieldType": "String",
+      "fieldValidateRules": ["maxlength"],
+      "fieldValidateRulesMaxlength": "200"
+    },
+    {
+      "fieldName": "replyToMessageId",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "replyToPreview",
+      "fieldType": "String",
+      "fieldValidateRules": ["maxlength"],
+      "fieldValidateRulesMaxlength": "200"
+    },
+    {
+      "fieldName": "forwardedFromMessageId",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "forwardedFromConversationId",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "referenceType",
+      "fieldType": "String",
+      "fieldValidateRules": ["maxlength"],
+      "fieldValidateRulesMaxlength": "50"
+    },
+    {
+      "fieldName": "referenceId",
+      "fieldType": "String",
+      "fieldValidateRules": ["maxlength"],
+      "fieldValidateRulesMaxlength": "100"
+    },
+    {
+      "documentation": "Status: SENDING, SENT, DELIVERED, READ, FAILED",
+      "fieldName": "status",
+      "fieldType": "String",
+      "fieldValidateRules": ["maxlength", "required"],
+      "fieldValidateRulesMaxlength": "20"
+    },
+    {
+      "fieldName": "isEdited",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "editedAt",
+      "fieldType": "Instant"
+    },
+    {
+      "fieldName": "isDeleted",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "deletedAt",
+      "fieldType": "Instant"
+    },
+    {
+      "fieldName": "deletedBy",
+      "fieldType": "String",
+      "fieldValidateRules": ["maxlength"],
+      "fieldValidateRulesMaxlength": "100"
+    },
+    {
+      "fieldName": "reactionCount",
+      "fieldType": "Integer"
+    }
+  ],
+  "microserviceName": "chat",
+  "name": "Message",
+  "pagination": "pagination",
+  "relationships": [
+    {
+      "otherEntityName": "messageAttachment",
+      "otherEntityRelationshipName": "message",
+      "relationshipName": "attachments",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "otherEntityName": "messageReadReceipt",
+      "otherEntityRelationshipName": "message",
+      "relationshipName": "readReceipts",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "otherEntityName": "messageReaction",
+      "otherEntityRelationshipName": "message",
+      "relationshipName": "reactions",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "otherEntityName": "conversation",
+      "otherEntityRelationshipName": "messages",
+      "relationshipName": "conversation",
+      "relationshipSide": "right",
+      "relationshipType": "many-to-one",
+      "relationshipValidateRules": "required"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "serviceClass"
+}

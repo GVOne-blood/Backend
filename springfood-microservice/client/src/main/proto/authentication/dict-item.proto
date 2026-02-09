@@ -1,0 +1,50 @@
+syntax = "proto3";
+
+package com.viettel.client.authentication;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+
+import "authentication/common.proto";
+
+option java_multiple_files = true;
+option java_package = "com.viettel.client.authentication";
+option java_outer_classname = "IdServiceDictItem";
+
+service DictItemIdService {
+
+  rpc createDictItem (DictItemGrpcDTO) returns (DictItemGrpcDTO) {
+  }
+
+  rpc updateDictItem (DictItemGrpcDTO) returns (DictItemGrpcDTO) {
+  }
+
+  rpc getAllDictItems (PageableSearchRequest) returns (DictItemGrpcDTOListWrapped) {
+  }
+
+  rpc getDictItem (DictItemGrpcReq) returns (DictItemGrpcDTO) {
+  }
+
+  rpc getDictItemByCode (DictItemGrpcReq) returns (DictItemGrpcDTO) {
+  }
+
+  rpc getListDictItemByLevel (DictItemGrpcReq) returns (DictItemGrpcDTOListWrapped) {
+  }
+
+  rpc getDictItemByParentId (DictItemGrpcReq) returns (DictItemGrpcDTOListWrapped) {
+  }
+
+  rpc deleteDictItem (DictItemGrpcReq) returns (google.protobuf.Empty) {
+  }
+}
+
+message DictItemGrpcReq {
+  optional string id = 1;
+  optional string itemCode = 2;
+  optional int32 level = 3;
+}
+
+message DictItemGrpcDTOListWrapped {
+  repeated DictItemGrpcDTO data = 1;
+}
+

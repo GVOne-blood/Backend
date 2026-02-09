@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Chat Test</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 20px;
+    }
+
+    .input-group {
+      margin: 10px 0;
+    }
+
+    input {
+      padding: 5px;
+      width: 300px;
+    }
+
+    button {
+      padding: 5px 10px;
+      cursor: pointer;
+    }
+
+    #logs {
+      background: #f0f0f0;
+      padding: 10px;
+      height: 300px;
+      overflow-y: scroll;
+      border: 1px solid #ccc;
+    }
+
+    .msg {
+      margin: 5px 0;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 2px;
+    }
+  </style>
+</head>
+<body>
+<h2>WebSocket Chat Debugger</h2>
+
+<div class="input-group">
+  <label>JWT Token (No 'Bearer '):</label><br>
+  <input id="token" placeholder="Paste your JWT here" type="text">
+  <button onclick="connect()">Connect</button>
+</div>
+
+<div class="input-group">
+  <label>Conversation ID (UUID):</label><br>
+  <input id="convoId" type="text" value="test-convo-1">
+  <button onclick="subscribe()">Join Room</button>
+</div>
+
+<div class="input-group">
+  <label>Message:</label><br>
+  <input id="msgContent" placeholder="Hello world..." type="text">
+  <button onclick="send()">Send</button>
+  <button onclick="sendTyping()">Typing...</button>
+</div>
+
+<div id="logs"></div>
+
+<script>
+  var stompClient = null;
+
+  function log(msg) {
+    var div = document.createElement('div');
+    div.className = 'msg';
+    div.innerText = msg;
+    document.getElementById('logs').prepend(div);
+  }
+
+  function connect() {
+    var socket = new SockJS('http://localhost:8098/ws/chat');
+    stompClient = Stomp.over(socket);
+    var token = document.getElementById('token').value;
+
+    stompClient.connect({'Authorization': 'Bearer ' + token}, function (frame) {
+      log('CONNECTED: ' + frame);
+    }, function (err) {
+      log('ERROR: ' + err);
+    });
+  }
+
+  function subscribe() {
+    var id = document.getElementById('convoId').value;
+    if (!stompClient) return log('Not connected!');
+
+    stompClient.subscribe('/topic/conversation/' + id, function (msg) {
+      var body = JSON.parse(msg.body);
+      if (body.eventType === 'TYPING') {
+        log('[TYPING] User ' + body.senderId + ' is typing...');
+      } else {
+        log('[CHAT] ' + body.senderId + ': ' + body.content);
+      }
+    });
+    log('Subscribed to ' + id);
+  }
+
+  function send() {
+    var id = document.getElementById('convoId').value;
+    var text = document.getElementById('msgContent').value;
+    var payload = {
+      clientMessageId: crypto.randomUUID(),
+      content: text,
+      messageType: 'TEXT'
+    };
+    stompClient.send("/app/chat/" + id + "/sendMessage", {}, JSON.stringify(payload));
+  }
+
+  function sendTyping() {
+    var id = document.getElementById('convoId').value;
+    stompClient.send("/app/chat/" + id + "/typing", {}, JSON.stringify({}));
+  }
+</script>
+</body>
+</html>

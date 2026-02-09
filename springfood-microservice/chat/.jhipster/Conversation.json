@@ -1,0 +1,113 @@
+{
+  "annotations": {
+    "changelogDate": "20260204095348"
+  },
+  "applications": "*",
+  "clientRootFolder": "chat",
+  "databaseType": "sql",
+  "documentation": "Conversation - Chat room/thread",
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "conversationId",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"],
+      "options": {
+        "id": true
+      }
+    },
+    {
+      "documentation": "Type: DIRECT, GROUP, ORDER_SUPPORT, SHOP_SUPPORT",
+      "fieldName": "conversationType",
+      "fieldType": "String",
+      "fieldValidateRules": ["maxlength", "required"],
+      "fieldValidateRulesMaxlength": "30"
+    },
+    {
+      "fieldName": "name",
+      "fieldType": "String",
+      "fieldValidateRules": ["maxlength"],
+      "fieldValidateRulesMaxlength": "100"
+    },
+    {
+      "fieldName": "description",
+      "fieldType": "String",
+      "fieldValidateRules": ["maxlength"],
+      "fieldValidateRulesMaxlength": "500"
+    },
+    {
+      "fieldName": "avatarUrl",
+      "fieldType": "String",
+      "fieldValidateRules": ["maxlength"],
+      "fieldValidateRulesMaxlength": "500"
+    },
+    {
+      "fieldName": "referenceType",
+      "fieldType": "String",
+      "fieldValidateRules": ["maxlength"],
+      "fieldValidateRulesMaxlength": "50"
+    },
+    {
+      "fieldName": "referenceId",
+      "fieldType": "String",
+      "fieldValidateRules": ["maxlength"],
+      "fieldValidateRulesMaxlength": "100"
+    },
+    {
+      "fieldName": "lastMessagePreview",
+      "fieldType": "String",
+      "fieldValidateRules": ["maxlength"],
+      "fieldValidateRulesMaxlength": "200"
+    },
+    {
+      "fieldName": "lastMessageAt",
+      "fieldType": "Instant"
+    },
+    {
+      "fieldName": "lastMessageSenderId",
+      "fieldType": "String",
+      "fieldValidateRules": ["maxlength"],
+      "fieldValidateRulesMaxlength": "100"
+    },
+    {
+      "fieldName": "messageCount",
+      "fieldType": "Long"
+    },
+    {
+      "fieldName": "isArchived",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "isPinned",
+      "fieldType": "Integer"
+    }
+  ],
+  "microserviceName": "chat",
+  "name": "Conversation",
+  "pagination": "pagination",
+  "relationships": [
+    {
+      "otherEntityName": "conversationSettings",
+      "otherEntityRelationshipName": "conversation",
+      "relationshipName": "settings",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-one"
+    },
+    {
+      "otherEntityName": "conversationParticipant",
+      "otherEntityRelationshipName": "conversation",
+      "relationshipName": "participants",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "otherEntityName": "message",
+      "otherEntityRelationshipName": "conversation",
+      "relationshipName": "messages",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-many"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "serviceClass"
+}

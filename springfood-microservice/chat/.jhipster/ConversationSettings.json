@@ -1,0 +1,75 @@
+{
+  "annotations": {
+    "changelogDate": "20260204095358"
+  },
+  "applications": "*",
+  "clientRootFolder": "chat",
+  "databaseType": "sql",
+  "documentation": "ConversationSettings - Per-conversation settings",
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "settingsId",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"],
+      "options": {
+        "id": true
+      }
+    },
+    {
+      "fieldName": "onlyAdminCanSend",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "onlyAdminCanAddMembers",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "autoDeleteDays",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "allowReactions",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "allowReplies",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "allowAttachments",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "maxAttachmentSizeMb",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "allowedFileTypes",
+      "fieldType": "String",
+      "fieldValidateRules": ["maxlength"],
+      "fieldValidateRulesMaxlength": "500"
+    },
+    {
+      "fieldName": "showReadReceipts",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "showTypingIndicators",
+      "fieldType": "Integer"
+    }
+  ],
+  "microserviceName": "chat",
+  "name": "ConversationSettings",
+  "relationships": [
+    {
+      "otherEntityName": "conversation",
+      "otherEntityRelationshipName": "settings",
+      "relationshipName": "conversation",
+      "relationshipSide": "right",
+      "relationshipType": "one-to-one"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "serviceClass"
+}

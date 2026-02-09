@@ -1,7 +1,7 @@
 package com.theblood.shopservice.repository;
 
 
-import com.theblood.shopservice.model.Shop;
+import com.theblood.shopservice.domain.Shop;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

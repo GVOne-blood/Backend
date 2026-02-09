@@ -1,0 +1,66 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "com.viettel.dvs.actionlog.web.grpc.entity.organization";
+//option java_outer_classname = "";
+
+package com.viettel.dvs.actionlog.entity;
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/wrappers.proto";
+import "util/pagination.proto";
+import "util/export.proto";
+import "buf/validate/validate.proto";
+
+// gRPC service providing CRUD methods for entity Organization
+service OrganizationService {
+    // Create a new organization.
+    // request : the organizationProto to create
+    // response : the created organizationProto or a ALREADY_EXISTS error
+    rpc CreateOrganization (OrganizationProto) returns (OrganizationProto);
+
+    // Update or create a organization.
+    // request : the organizationProto to update or create
+    // response : the updated organizationProto
+    rpc UpdateOrganization (OrganizationProto) returns (OrganizationProto);
+
+    // Patch a organization.
+    // request : the organizationProto to patch
+    // response : the patched organizationProto
+    rpc PartialUpdateOrganization (OrganizationProto) returns (OrganizationProto);
+
+    // Get all the organizations.
+    // response : the list of organizationProtos
+    rpc GetAllOrganizations (util.PageRequest) returns (stream OrganizationProto);
+
+    // Get a organization from it's id.
+    // request : the id of the organizationProto to retrieve
+    // response : the organizationProto or a NOT_FOUND error
+    rpc GetOrganization (OrganizationIdProto) returns (OrganizationProto);
+
+    // Delete a organization from it's id.
+    // request : the id of the organizationProto to delete
+    // response : empty or a NOT_FOUND error
+    rpc DeleteOrganization (OrganizationIdProto) returns (google.protobuf.Empty);
+
+    // Import organizations.
+    // request : ImportProto
+    // response : empty
+    rpc ImportOrganizations (util.ImportProto) returns (google.protobuf.Empty);
+
+    // Export organizations.
+    // request : empty
+    // response : CarboneResponseDataProto
+    rpc ExportOrganizations (google.protobuf.Empty) returns (util.CarboneResponseDataProto);
+}
+
+
+message OrganizationProto {
+    oneof id_oneof {
+        string id = 1 ;
+    }
+}
+
+message OrganizationIdProto {
+    string id = 1;
+}

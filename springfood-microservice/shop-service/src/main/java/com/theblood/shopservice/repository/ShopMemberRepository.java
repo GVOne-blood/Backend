@@ -1,13 +1,15 @@
 package com.theblood.shopservice.repository;
 
-import com.theblood.shopservice.model.ShopMember;
+import com.theblood.shopservice.domain.ShopMember;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-import java.util.UUID;
-
-public interface ShopMemberRepository extends JpaRepository<ShopMember, UUID> {
-
-
-    boolean existsByIdAndUserIdAndRoleName(UUID id, UUID userId, String roleName);
+/**
+ * Spring Data JPA repository for the ShopMember entity.
+ */
+@SuppressWarnings("unused")
+@Repository
+public interface ShopMemberRepository extends JpaRepository<ShopMember, String> {
+    boolean existsByIdAndUserIdAndRoleName(String id, String userId, String roleName);
 
 }

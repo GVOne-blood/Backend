@@ -1,0 +1,64 @@
+syntax = "proto3";
+
+package com.viettel.client.authentication;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+import "google/protobuf/any.proto";
+import "google/protobuf/empty.proto";
+
+import "authentication/common.proto";
+
+option java_multiple_files = true;
+option java_package = "com.viettel.client.authentication";
+
+service QuickLoginService {
+  rpc saveAll (SaveAllReq) returns (SaveAllRes) {
+  }
+
+  rpc delete (QuickLoginIdGrpcDTO) returns (google.protobuf.Empty) {
+  }
+
+  rpc unlock (QuickLoginUnlockGrpcDTO) returns (google.protobuf.Empty) {
+  }
+}
+
+message SaveAllReq {
+  repeated QuickLoginUpsertGrpcDTO data = 1;
+}
+
+message SaveAllRes {
+  repeated QuickLoginGrpcDTO data = 1;
+}
+
+message QuickLoginUpsertGrpcDTO {
+  string device_id = 1;
+  string conference_id = 2;
+  string conference_name = 3;
+  google.protobuf.Timestamp start_date = 4;
+  google.protobuf.Timestamp end_date = 5;
+  string user_id = 6;
+}
+
+message QuickLoginGrpcDTO {
+  string device_id = 1;
+  string conference_id = 2;
+  string conference_name = 3;
+  google.protobuf.Timestamp start_date = 4;
+  google.protobuf.Timestamp end_date = 5;
+  AccountDTO user = 6;
+  string login_code = 7;
+  google.protobuf.Timestamp created_date = 8;
+  string created_by = 9;
+  google.protobuf.Timestamp last_modified_date = 10;
+  string last_modified_by = 11;
+}
+
+message QuickLoginIdGrpcDTO {
+  string device_id = 1;
+  string conference_id = 2;
+}
+
+message QuickLoginUnlockGrpcDTO {
+  string conference_id = 1;
+}

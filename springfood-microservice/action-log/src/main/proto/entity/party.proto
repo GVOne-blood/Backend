@@ -1,0 +1,286 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "com.viettel.dvs.actionlog.web.grpc.entity.party_activity_process";
+//option java_outer_classname = "";
+
+package com.viettel.dvs.actionlog.entity;
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+import "util/queryfilters.proto";
+import "util/pagination.proto";
+import "util/export.proto";
+import "buf/validate/validate.proto";
+
+// gRPC service providing CRUD methods for entity PartyActivityProcess
+service PartyActivityProcessService {
+    // Create a new partyActivityProcess.
+    // request : the partyActivityProcessProto to create
+    // response : the created partyActivityProcessProto or a ALREADY_EXISTS error
+    rpc CreatePartyActivityProcess (PartyActivityProcessProto) returns (PartyActivityProcessProto);
+
+    // Update or create a partyActivityProcess.
+    // request : the partyActivityProcessProto to update or create
+    // response : the updated partyActivityProcessProto
+    rpc UpdatePartyActivityProcess (PartyActivityProcessProto) returns (PartyActivityProcessProto);
+
+    // Patch a partyActivityProcess.
+    // request : the partyActivityProcessProto to patch
+    // response : the patched partyActivityProcessProto
+    rpc PartialUpdatePartyActivityProcess (PartyActivityProcessProto) returns (PartyActivityProcessProto);
+
+    // Get all the partyActivityProcesses.
+    // response : the list of partyActivityProcessProtos
+    rpc GetAllPartyActivityProcesses (PartyActivityProcessPageRequestAndFilters) returns (stream PartyActivityProcessProto);
+
+    // Get a partyActivityProcess from it's id.
+    // request : the id of the partyActivityProcessProto to retrieve
+    // response : the partyActivityProcessProto or a NOT_FOUND error
+    rpc GetPartyActivityProcess (PartyActivityProcessIdProto) returns (PartyActivityProcessProto);
+
+    // Delete a partyActivityProcess from it's id.
+    // request : the id of the partyActivityProcessProto to delete
+    // response : empty or a NOT_FOUND error
+    rpc DeletePartyActivityProcess (PartyActivityProcessIdProto) returns (google.protobuf.Empty);
+
+    // Import partyActivityProcesses.
+    // request : ImportProto
+    // response : empty
+    rpc ImportPartyActivityProcesses (util.ImportProto) returns (google.protobuf.Empty);
+
+    // Export partyActivityProcesses.
+    // request : empty
+    // response : CarboneResponseDataProto
+    rpc ExportPartyActivityProcesses (google.protobuf.Empty) returns (util.CarboneResponseDataProto);
+}
+
+
+message PartyActivityProcessProto {
+    enum DocStatusProto {
+        DRAFT = 0;
+        APPROVING = 1;
+        REJECT_APPROVAL = 2;
+        RECEIVING = 3;
+        REJECT_SUBMISSION = 4;
+        DONE = 5;
+    }
+
+    oneof id_oneof {
+        string id = 1 ;
+    }
+    google.protobuf.Timestamp send_date = 2 ;
+
+    oneof party_unit_created_by_oneof {
+        string party_unit_created_by = 3 [(buf.validate.field).string = { max_len :50}];
+    }
+    oneof is_active_oneof {
+        int32 is_active = 4 ;
+    }
+    oneof manager_id_oneof {
+        string manager_id = 5 [(buf.validate.field).string = { max_len :50}];
+    }
+    oneof from_party_unit_id_oneof {
+        string from_party_unit_id = 6 [(buf.validate.field).string = { max_len :50}];
+    }
+    google.protobuf.Timestamp leaving_date = 7 ;
+
+    oneof to_party_unit_id_oneof {
+        string to_party_unit_id = 8 [(buf.validate.field).string = { max_len :50}];
+    }
+    oneof to_party_committee_id_oneof {
+        string to_party_committee_id = 9 [(buf.validate.field).string = { max_len :50}];
+    }
+    google.protobuf.Timestamp arrived_date = 10 ;
+
+    google.protobuf.Timestamp approval_date = 11 ;
+
+    google.protobuf.Timestamp official_end_date = 12 ;
+
+    google.protobuf.Timestamp end_date = 13 ;
+
+    google.protobuf.Timestamp to_sign_date = 14 ;
+
+    oneof reason_moving_oneof {
+        string reason_moving = 15 [(buf.validate.field).string = { max_len :256}];
+    }
+    oneof is_official_oneof {
+        int32 is_official = 16 ;
+    }
+    oneof moving_type_oneof {
+        int32 moving_type = 17 ;
+    }
+    oneof moving_period_oneof {
+        string moving_period = 18 [(buf.validate.field).string = { max_len :50}];
+    }
+    oneof extend_period_oneof {
+        string extend_period = 19 [(buf.validate.field).string = { max_len :50}];
+    }
+    oneof new_end_date_oneof {
+        string new_end_date = 20 [(buf.validate.field).string = { max_len :8}];
+    }
+    google.protobuf.Timestamp party_fee_paid_to = 21 ;
+
+    oneof doc_status_oneof {
+        DocStatusProto doc_status = 22 ;
+    }
+    oneof process_party_id_oneof {
+        string process_party_id = 23 [(buf.validate.field).string = { max_len :50}];
+    }
+    oneof to_country_oneof {
+        string to_country = 24 [(buf.validate.field).string = { max_len :50}];
+    }
+    oneof to_working_address_oneof {
+        string to_working_address = 25 [(buf.validate.field).string = { max_len :255}];
+    }
+    oneof to_phone_number_oneof {
+        string to_phone_number = 26 [(buf.validate.field).string = { max_len :255}];
+    }
+    oneof to_living_address_oneof {
+        string to_living_address = 27 [(buf.validate.field).string = { max_len :255}];
+    }
+    oneof attach_id_oneof {
+        string attach_id = 28 [(buf.validate.field).string = { max_len :2000}];
+    }
+    oneof party_member_type_oneof {
+        int32 party_member_type = 29 ;
+    }
+    oneof current_party_unit_id_oneof {
+        string current_party_unit_id = 30 [(buf.validate.field).string = { max_len :255}];
+    }
+    oneof approval_party_committee_id_oneof {
+        string approval_party_committee_id = 31 [(buf.validate.field).string = { max_len :255}];
+    }
+    oneof authority_type_oneof {
+        int32 authority_type = 32 ;
+    }
+    oneof approval_party_committee_address_oneof {
+        string approval_party_committee_address = 33 [(buf.validate.field).string = { max_len :2000}];
+    }
+    oneof approval_party_committee_level_oneof {
+        string approval_party_committee_level = 34 [(buf.validate.field).string = { max_len :2000}];
+    }
+    oneof party_member_id_oneof {
+        string party_member_id = 35;
+    }
+}
+
+message PartyActivityProcessIdProto {
+    string id = 1;
+}
+message PartyActivityProcessPageRequestAndFilters {
+    enum DocStatusProto {
+        DRAFT = 0;
+        APPROVING = 1;
+        REJECT_APPROVAL = 2;
+        RECEIVING = 3;
+        REJECT_SUBMISSION = 4;
+        DONE = 5;
+    }
+
+    oneof id_oneof {
+        string id = 1 ;
+    }
+    google.protobuf.Timestamp send_date = 2 ;
+
+    oneof party_unit_created_by_oneof {
+        string party_unit_created_by = 3 [(buf.validate.field).string = { max_len :50}];
+    }
+    oneof is_active_oneof {
+        int32 is_active = 4 ;
+    }
+    oneof manager_id_oneof {
+        string manager_id = 5 [(buf.validate.field).string = { max_len :50}];
+    }
+    oneof from_party_unit_id_oneof {
+        string from_party_unit_id = 6 [(buf.validate.field).string = { max_len :50}];
+    }
+    google.protobuf.Timestamp leaving_date = 7 ;
+
+    oneof to_party_unit_id_oneof {
+        string to_party_unit_id = 8 [(buf.validate.field).string = { max_len :50}];
+    }
+    oneof to_party_committee_id_oneof {
+        string to_party_committee_id = 9 [(buf.validate.field).string = { max_len :50}];
+    }
+    google.protobuf.Timestamp arrived_date = 10 ;
+
+    google.protobuf.Timestamp approval_date = 11 ;
+
+    google.protobuf.Timestamp official_end_date = 12 ;
+
+    google.protobuf.Timestamp end_date = 13 ;
+
+    google.protobuf.Timestamp to_sign_date = 14 ;
+
+    oneof reason_moving_oneof {
+        string reason_moving = 15 [(buf.validate.field).string = { max_len :256}];
+    }
+    oneof is_official_oneof {
+        int32 is_official = 16 ;
+    }
+    oneof moving_type_oneof {
+        int32 moving_type = 17 ;
+    }
+    oneof moving_period_oneof {
+        string moving_period = 18 [(buf.validate.field).string = { max_len :50}];
+    }
+    oneof extend_period_oneof {
+        string extend_period = 19 [(buf.validate.field).string = { max_len :50}];
+    }
+    oneof new_end_date_oneof {
+        string new_end_date = 20 [(buf.validate.field).string = { max_len :8}];
+    }
+    google.protobuf.Timestamp party_fee_paid_to = 21 ;
+
+    oneof doc_status_oneof {
+        DocStatusProto doc_status = 22 ;
+    }
+    oneof process_party_id_oneof {
+        string process_party_id = 23 [(buf.validate.field).string = { max_len :50}];
+    }
+    oneof to_country_oneof {
+        string to_country = 24 [(buf.validate.field).string = { max_len :50}];
+    }
+    oneof to_working_address_oneof {
+        string to_working_address = 25 [(buf.validate.field).string = { max_len :255}];
+    }
+    oneof to_phone_number_oneof {
+        string to_phone_number = 26 [(buf.validate.field).string = { max_len :255}];
+    }
+    oneof to_living_address_oneof {
+        string to_living_address = 27 [(buf.validate.field).string = { max_len :255}];
+    }
+    oneof attach_id_oneof {
+        string attach_id = 28 [(buf.validate.field).string = { max_len :2000}];
+    }
+    oneof party_member_type_oneof {
+        int32 party_member_type = 29 ;
+    }
+    oneof current_party_unit_id_oneof {
+        string current_party_unit_id = 30 [(buf.validate.field).string = { max_len :255}];
+    }
+    oneof approval_party_committee_id_oneof {
+        string approval_party_committee_id = 31 [(buf.validate.field).string = { max_len :255}];
+    }
+    oneof authority_type_oneof {
+        int32 authority_type = 32 ;
+    }
+    oneof approval_party_committee_address_oneof {
+        string approval_party_committee_address = 33 [(buf.validate.field).string = { max_len :2000}];
+    }
+    oneof approval_party_committee_level_oneof {
+        string approval_party_committee_level = 34 [(buf.validate.field).string = { max_len :2000}];
+    }
+    oneof party_member_id_oneof {
+        string party_member_id = 35;
+    }
+    oneof distinct_oneof {
+        bool distinct = 36;
+    }
+    int32 page = 37;
+    int32 size = 38;
+    repeated util.Order orders = 39;
+}
+

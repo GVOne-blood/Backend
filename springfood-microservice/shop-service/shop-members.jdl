@@ -1,0 +1,17 @@
+entity ShopMember {
+  @Id shopMemberId String maxlength(50) required
+  shopId String maxlength(50)
+  userId String maxlength(50)
+  roleName String maxlength(255)
+  createdAt Instant
+  updatedAt Instant
+  department String maxlength(50)
+  joinDate String maxlength(50)
+  status String maxlength(50)
+  endDate String maxlength(50)
+  workSchedule String maxlength(255)
+  salaryType String maxlength(50)
+  baseSalary BigDecimal
+  commission BigDecimal
+}
+

@@ -8,9 +8,9 @@ spring:
     name: product-service
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/product_service
-    username: postgres
-    password: 123456
+    url: ${DEFAULT_DATABASE_URL}
+    username: ${DEFAULT_DATABASE_USERNAME}
+    password: ${DEFAULT_DATABASE_PASSWORD}
   jpa:
     hibernate:
       ddl-auto: update
@@ -29,7 +29,7 @@ spring:
     shared:
       host: localhost
       port: 6379
-      password: 123456
+      password: ${DEFAULT_DATABASE_PASSWORD}
       timeout: 3000ms
       lettuce:
         pool:
@@ -78,7 +78,7 @@ grpc:
     port: 9095
   client:
     shop-service:
-      address: 'static://localhost:9093'
+      address: 'static://localhost:9090'
       negotiation-type: plaintext
 
 minio:

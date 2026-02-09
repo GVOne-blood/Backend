@@ -1,0 +1,91 @@
+syntax = "proto3";
+
+package com.viettel.client.authorization;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+import "authorization/author-common.proto";
+import "authorization/tenant.proto";
+
+option java_multiple_files = true;
+option java_package = "com.viettel.client.authorization";
+option java_outer_classname = "AuthorServicePolicy";
+
+service PolicyService {
+  rpc createPolicyRoleUser (PolicyGrpcDTO) returns (PolicyGrpcDTO) {
+  }
+
+  rpc updatePolicy (PolicyGrpcDTO) returns (PolicyGrpcDTO) {
+  }
+
+  rpc doSearch (SearchParamGrpc) returns (PolicySearchResultGrpc) {
+  }
+
+  rpc deletePolicy (CustomPojoRetrieverGrpc) returns (google.protobuf.Empty) {
+  }
+
+  rpc deletePolicyListId (CustomPojoRetrieverGrpc) returns (google.protobuf.Empty) {
+  }
+
+  rpc verifyToDelete (CustomPojoRetrieverGrpc) returns (PolicyVerifyToDeleteResultGrpc) {
+  }
+
+  rpc changeStatePolicy (PolicyGrpcDTO) returns (google.protobuf.Empty) {
+  }
+
+  rpc getByIdPolicy (CustomPojoRetrieverGrpc) returns (PolicyGrpcDTO) {
+  }
+}
+
+message PolicyGrpcDTO {
+  optional string id = 1;
+  optional string policyName = 2;
+  optional string policyCode = 3;
+  optional string description = 4;
+  optional string policyType = 5;
+  optional int32 processingLogic = 6;
+  optional string decidingLogic = 7;
+  optional string policyKey = 8;
+  optional string operator = 9;
+  optional string regexPattern = 10;
+  optional string value = 11;
+  optional int32 status = 12;
+  optional google.protobuf.Timestamp startTime = 13;
+  optional google.protobuf.Timestamp endTime = 14;
+  optional string createdBy = 15;
+  optional google.protobuf.Timestamp createdDate = 16;
+  optional string lastModifiedBy = 17;
+  optional google.protobuf.Timestamp lastModifiedDate = 18;
+  repeated PolicyGrpcDTO children = 19;
+  repeated TenantGrpcDTO tenants = 20;
+  optional int32 page = 21;
+  optional int32 size = 22;
+  optional string sort = 23;
+  optional string keyword = 24;
+}
+
+message PolicySuccessReplyGrpc {
+  optional int32 code = 1;
+  optional string message = 2;
+  optional PolicyGrpcDTO detail = 3;
+}
+
+message PolicySearchResultGrpc {
+  repeated PolicyGrpcDTO data = 1;
+  optional int32 total = 2;
+  optional int32 activeTotal = 3;
+  optional int32 inactiveTotal = 4;
+}
+
+message PolicyVerifyToDeleteResultGrpc {
+  repeated string canDelete = 1;
+  repeated ItemMessageErrorGrpc notDelete = 2;
+}
+
+message PolicyVerifyToDeleteReplyGrpc {
+  optional int32 code = 1;
+  optional string message = 2;
+  optional PolicyVerifyToDeleteResultGrpc detail = 3;
+}
+
+

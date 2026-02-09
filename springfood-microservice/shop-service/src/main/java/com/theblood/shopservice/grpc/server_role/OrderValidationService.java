@@ -1,13 +1,13 @@
 package com.theblood.shopservice.grpc.server_role;
 
 import com.theblood.common.exception.custom.InvalidDataException;
+import com.theblood.common.grpc.ShopServiceGrpc;
+import com.theblood.common.grpc.ShopValidationRequest;
+import com.theblood.common.grpc.ShopValidationResponse;
 import com.theblood.shopservice.common.enums.ShopStatus;
-import com.theblood.shopservice.grpc.ShopServiceGrpc;
-import com.theblood.shopservice.grpc.ShopValidationRequest;
-import com.theblood.shopservice.grpc.ShopValidationResponse;
-import com.theblood.shopservice.model.Shop;
-import com.theblood.shopservice.repository.ShopMemberRepository;
+import com.theblood.shopservice.domain.Shop;
 import com.theblood.shopservice.repository.ShopRepository;
+import com.theblood.shopservice.repository.ShopMemberRepository;
 import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

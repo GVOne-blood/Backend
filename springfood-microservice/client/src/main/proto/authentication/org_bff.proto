@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package com.viettel.client.authentication;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+import "google/protobuf/any.proto";
+import "google/protobuf/empty.proto";
+
+import "authentication/common.proto";
+
+option java_multiple_files = true;
+option java_package = "com.viettel.client.authentication";
+
+service OrgBffService {
+  rpc getChildren (GetChildrenReq) returns (GetChildrenResp) {
+  }
+
+}
+
+message GetChildrenReq {
+  optional int64 shopId = 1;
+  optional int32 status = 2;
+}
+
+message GetChildrenResp {
+  repeated int64 childrenIds = 1;
+}

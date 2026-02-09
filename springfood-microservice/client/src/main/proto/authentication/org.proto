@@ -1,0 +1,258 @@
+syntax = "proto3";
+
+package com.viettel.client.authentication;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+import "google/protobuf/any.proto";
+import "google/protobuf/empty.proto";
+
+import "authentication/common.proto";
+import "authentication/sysuser.proto";
+import "authentication/role.proto";
+
+option java_multiple_files = true;
+option java_package = "com.viettel.client.authentication";
+
+service OrgService {
+  rpc createOrg (OrgDTO) returns (OrgDTO) {
+  }
+
+  rpc updateOrg (UpdateOrgReq) returns (OrgDTO) {
+  }
+
+  rpc getByIdOrg (OrgId) returns (OrgDTO) {
+  }
+  rpc getById (OrgId) returns (OrgDTO) {
+  }
+
+  rpc getByCodes (OrgCodes) returns (OrgDTOList) {
+  }
+  //  TODO: modify response to list wrapper
+  rpc getListOrgById (GetListOrgByIdReq) returns (GetListOrgByIdResp) {
+  }
+
+  rpc getListOrgByOrgType (GetListOrgByOrgTypeReq) returns (OrgDTOList) {
+  }
+
+  rpc deleteOrg (OrgId) returns (google.protobuf.Empty) {
+  }
+
+  // deprecated
+  rpc changedStatus (OrgId) returns (google.protobuf.Any) {
+  }
+
+  rpc search (PageableSearchOrgReq) returns (PageableOrgDTO) {
+  }
+  rpc getByType (OrgType) returns (OrgDTOList) {
+  }
+  rpc deleteOrgList (SearchOrgDTO) returns (google.protobuf.Empty) {
+  }
+
+  // Validate before delete multiple org
+  // TODO: modified response
+  rpc validateDelete (SearchOrgDTO) returns (ValidationMessage) {
+  }
+
+  rpc addAvailableSubunits (SearchOrgDTO) returns (MsgResponse) {
+  }
+
+  // TODO: modify response to list wrapper
+  rpc viewTree (SearchOrgReq) returns (ViewTreeResp) {
+  }
+
+  rpc getChildren (OrgPageableSearchReq) returns (PageableOrgDTO) {
+  }
+
+  rpc getUserOrg (OrgPageableSearchReq) returns (PageableAccountDTO) {
+  }
+
+  rpc getAllOrgUsers (GetByIdsReq) returns (AccountDTOList);
+
+  rpc getRoleUnit (OrgPageableSearchReq) returns (PageableRoleDTO) {
+  }
+
+  // TODO: modify response to list wrapper
+  rpc addOrgRole (AddOrgRoleReq) returns (RoleDTOList) {
+  }
+
+  // TODO: modify response to list wrapper
+  rpc deleteOrgRole (DeleteOrgRoleReq) returns (RoleDTOList) {
+  }
+
+  // TODO: response in json
+  rpc getAllOrgExcel (OrgPageableSearchReq) returns (google.protobuf.Any) {
+  }
+
+  rpc addUser (UserOfOrgDto) returns (AccountDTO) {
+  }
+
+  rpc deleteUser (DeleteUserReq) returns (AccountDTO) {
+  }
+
+  // TODO: modify response to list wrapper
+  rpc deleteListUser (AccountDTO) returns (AccountDTOList) {
+  }
+
+  // TODO: response in json
+  rpc downloadTemplate (google.protobuf.Empty) returns (DownloadTemplateResp) {
+  }
+
+  // TODO: response in json
+  rpc importAllAccounts (ImportAllAccountsReq) returns (google.protobuf.Any) {
+  }
+
+  rpc getMappingOrgByListCode (GetMappingOrgByListCodeReq) returns (GetMappingOrgByListCodeResp) {
+  }
+  rpc getOrgInfoByIOfficeOrg (OrgIOfficeReq) returns (OrgDTOList) {
+  }
+  rpc syncIOfficeLocation(google.protobuf.Empty) returns (IOfficeLocationDTOList) {}
+
+  rpc getListIdsByParentOrgId(OrgId) returns (GetByParentOrgIdResp) {}
+  rpc getListIdsByIsCenter(GetListIdsByIsCenterReq) returns (GetByParentOrgIdResp) {}
+  rpc listAllOrgByIds(GetListOrgById) returns (OrgDTOList){}
+  rpc listAllOrgCityCode(OrgCityCode) returns (OrgDTOList){}
+}
+
+message GetListOrgById {
+  repeated string listId = 1;
+}
+
+message OrgId {
+  optional string id = 1;
+}
+
+message OrgCodes {
+  repeated string code = 1;
+}
+
+message OrgType {
+  optional string type = 1;
+}
+message OrgIOfficeReq{
+  repeated string ids = 1;
+}
+
+message UpdateOrgReq {
+  optional string id = 1;
+  optional OrgDTO orgDTO = 2;
+}
+
+message GetListOrgByIdReq {
+  repeated string listId = 1;
+}
+
+message GetListOrgByOrgTypeReq {
+  repeated string listType = 1;
+}
+
+message GetListOrgByIdResp {
+  map<string, string> orgMap = 1;
+}
+
+message PageableOrgDTO {
+  repeated OrgDTO data = 1;
+  optional int64 total = 2;
+  optional int64 activeTotal = 3;
+  optional int64 inactiveTotal = 4;
+  optional int64 deletedTotal = 5;
+  optional int64 searchTotal = 6;
+}
+
+message SearchOrgDTO {
+  //  @@
+  optional string type = 1;
+  optional string orgCode = 2;
+  optional string orgName = 3;
+  optional string parents = 4;
+  optional string children = 5;
+  repeated string listId = 6;
+}
+
+message SearchOrgReq {
+  optional string keyword = 1;
+  optional int32 active = 2;
+  optional int32 deleted = 3;
+  optional int32 status = 4;
+  optional string parentId = 5;
+}
+
+message PageableSearchOrgReq {
+  SearchOrgReq search = 1;
+  PageRequest page = 2;
+}
+
+message ViewTreeResp {
+  repeated OrgTree data = 1;
+}
+
+message OrgPageableSearchReq {
+  SearchRequest search = 1;
+  PageRequest page = 2;
+  optional string id = 3;
+  optional string conferenceId = 4;
+}
+
+message AddOrgRoleReq {
+  message AddOrgRoleReqBody {
+    repeated string id = 1;
+  }
+  optional string shopId = 1;
+  optional AddOrgRoleReqBody body = 2;
+}
+
+message RoleDTOList {
+  repeated RoleDTO data = 1;
+}
+
+message DeleteOrgRoleReq {
+  optional string shopId = 1;
+  RoleDTO roleDTO = 2;
+}
+
+message UserOfOrgDto {
+  string isUserExisted = 1;
+  string userModify = 2;
+  CreateAccountDTO createAccountDTO = 3;
+}
+
+message DeleteUserReq {
+  optional string userId = 1;
+  optional string userModify = 2;
+}
+
+message ImportAllAccountsReq {
+  optional string key = 1;
+}
+
+message GetMappingOrgByListCodeReq {
+  repeated string listCode = 1;
+}
+
+message GetMappingOrgByListCodeResp {
+  message CodeResp {
+    map<string, string> code = 1;
+  }
+  repeated CodeResp data = 1;
+}
+
+message DownloadTemplateResp {
+  string fileLink = 1;
+}
+
+message GetByIdsReq {
+  repeated string ids = 1;
+}
+
+message GetByParentOrgIdResp {
+  repeated string id = 1;
+}
+
+message GetListIdsByIsCenterReq {
+  optional int32 isCenter = 1;
+  optional string id = 2;
+}
+
+message OrgCityCode {
+  optional string cityCode = 1;
+}

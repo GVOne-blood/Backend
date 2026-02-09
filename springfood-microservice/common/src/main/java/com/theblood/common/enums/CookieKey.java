@@ -1,5 +1,19 @@
 package com.theblood.common.enums;
 
 public enum CookieKey {
-    ACCESS_TOKEN, REFRESH_TOKEN
+    ACCESS_TOKEN("X-Authorization"),
+    REFRESH_TOKEN("X-F5");
+
+    private String header;
+
+    CookieKey() {
+    }
+
+    ;
+
+    CookieKey(String code) {
+        this.header = code;
+    }
+
+
 }

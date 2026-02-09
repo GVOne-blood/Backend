@@ -1,0 +1,27 @@
+# MinIO Configuration Example (YAML format)
+# Copy these properties to your application.yml
+
+minio:
+  # Required properties
+  endpoint: http://localhost:9000
+  access-key: minioadmin
+  secret-key: minioadmin
+  bucket: my-bucket
+  
+  # Optional properties (with default values)
+  secure: false
+  connect-timeout: 10000
+  write-timeout: 60000
+  read-timeout: 10000
+  auto-create-bucket: true
+  
+  # Part size for multipart upload (100MB in bytes)
+  # MinIO uses parallel/multi-threaded upload for large files
+  part-size: 104857600  # 100MB
+  
+  # Base URL for file access (optional)
+  # Use this when MinIO is behind proxy/CDN
+  # base-url: https://cdn.yourdomain.com
+  
+  # Disable MinIO auto-configuration if needed
+  # enabled: false

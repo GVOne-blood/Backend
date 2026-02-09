@@ -1,0 +1,115 @@
+{
+  "annotations": {
+    "changelogDate": "20260204095349"
+  },
+  "applications": "*",
+  "clientRootFolder": "chat",
+  "databaseType": "sql",
+  "documentation": "ConversationParticipant - Users in conversations",
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "participantId",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"],
+      "options": {
+        "id": true
+      }
+    },
+    {
+      "fieldName": "userId",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "displayName",
+      "fieldType": "String",
+      "fieldValidateRules": ["maxlength"],
+      "fieldValidateRulesMaxlength": "100"
+    },
+    {
+      "fieldName": "avatarUrl",
+      "fieldType": "String",
+      "fieldValidateRules": ["maxlength"],
+      "fieldValidateRulesMaxlength": "500"
+    },
+    {
+      "documentation": "Role: OWNER, ADMIN, MEMBER",
+      "fieldName": "role",
+      "fieldType": "String",
+      "fieldValidateRules": ["maxlength", "required"],
+      "fieldValidateRulesMaxlength": "20"
+    },
+    {
+      "documentation": "Status: ACTIVE, LEFT, REMOVED, MUTED",
+      "fieldName": "status",
+      "fieldType": "String",
+      "fieldValidateRules": ["maxlength", "required"],
+      "fieldValidateRulesMaxlength": "20"
+    },
+    {
+      "fieldName": "nickname",
+      "fieldType": "String",
+      "fieldValidateRules": ["maxlength"],
+      "fieldValidateRulesMaxlength": "50"
+    },
+    {
+      "fieldName": "lastReadMessageId",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "lastReadAt",
+      "fieldType": "Instant"
+    },
+    {
+      "fieldName": "unreadCount",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "isMuted",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "muteUntil",
+      "fieldType": "Instant"
+    },
+    {
+      "fieldName": "isPinned",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "pinnedAt",
+      "fieldType": "Instant"
+    },
+    {
+      "fieldName": "joinedAt",
+      "fieldType": "Instant",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "leftAt",
+      "fieldType": "Instant"
+    },
+    {
+      "fieldName": "addedBy",
+      "fieldType": "String",
+      "fieldValidateRules": ["maxlength"],
+      "fieldValidateRulesMaxlength": "100"
+    }
+  ],
+  "microserviceName": "chat",
+  "name": "ConversationParticipant",
+  "pagination": "pagination",
+  "relationships": [
+    {
+      "otherEntityName": "conversation",
+      "otherEntityRelationshipName": "participants",
+      "relationshipName": "conversation",
+      "relationshipSide": "right",
+      "relationshipType": "many-to-one",
+      "relationshipValidateRules": "required"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "serviceClass"
+}

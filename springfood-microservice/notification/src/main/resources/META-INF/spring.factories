@@ -1,0 +1,8 @@
+org.springframework.context.ApplicationContextInitializer=\
+com.theblood.notification.config.DotenvConfig
+
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+com.theblood.springfood.client.autoconf.ClientConfiguration,\
+com.theblood.springfood.client.autoconf.UserContextHttpConfiguration,\
+com.theblood.springfood.client.autoconf.feign.FeignClientAutoConfiguration
+

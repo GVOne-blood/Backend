@@ -1,0 +1,399 @@
+syntax = "proto3";
+
+package com.viettel.client.authentication;
+
+import "google/protobuf/timestamp.proto";
+
+option java_multiple_files = true;
+option java_package = "com.viettel.client.authentication";
+
+message MsgResponse {
+  optional string message = 1;
+  optional string detail = 2;
+}
+
+message ValidationMessage {
+  repeated int64 canDelete = 1;
+  repeated ItemMessageError notDelete = 2;
+}
+
+message ItemMessageError {
+  optional string id = 1;
+  optional string name = 2;
+  optional string message = 3;
+}
+
+message SearchRequest {
+  optional string keyword = 1;
+  optional int32 active = 2;
+  optional int32 deleted = 3;
+  optional int32 status = 4;
+}
+
+message PageRequest {
+  optional int32 page = 1;
+  optional int32 size = 2;
+  optional string sort = 3;
+}
+
+message PageableSearchRequest {
+  SearchRequest search = 1;
+  PageRequest page = 2;
+}
+
+message AccountRoleRequest {
+  optional int32 shopId = 1;
+  optional string roleOption = 2;
+}
+message AccountOrgRequest {
+  optional string shopId = 1;
+}
+message AccountSecretaryRequest {
+  optional int64 accountId = 1;
+}
+
+message AccountExpertRequest{
+  optional int32 shopId = 1;
+  optional string keyword = 2 ;
+}
+
+message DictItemGrpcDTO {
+  optional string dict_item_id = 1;
+  optional string modified_by = 2;
+  optional google.protobuf.Timestamp create_date = 3;
+  optional google.protobuf.Timestamp modified_date = 4;
+  optional string item_code = 5;
+  optional string item_name = 6;
+  optional string item_description = 7;
+  optional string item_parent_id = 8;
+  optional int32 is_active = 9;
+  optional int32 level = 10;
+}
+
+message AccountDTO {
+  optional string accountId = 1;
+
+  optional string approvalStatus = 2 ;
+
+  optional int32 failedLoginAttempts = 3;
+
+  optional google.protobuf.Timestamp lastLoginAt = 4;
+
+  optional string identityNo = 5;
+
+  optional string userName = 6;
+
+  optional string phoneNumber = 7;
+
+  optional int32 vneid = 8;
+
+  optional int32 signupAccountType = 9;
+
+  optional int32 activeFaceId = 10;
+
+  optional int32 isActive = 11;
+
+  optional string shopId = 12;
+
+  optional string partyMemberId = 13;
+
+  optional string userLevelGroup = 14;
+
+  optional bool isAdmin = 15;
+}
+
+message CreateAccountDTO {
+  optional string accountId = 1;
+
+  optional string approvalStatus = 2 ;
+
+  optional int32 failedLoginAttempts = 3;
+
+  optional google.protobuf.Timestamp lastLoginAt = 4;
+
+  optional string identityNo = 5;
+
+  optional string phoneNumber = 6;
+
+  optional int32 vneid = 7;
+
+  optional int32 signupAccountType = 8;
+
+  optional int32 activeFaceId = 9;
+
+  optional int32 isActive = 10;
+
+  optional string password = 11;
+}
+
+message AccountApprovalDTO {
+  optional string accountId = 1;
+  optional string approvalStatus = 2;
+  optional string approvedBy = 3;
+  optional google.protobuf.Timestamp approvedAt = 4;
+  optional string rejectReason = 5;
+  optional string shopId = 6;
+}
+
+message OrgDTO {
+  optional string id = 1;
+  optional string orgName = 2;
+  optional string orgCode = 3;
+  optional string orgType = 4;
+  optional string address = 5;
+  optional string parentOrgId = 6;
+  optional string parentCode = 7;
+  optional string nationId = 8;
+  optional string cityId = 9;
+  optional string dictItemId = 10;
+  optional int64 levels = 11;
+  optional string description = 12;
+  optional string nameR = 13;
+  optional int64 isCheck = 14;
+  optional string cityCode = 15;
+  optional string cityName = 16;
+  optional string fullName = 17;
+  optional string paramConfig = 18;
+  optional string idNew = 19;
+  optional int64 isLock = 20;
+  optional int64 isActive = 21;
+  optional string orgCreatedId = 22;
+  optional string manageId = 23;
+  optional string createdBy = 24;
+  optional string modifiedBy = 25;
+  optional google.protobuf.Timestamp fromDate = 26;
+  optional google.protobuf.Timestamp toDate = 27;
+  optional OrgDTO parent = 28;
+  optional int32 childrenCount = 29;
+  optional string fullNameDisplay = 30;
+  optional int64 userCount = 31;
+  optional string isCheckLabel = 32;
+  optional string parentName = 33;
+  optional string nationName = 34;
+  optional string managerId = 35;
+  optional string organizationPath = 36;
+}
+message OrgDTOList {
+  repeated OrgDTO data = 1;
+}
+
+
+message AuthenticationDTO {
+  optional string id = 1;
+  optional string userName = 2;
+  optional string fullName = 3;
+  optional string email = 4;
+  optional int32 isActivate = 5;
+  optional string phoneNumber = 6;
+  optional string jobTitle = 7;
+  optional string orgCode = 8;
+  repeated string roles = 9;
+  optional string shopId = 10;
+  repeated string roleIds = 11;
+}
+message BooleanMessage {
+  bool result = 1;
+}
+
+message FirstLoginDTO {
+  optional string token = 1;
+  optional AccountDTO user = 2;
+  optional string permission = 3;
+  optional string menu = 4;
+  optional bool remindChangePassWord = 5;
+}
+
+message FirstLoginAccountDTO {
+  optional string token = 1;
+  optional string refreshToken = 2;
+  optional AccountDTO account = 3;
+  optional string permission = 4;
+  optional string menu = 5;
+  optional bool remindChangePassWord = 6;
+  optional string otpSignature = 7;
+  optional bool isAdmin = 8;
+}
+
+message ValidationConfigDTO {
+  // ConfigDTO
+  optional string id = 1;
+  optional int32 tenantId = 2;
+  optional string createdBy = 3;
+  optional google.protobuf.Timestamp createdDate = 4;
+  optional string lastModifiedBy = 5;
+  optional google.protobuf.Timestamp lastModifiedDate = 6;
+
+  // AuthenDTO
+  optional int32 minLength = 7;
+  optional int32 maxLength = 8;
+  optional int32 upperLetter = 9;
+  optional int32 lowerLetter = 10;
+  optional int32 number = 11;
+  optional int32 symbol = 12;
+}
+
+message SmsConfigDTO {
+  // ConfigDTO
+  optional string id = 1;
+  optional int32 tenantId = 2;
+  optional string createdBy = 3;
+  optional google.protobuf.Timestamp createdDate = 4;
+  optional string lastModifiedBy = 5;
+  optional google.protobuf.Timestamp lastModifiedDate = 6;
+
+  // SmsConfigDTO
+  optional string endpoint = 7;
+  optional string smsUserName = 8;
+  optional string smsPassword = 9;
+  optional string cpCode = 10;
+  optional int32 serviceId = 11;
+  optional string commandCode = 12;
+}
+
+message SignupConfigDTO {
+  // ConfigDTO
+  optional string id = 1;
+  optional int32 tenantId = 2;
+  optional string createdBy = 3;
+  optional google.protobuf.Timestamp createdDate = 4;
+  optional string lastModifiedBy = 5;
+  optional google.protobuf.Timestamp lastModifiedDate = 6;
+
+  // SignupConfigDTO
+  optional bool status = 7;
+  optional bool recaptcha = 8;
+  optional bool approve = 9;
+  optional bool phoneStatus = 10;
+  optional bool emailStatus = 11;
+  optional int64 activeTime = 12;
+  optional int32 activeTimeUnit = 13;
+}
+
+message PassConfigDTO {
+  // ConfigDTO
+  optional string id = 1;
+  optional int32 tenantId = 2;
+  optional string createdBy = 3;
+  optional google.protobuf.Timestamp createdDate = 4;
+  optional string lastModifiedBy = 5;
+  optional google.protobuf.Timestamp lastModifiedDate = 6;
+
+  // AuthenDTO
+  optional int32 minLength = 7;
+  optional int32 maxLength = 8;
+  optional int32 upperLetter = 9;
+  optional int32 lowerLetter = 10;
+  optional int32 number = 11;
+  optional int32 symbol = 12;
+
+  // PassConfigDTO
+  optional int32 expPassStatus = 13;
+  optional int32 expPassTime = 14;
+  optional int32 timeRequireChange = 15;
+  optional string sendVia = 16;
+  optional string methodSendPassUserManagement = 17;
+  optional string sendAdminVia = 18;
+  optional string sendViaWhenLocked = 19;
+  optional string firstRemindTime = 20;
+  optional int32 fredSend = 21;
+  optional int32 wrongPassStatus = 22;
+  optional int32 sendAdminStatus = 23;
+  optional int32 lockWrongPassCount = 24;
+  optional int64 timeLock = 25;
+  optional int32 timeLockUnit = 26;
+  optional int32 captchaWrongPassStatus = 27;
+  optional int32 captchaWrongPassCount = 28;
+  optional int32 alertWrongPassCount = 29;
+  optional int32 wrongPassTime = 30;
+}
+
+message LoginConfigDTO {
+  // ConfigDTO
+  optional string id = 1;
+  optional int32 tenantId = 2;
+  optional string createdBy = 3;
+  optional google.protobuf.Timestamp createdDate = 4;
+  optional string lastModifiedBy = 5;
+  optional google.protobuf.Timestamp lastModifiedDate = 6;
+
+  // LoginConfigDTO
+  optional bool passStatus = 7;
+  optional bool phoneStatus = 8;
+  optional bool usbTokenStatus = 9;
+  optional string signType = 10;
+  optional string sendViaWhenForgetPassword = 11;
+  optional bool rmbPass = 12;
+  optional bool recaptcha = 13;
+  optional bool passPhoneStatus = 14;
+  optional bool passEmailStatus = 15;
+  optional int64 activeTime = 16;
+  optional int32 activeTimeUnit = 17;
+  optional int64 loginTimeOut = 18;
+  optional int32 loginTimeOutUnit = 19;
+  optional int64 rememberLoginTimeOut = 20;
+  optional int32 rememberLoginTimeOutUnit = 21;
+}
+
+message EmailConfigDTO {
+  // ConfigDTO
+  optional string id = 1;
+  optional int32 tenantId = 2;
+  optional string createdBy = 3;
+  optional google.protobuf.Timestamp createdDate = 4;
+  optional string lastModifiedBy = 5;
+  optional google.protobuf.Timestamp lastModifiedDate = 6;
+
+  // EmailConfigDTO
+  optional string smtpServer = 7;
+  optional string smtpPort = 8;
+  optional string smtpUserName = 9;
+  optional string smtpPassword = 10;
+  optional bool isActive = 11;
+}
+
+message JobTitleDTO {
+  optional string id = 1;
+  optional string code = 2;
+  optional string name = 3;
+  optional string description = 4;
+  optional string order = 5;
+  optional int32 status = 6;
+  optional int32 tenantId = 7;
+}
+
+message RoleDTO {
+  optional string id = 1;
+  optional string roleName = 2;
+  optional string roleCode = 3;
+  optional int32 status = 4;
+  optional string description = 5;
+  optional string shopId = 6;
+  repeated string listId = 7;
+  optional string manageDepartment = 8;
+  optional int64 numberOfUser = 9;
+  repeated string roleLevel = 10;
+  optional int32 isLock = 11;
+  optional int32 isAdmin = 12;
+}
+
+message OrgTree {
+  string id = 1;
+  string orgName = 2;
+  string orgCode = 3;
+  int32 status = 4;
+  repeated OrgTree children = 5;
+  optional AccountDTO manager = 6;
+}
+message IOfficeLocationDTO{
+  string id = 1;
+  string name = 2;
+  string autoApproved = 3;
+}
+message IOfficeLocationDTOList{
+  repeated IOfficeLocationDTO data = 1;
+}
+
+message AuthTokenDTO {
+  optional string token = 1;
+  optional google.protobuf.Timestamp expiration = 2;
+}

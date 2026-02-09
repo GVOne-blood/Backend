@@ -2,9 +2,9 @@ package com.theblood.productservice.mapper;
 
 import com.theblood.common.dto.kafka.ProductValidationRequest;
 import com.theblood.common.dto.response.ProductDetail;
+import com.theblood.productservice.domain.Product;
 import com.theblood.productservice.dto.request.ItemRequest;
 import com.theblood.productservice.dto.request.ProductRequest;
-import com.theblood.productservice.model.Product;
 import com.theblood.productservice.repository.projection.ProductProjection;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

@@ -1,0 +1,189 @@
+syntax = "proto3";
+
+package com.viettel.client.authorization;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+import "authorization/author-common.proto";
+import "authorization/application.proto";
+import "authorization/tenant.proto";
+import "authorization/resource.proto";
+option java_multiple_files = true;
+option java_package = "com.viettel.client.authorization";
+option java_outer_classname = "AuthorServiceMenuConfig";
+
+service MenuConfigService {
+  rpc createMenuConfig (MenuConfigGrpcDTO) returns (MenuConfigGrpcDTO) {
+  }
+
+  rpc updateMenuConfig (MenuConfigGrpcDTO) returns (MenuConfigGrpcDTO) {
+  }
+
+  rpc getAllMenuConfig (SearchParamGrpc) returns (MenuConfigGrpcDTOListWrapped) {
+  }
+
+  rpc deleteMenuConfig (CustomPojoRetrieverGrpc) returns (google.protobuf.Empty) {
+  }
+
+  rpc deleteAllList (CustomPojoRetrieverGrpc) returns (google.protobuf.Empty) {
+  }
+
+  rpc getMenuConfig (CustomPojoRetrieverGrpc) returns (MenuConfigGrpcDTO) {
+  }
+
+  rpc doSearch (SearchParamGrpc) returns (MenuConfigSearchResultGrpc) {
+  }
+
+
+}
+
+message MenuConfigGrpcDTO {
+  optional string id = 1;
+  optional string menuName = 2;
+  optional string menuCode = 3;
+  optional string description = 4;
+  optional string url = 5;
+  optional int32 status = 6;
+  optional string parentId = 7;
+  optional int32 menuOrder = 8;
+  optional int32 active = 9;
+  optional string parentMenu = 10;
+  repeated ResourceGrpcDTO listResource = 11;
+  repeated RoleResourceGrpcDTO listRoleResource = 12;
+  optional int32 visible = 13;
+}
+
+message AccountDTO {
+  optional string id = 1;
+  optional string userName = 2;
+  optional string fullName = 3;
+  optional string email = 4;
+  optional string phoneNumber = 5;
+  optional string tenantId = 6;
+  optional string userLanguage = 7;
+  optional string jobTitle = 8;
+  optional string description = 9;
+  optional string imageUrl = 10;
+  optional int32 active = 11;
+  optional int32 isLock = 12;
+  optional int32 deleted = 13;
+  repeated string listId = 14;
+  optional OrgDTO org = 15;
+  optional google.protobuf.Timestamp officialTime = 16;
+  optional bool isLoginByUsbToken = 17;
+  optional string resetKey = 18;
+  optional google.protobuf.Timestamp resetDate = 19;
+  optional google.protobuf.Timestamp lastChangePassword = 20;
+  optional google.protobuf.Timestamp remindPasswordChangeTime = 21;
+  optional google.protobuf.Timestamp passwordExpiredTime = 22;
+  optional int32 periodRemindPassword = 24;
+  optional string remindPasswordType = 25;
+  optional bool remindChangePassWord = 27;
+  optional string position = 28;
+  optional string countDownDelete = 29;
+  optional string signNumber = 30;
+  repeated RoleDTO roles = 31;
+  optional google.protobuf.Timestamp createdDate = 32;
+  optional string subscriberId = 33;
+  optional int32 isManager = 34;
+  optional int64 secretaryOfOwnerId = 35;
+  optional bool assigned = 36;
+  optional string positionCouncil = 37;
+  optional int32 isCenter = 38;
+  optional string identityCard = 39;
+}
+message OrgDTO {
+  optional string id = 1;
+  optional string orgName = 2;
+  optional string orgCode = 3;
+  optional string orgType = 4;
+  optional string address = 5;
+  optional string parentOrgId = 6;
+  optional string parentCode = 7;
+  optional string nationId = 8;
+  optional string cityId = 9;
+  optional string dictItemId = 10;
+  optional int64 levels = 11;
+  optional string description = 12;
+  optional string nameR = 13;
+  optional int64 isCheck = 14;
+  optional string cityCode = 15;
+  optional string cityName = 16;
+  optional string fullName = 17;
+  optional string paramConfig = 18;
+  optional string idNew = 19;
+  optional int64 isLock = 20;
+  optional int64 isActive = 21;
+  optional string orgCreatedId = 22;
+  optional string manageId = 23;
+  optional string createdBy = 24;
+  optional string modifiedBy = 25;
+  optional google.protobuf.Timestamp fromDate = 26;
+  optional google.protobuf.Timestamp toDate = 27;
+  optional OrgDTO parent = 28;
+  optional int32 childrenCount = 29;
+  optional string fullNameDisplay = 30;
+
+}
+message RoleDTO {
+  optional string id = 1;
+  optional string roleName = 2;
+  optional string roleCode = 3;
+  optional int32 status = 4;
+  optional string description = 5;
+  optional string tenantId = 6;
+  repeated string listId = 7;
+  optional bool canSelfAssign = 8;
+}
+
+message RoleResourceGrpcDTO {
+  optional RoleDTO role = 1;
+  optional ResourceGrpcDTO resource = 2;
+}
+
+message MenuConfigReplyGrpc {
+  optional int32 code = 1;
+  optional string message = 2;
+  oneof response {
+    MenuConfigGrpcDTO detail = 3;
+    string detailErrorMessage = 4;
+  }
+}
+
+message MenuConfigSearchResultGrpc {
+  repeated MenuConfigGrpcDTO data = 1;
+  optional int32 total = 2;
+  optional int32 activeTotal = 3;
+  optional int32 inactiveTotal = 4;
+  optional int32 searchTotal = 5;
+}
+
+
+
+
+message MenuConfigGrpcDTOListWrapped {
+  repeated MenuConfigGrpcDTO data = 1;
+}
+
+
+message MenuConfigTreeGrpcListWrapped {
+  repeated MenuConfigTreeGrpc data = 1;
+}
+message MenuConfigTreeGrpc {
+  optional string id = 1;
+  optional string menuName = 2;
+  optional string menuCode = 3;
+  optional string description = 4;
+  optional string url = 5;
+  optional int32 status = 6;
+  optional string applicationId = 7;
+  optional string parentId = 8;
+  optional int32 menuOrder = 9;
+  optional string iconMenu = 10;
+  optional int32 active = 11;
+  optional string shopId = 12;
+  optional int64 manageDepartment = 13;
+  optional string appName = 14;
+  optional ApplicationGrpcDTO application = 15;
+  repeated MenuConfigTreeGrpc children = 16;
+}

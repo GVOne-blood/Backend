@@ -1,0 +1,41 @@
+{
+  "annotations": {
+    "changelogDate": "20260204095356"
+  },
+  "applications": "*",
+  "clientRootFolder": "chat",
+  "databaseType": "sql",
+  "documentation": "BlockedUser - Block list",
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "blockId",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"],
+      "options": {
+        "id": true
+      }
+    },
+    {
+      "fieldName": "blockerId",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "blockedUserId",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "reason",
+      "fieldType": "String",
+      "fieldValidateRules": ["maxlength"],
+      "fieldValidateRulesMaxlength": "500"
+    }
+  ],
+  "microserviceName": "chat",
+  "name": "BlockedUser",
+  "relationships": [],
+  "searchEngine": "no",
+  "service": "serviceClass"
+}

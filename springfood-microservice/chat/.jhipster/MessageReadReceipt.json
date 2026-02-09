@@ -1,0 +1,51 @@
+{
+  "annotations": {
+    "changelogDate": "20260204095352"
+  },
+  "applications": "*",
+  "clientRootFolder": "chat",
+  "databaseType": "sql",
+  "documentation": "MessageReadReceipt - Read tracking",
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "receiptId",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"],
+      "options": {
+        "id": true
+      }
+    },
+    {
+      "fieldName": "userId",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "readAt",
+      "fieldType": "Instant",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "deviceType",
+      "fieldType": "String",
+      "fieldValidateRules": ["maxlength"],
+      "fieldValidateRulesMaxlength": "50"
+    }
+  ],
+  "microserviceName": "chat",
+  "name": "MessageReadReceipt",
+  "pagination": "pagination",
+  "relationships": [
+    {
+      "otherEntityName": "message",
+      "otherEntityRelationshipName": "readReceipts",
+      "relationshipName": "message",
+      "relationshipSide": "right",
+      "relationshipType": "many-to-one",
+      "relationshipValidateRules": "required"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "serviceClass"
+}

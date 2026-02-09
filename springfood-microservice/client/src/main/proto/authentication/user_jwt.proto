@@ -1,0 +1,139 @@
+syntax = "proto3";
+
+package com.viettel.client.authentication;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/any.proto";
+import "google/protobuf/empty.proto";
+
+import "authentication/common.proto";
+
+option java_multiple_files = true;
+option java_package = "com.viettel.client.authentication";
+
+service UserJWTService {
+  rpc authorize (LoginVM) returns (FirstLoginAccountDTO) {
+  }
+
+  rpc logout (google.protobuf.Empty) returns (google.protobuf.Empty) {
+  }
+
+  rpc checkAuthentication (google.protobuf.Empty) returns (AuthenticationDTO) {
+  }
+
+  rpc getUserInfoByToken (google.protobuf.Empty) returns (AccountDTO) {
+  }
+
+  rpc getCaptchaCode (google.protobuf.Empty) returns (CaptchaResponse) {
+  }
+
+  rpc generateCaptcha (GenerateCaptchaRequest) returns (GenerateCaptchaResponse) {
+  }
+
+  rpc verifySignature (SignatureInfoDto) returns (FirstLoginDTO) {
+  }
+
+  rpc genRandomString (google.protobuf.Empty) returns (GenRandomStringResponse) {
+  }
+
+  rpc generateCode (ChangePwdDTO) returns (GenerateCodeResponse) {
+  }
+
+  rpc authenticateOTP (ChangePwdDTO) returns (AuthenticateOTPResponse) {
+  }
+
+  rpc changePasswordForget (ChangePwdDTO) returns (google.protobuf.Empty) {
+  }
+
+  rpc disableRemindPassword (DisableRemindPasswordRequest) returns (AccountDTO) {
+  }
+
+  rpc checkSecurityVehiclePassword (SecurityVehiclePasswordRequest) returns (CheckSecurityVehiclePasswordResponse) {
+  }
+
+  rpc resetSecurityVehiclePassword (SecurityVehiclePasswordRequest) returns (google.protobuf.Empty) {
+  }
+  rpc GetToken (LoginRequest) returns (AuthTokenDTO) {}
+}
+
+message LoginVM {
+  optional string username = 1;
+  optional string password = 2;
+  optional bool rememberMe = 3;
+  optional string captcha = 4;
+  optional string transactionId = 5;
+}
+
+message LoginOtpVM {
+  optional string username = 1;
+  optional string password = 2;
+  optional bool rememberMe = 3;
+  optional string captcha = 4;
+  optional string transactionId = 5;
+  optional string otp = 6;
+  optional bool rememberOtp = 7;
+  optional string otpSignature = 8;
+}
+
+message CaptchaResponse {
+  optional string type = 1;
+  optional string code = 2;
+  optional string message = 3;
+  optional string data = 4;
+}
+
+message GenerateCaptchaRequest {
+  optional string key = 1;
+}
+
+message GenerateCaptchaResponse {
+  optional string imgCaptcha = 1;
+  optional string key = 2;
+}
+
+message SignatureInfoDto {
+  optional string hashValue = 1;
+  optional string email = 2;
+  optional string signature = 3;
+}
+
+message GenRandomStringResponse {
+  optional string hashValue = 1;
+  optional string encodeValue = 2;
+}
+
+message ChangePwdDTO {
+  optional string userName = 1;
+  optional string newPass = 2;
+  optional string comPass = 3;
+  optional string captcha = 4;
+  optional string key = 5;
+  optional string otp = 6;
+}
+
+message GenerateCodeResponse {
+  optional string email = 1;
+  optional int64 expiredTime = 2;
+}
+
+message AuthenticateOTPResponse {
+  optional string key = 1;
+}
+
+message DisableRemindPasswordRequest {
+  optional string userId = 1;
+}
+
+
+message SecurityVehiclePasswordRequest {
+  optional string userId = 1;
+  optional string password = 2;
+}
+
+message CheckSecurityVehiclePasswordResponse {
+  optional bool success = 1;
+}
+message LoginRequest {
+  optional string username = 1;
+  optional string password = 2;
+}

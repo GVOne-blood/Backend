@@ -28,7 +28,7 @@ import java.util.Date;
 
 @RestControllerAdvice
 public class GlobalHandleException {
-
+    
     @ExceptionHandler(NoResourceFoundException.class)
     public ResponseEntity<ResponseError> handleNoResourceFoundException(NoResourceFoundException e, WebRequest request) {
         ResponseError error = ResponseError.builder()

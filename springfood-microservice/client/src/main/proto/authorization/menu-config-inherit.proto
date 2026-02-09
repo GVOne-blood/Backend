@@ -1,0 +1,53 @@
+syntax = "proto3";
+import "authorization/resource.proto";
+import "authentication/common.proto";
+import "google/protobuf/empty.proto";
+
+package com.viettel.client.authorization;
+
+service MenuConfigInheritService{
+  rpc listAllMenuConfigInherit(MenuConfigInheritRequestGrpcDTO) returns (MenuConfigInheritWrapGrpcDTO){
+  }
+
+  rpc updateMenuOrApiToRole(MenuConfigUpdateRequestGrpcDTO) returns(google.protobuf.Empty);
+
+  rpc listAllMenuConfigInheritChecked(MenuConfigInheritRequestGrpcDTO) returns(MenuConfigInheritWrapGrpcDTO);
+}
+
+message MenuConfigInheritRequestGrpcDTO{
+  optional string id = 1;
+  optional string parentId = 2;
+  optional string keyword = 3;
+  optional string menuCode = 4;
+  optional int64 roleId = 5;
+  optional string checkedWithRoleId = 6;
+}
+
+message MenuConfigInheritGrpcDTO{
+  optional string id = 1;
+  optional string menuName = 2;
+  optional string menuCode = 3;
+  optional string description = 4;
+  optional string url = 5;
+  optional int32 status = 6;
+  optional string applicationId = 7;
+  optional string parentId = 8;
+  optional int32 menuOrder = 9;
+  optional string iconMenu = 10;
+  optional int32 active = 11;
+  optional string shopId = 12;
+  optional string manageDepartment = 13;
+  optional string appName = 14;
+  optional string parentMenu = 15;
+  repeated ResourceGrpcDTO resourceChild = 16;
+  repeated MenuConfigInheritGrpcDTO children = 17;
+}
+
+message MenuConfigInheritWrapGrpcDTO{
+  repeated MenuConfigInheritGrpcDTO menuConfigInheritData = 1;
+}
+
+message MenuConfigUpdateRequestGrpcDTO{
+  repeated string menuOrApiKeyChecked = 1;
+  string roleId = 2;
+}

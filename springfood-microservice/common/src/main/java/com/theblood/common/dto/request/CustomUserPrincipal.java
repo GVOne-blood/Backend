@@ -4,6 +4,7 @@ package com.theblood.common.dto.request;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
 import java.util.UUID;
@@ -14,9 +15,12 @@ import java.util.UUID;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Component
 public class CustomUserPrincipal implements Serializable {
     private UUID userId;
     private String username;
+    private String shopId;
+    private String role;
 
     // Convenience method
     public String getUserIdString() {

@@ -1,0 +1,75 @@
+syntax = "proto3";
+
+package com.viettel.client.authorization;
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/wrappers.proto";
+import "authorization/author-common.proto";
+import "authorization/tenant.proto";
+
+
+option java_multiple_files = true;
+option java_package = "com.viettel.client.authorization";
+option java_outer_classname = "AuthorServiceScope";
+
+service ScopeService {
+  rpc createScope (ScopeGrpcDTO) returns (ScopeGrpcDTO) {
+  }
+
+  rpc updateScope (ScopeGrpcDTO) returns (ScopeGrpcDTO) {
+  }
+
+  rpc verifyToChangeStatus (CustomPojoRetrieverGrpc) returns (google.protobuf.StringValue) {
+  }
+
+  rpc getAllScopes (SearchParamGrpc) returns (ScopeGrpcDTOListWrapped) {
+  }
+
+  rpc getScope (CustomPojoRetrieverGrpc) returns (ScopeGrpcDTO) {
+  }
+
+  rpc deleteScope (CustomPojoRetrieverGrpc) returns (google.protobuf.Empty) {
+  }
+
+  rpc deleteAllList (CustomPojoRetrieverGrpc) returns (google.protobuf.Empty) {
+  }
+
+  rpc doSearch (SearchParamGrpc) returns (ScopeSearchResultGrpc) {
+  }
+}
+
+message ScopeGrpcDTO {
+  optional string id = 1;
+  optional string scopeName = 2;
+  optional string scopeCode = 3;
+  optional string description = 4;
+  optional int32 status = 5;
+  optional string createdBy = 6;
+  optional google.protobuf.Timestamp createdDate = 7;
+  optional string lastModifiedBy = 8;
+  optional google.protobuf.Timestamp lastModifiedDate = 9;
+  repeated string listId = 10;
+  repeated TenantGrpcDTO tenants = 11;
+}
+
+message ScopeGrpcDTOListWrapped {
+  repeated ScopeGrpcDTO data = 1;
+}
+
+message ScopeReplyGrpc {
+  optional int32 code = 1;
+  optional string message = 2;
+  oneof response {
+    ScopeGrpcDTO detail = 3;
+    string detailErrorMessage = 4;
+  }
+}
+
+message ScopeSearchResultGrpc {
+  repeated ScopeGrpcDTO data = 1;
+  optional int32 total = 2;
+  optional int32 activeTotal = 3;
+  optional int32 inactiveTotal = 4;
+}

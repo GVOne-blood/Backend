@@ -1,7 +1,6 @@
 package com.theblood.shopservice.config;
 
 
-import com.theblood.commonsecurity.filter.InternalAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,12 +24,12 @@ import java.util.List;
 public class SecurityConfig {
     private final InternalAuthenticationFilter internalAuthenticationFilter;
     String[] SHOP_WHITELIST = {
-            "/shop/**",
-            "/swagger-ui/**",
-            "/v3/api-docs/**",
-            "/swagger-resources/**",
-            "/webjars/**",
-            "/com.theblood.shopservice.grpc.ProductService/**" // Allow gRPC calls
+        "/shop/**",
+        "/swagger-ui/**",
+        "/v3/api-docs/**",
+        "/swagger-resources/**",
+        "/webjars/**",
+        "/com.theblood.shopservice.grpc.ProductService/**" // Allow gRPC calls
     };
 //    private CustomAuthenticationEntryPoint authenticationEntryPoint;
 //    private CustomAccessDeniedHandler accessDeniedHandler;
@@ -38,15 +37,15 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(AbstractHttpConfigurer::disable)
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(SHOP_WHITELIST).permitAll()
-                        .anyRequest().authenticated())
+            .csrf(AbstractHttpConfigurer::disable)
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers(SHOP_WHITELIST).permitAll()
+                .anyRequest().authenticated())
 //                .exceptionHandling(exception -> exception
 //                        .authenticationEntryPoint(authenticationEntryPoint)
 //                        .accessDeniedHandler(accessDeniedHandler))
-                .addFilterBefore(internalAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+            .addFilterBefore(internalAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 
