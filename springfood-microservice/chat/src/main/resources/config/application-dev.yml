@@ -19,6 +19,11 @@ logging:
     tech.jhipster: DEBUG
     org.hibernate.SQL: DEBUG
     com.theblood.springfood.chat: DEBUG
+    # Disable noisy Kafka connection logs
+    org.apache.kafka.clients.NetworkClient: ERROR
+    org.apache.kafka.clients.consumer.internals: ERROR
+    # Disable JMX remote logs
+    javax.management.remote.rmi: ERROR
 
 management:
   zipkin: # Use the "zipkin" Maven profile to have the Spring Cloud Zipkin dependencies
@@ -29,6 +34,39 @@ management:
       probability: 1.0 # report 100% of traces
 
 spring:
+  ai:
+    mcp:
+      server:
+        enabled: true
+        name: springfood-chat-mcp
+        version: 1.0.0
+        type: SYNC
+        sse-message-endpoint: /mcp/messages
+        capabilities:
+          tool: true
+          resource: false
+          prompt: false
+    google:
+      genai:
+        # Get API key from environment variable
+        # Get your FREE API key at: https://aistudio.google.com/app/apikey
+        api-key: ${GEMINI_API_KEY:your-gemini-api-key-here}
+        chat:
+          options:
+            # Switch to gemini-3-flash (available quota: 5 RPM, 250K TPM, 20 RPD)
+            # Alternative: gemini-2.5-flash-lite (10 RPM, 250K TPM, 20 RPD)
+            model: gemini-3-flash
+            temperature: 0.7
+            max-output-tokens: 1000
+    # Spring AI Chat Memory Repository Configuration
+    chat:
+      memory:
+        repository:
+          jdbc:
+            # Always initialize schema (create SPRING_AI_CHAT_MEMORY table)
+            initialize-schema: always
+  websocket:
+    allowed-origins: "*"
   cache:
     type: simple  # Use in-memory cache instead of Redis
   devtools:
@@ -42,12 +80,13 @@ spring:
       indent-output: true
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
-    url: jdbc:postgresql://localhost:5432/springfood
+    url: jdbc:postgresql://localhost:5432/springfood?currentSchema=springfood_chat
     username: postgres
     password: 123456
     hikari:
       poolName: Hikari
       auto-commit: false
+      schema: springfood_chat
   jpa:
     properties:
       hibernate:
@@ -63,10 +102,56 @@ spring:
   thymeleaf:
     cache: false
 
+  # ===================================================================
+  # KAFKA CONFIGURATION FOR MESSAGE DISTRIBUTION
+  # ===================================================================
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      acks: all  # Required for idempotent producer (enable.idempotence=true)
+      properties:
+        enable.idempotence: true  # Prevent duplicate messages
+        max.in.flight.requests.per.connection: 5  # Maintain ordering with idempotence
+    consumer:
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      auto-offset-reset: earliest
+      enable-auto-commit: false  # Manual commit for at-least-once delivery
+      max-poll-records: 100  # Batch size for persistence consumer
+      properties:
+        spring.json.trusted.packages: "*"  # Trust all packages for JSON deserialization
+    listener:
+      ack-mode: manual  # Manual acknowledgment for better control
+
+  # ===================================================================
+  # REDIS CONFIGURATION FOR TYPING INDICATORS & CACHING
+  # ===================================================================
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password: 123456
+      timeout: 2000ms
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+          max-wait: -1ms
+
 server:
-  port: 8098
+  port: 9098
   # make sure requests the proxy uri instead of the server one
   forward-headers-strategy: native
+
+# ===================================================================
+# gRPC SERVER CONFIGURATION
+# ===================================================================
+grpc:
+  server:
+    port: 9100  # gRPC port for chat service
 
 # ===================================================================
 # JHipster specific properties
@@ -94,8 +179,9 @@ jhipster:
   security:
     authentication:
       jwt:
-        # This token must be encoded using Base64 and be at least 256 bits long (you can type `openssl rand -base64 64` on your command line to generate a 512 bits one)
-        base64-secret: ZmM5ZjRlZDJiNjA2NjIyNWE4OTE0MGViNjJhY2YyYjk3YTI1ZDdlZWY1YTJiNzVkM2NkZDNlN2Q5YTYyNDcwMzk3NDdjYjBjNjJhMjdiYTdiMDMyNzdmM2Q4YWI2YjQ0ZDA5NWIzYjdmZTY5YjlmMmFkNjdiOGQ4ODQ0YTUyOWI=
+        # Use JWT secret from .env file (same as authentication service)
+        # Default value if .env not found
+        base64-secret: ${JWT_SECRET_KEY:4dVgNvOxWTz2PKJZqCYFoh+AXX0l2OVHoCTfN9ZdXGs=}
         # Token is valid 24 hours
         token-validity-in-seconds: 86400
         token-validity-in-seconds-for-remember-me: 2592000
@@ -115,8 +201,56 @@ jhipster:
 # https://www.jhipster.tech/common-application-properties/
 # ===================================================================
 
-# Config này để thỏa mãn dependency com.theblood.common.util.JwtUtil
+# Config này để thỏa mãn dependency util.com.theblood.springfood.common.JwtUtil
 app:
   jwt:
-    secretKey: ${jhipster.security.authentication.jwt.base64-secret}
-    refreshKey: ${jhipster.security.authentication.jwt.base64-secret} # Reuse for dev simplicity
+    secretKey: ${JWT_SECRET_KEY:4dVgNvOxWTz2PKJZqCYFoh+AXX0l2OVHoCTfN9ZdXGs=}
+    refreshKey: ${JWT_REFRESH_KEY:4dVgNvOxWTz2PKJZqCYFoh+AXX0l2OVHoCTfN9ZdXGs=}
+    resetKey: ${JWT_RESET_KEY:RKyKtM34VufukHK6sSPlQdDA8wBOHCYUygwIp6Fekco=}
+
+# ===================================================================
+# EUREKA CLIENT CONFIGURATION
+# ===================================================================
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${server.port}
+
+
+
+# ===================================================================
+# Client Module Configuration (gRPC + REST)
+# ===================================================================
+springfood:
+  client:
+    enabled: true
+    default-protocol: grpc
+
+    services:
+      product:
+        enabled: true
+        protocol: grpc
+
+      shop:
+        enabled: true
+        protocol: grpc
+
+      order:
+        enabled: true
+        protocol: grpc
+
+# gRPC Client Config
+grpc:
+  client:
+    product-service:
+      address: dns:///localhost:9090
+      negotiation-type: plaintext
+    shop-service:
+      address: dns:///localhost:9091
+      negotiation-type: plaintext
+    order-service:
+      address: dns:///localhost:9092
+      negotiation-type: plaintext

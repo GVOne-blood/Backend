@@ -1,7 +1,7 @@
 package com.theblood.orderservice.background.job;
 
 
-import com.theblood.common.enums.MessageStatus;
+import com.theblood.springfood.common.enums.MessageStatus;
 import com.theblood.orderservice.kafka.model.OutboxMessage;
 import com.theblood.orderservice.repository.OutboxMessageRepository;
 import jakarta.transaction.Transactional;

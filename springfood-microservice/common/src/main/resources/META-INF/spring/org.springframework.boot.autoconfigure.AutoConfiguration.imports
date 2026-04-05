@@ -1,0 +1,4 @@
+com.theblood.springfood.common.config.kafka.KafkaProducerAutoConfiguration
+com.theblood.springfood.common.config.kafka.KafkaConsumerAutoConfiguration
+com.theblood.springfood.common.config.email.EmailAutoConfiguration
+com.theblood.springfood.common.config.AsyncConfiguration

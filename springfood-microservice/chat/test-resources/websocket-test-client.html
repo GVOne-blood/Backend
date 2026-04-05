@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>Chat Realtime Test Client</title>
+  <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      padding: 20px;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+      overflow: hidden;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .header h1 {
+      font-size: 24px;
+      margin-bottom: 5px;
+    }
+
+    .header p {
+      opacity: 0.9;
+      font-size: 14px;
+    }
+
+    .main-content {
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      height: calc(100vh - 200px);
+    }
+
+    .sidebar {
+      background: #f8f9fa;
+      border-right: 1px solid #dee2e6;
+      padding: 20px;
+      overflow-y: auto;
+    }
+
+    .config-section {
+      margin-bottom: 20px;
+    }
+
+    .config-section h3 {
+      font-size: 14px;
+      color: #495057;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 12px;
+      color: #6c757d;
+      margin-bottom: 5px;
+    }
+
+    .form-group input,
+    .form-group textarea {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid #ced4da;
+      border-radius: 5px;
+      font-size: 13px;
+    }
+
+    .form-group textarea {
+      resize: vertical;
+      min-height: 60px;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin-bottom: 10px;
+    }
+
+    .btn-primary {
+      background: #667eea;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #5568d3;
+    }
+
+    .btn-success {
+      background: #28a745;
+      color: white;
+    }
+
+    .btn-success:hover {
+      background: #218838;
+    }
+
+    .btn-danger {
+      background: #dc3545;
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background: #c82333;
+    }
+
+    .btn-warning {
+      background: #ffc107;
+      color: #212529;
+    }
+
+    .btn-warning:hover {
+      background: #e0a800;
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .status {
+      padding: 8px 12px;
+      border-radius: 5px;
+      font-size: 12px;
+      font-weight: 600;
+      text-align: center;
+      margin-bottom: 15px;
+    }
+
+    .status.disconnected {
+      background: #f8d7da;
+      color: #721c24;
+    }
+
+    .status.connected {
+      background: #d4edda;
+      color: #155724;
+    }
+
+    .status.connecting {
+      background: #fff3cd;
+      color: #856404;
+    }
+
+    .chat-area {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    .messages-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+      background: #ffffff;
+    }
+
+    .message {
+      margin-bottom: 15px;
+      padding: 12px 15px;
+      border-radius: 10px;
+      max-width: 70%;
+      word-wrap: break-word;
+      animation: slideIn 0.3s ease;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .message.sent {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      margin-left: auto;
+      border-bottom-right-radius: 3px;
+    }
+
+    .message.received {
+      background: #e9ecef;
+      color: #212529;
+      margin-right: auto;
+      border-bottom-left-radius: 3px;
+    }
+
+    .message.system {
+      background: #fff3cd;
+      color: #856404;
+      margin: 10px auto;
+      text-align: center;
+      font-size: 12px;
+      max-width: 90%;
+    }
+
+    .message-meta {
+      font-size: 10px;
+      opacity: 0.8;
+      margin-top: 5px;
+    }
+
+    .message-content {
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    .typing-indicator {
+      padding: 10px 20px;
+      background: #f8f9fa;
+      border-top: 1px solid #dee2e6;
+      font-size: 12px;
+      color: #6c757d;
+      font-style: italic;
+      min-height: 40px;
+    }
+
+    .input-area {
+      padding: 20px;
+      background: #f8f9fa;
+      border-top: 1px solid #dee2e6;
+    }
+
+    .input-group {
+      display: flex;
+      gap: 10px;
+    }
+
+    .input-group input {
+      flex: 1;
+      padding: 12px 15px;
+      border: 1px solid #ced4da;
+      border-radius: 25px;
+      font-size: 14px;
+    }
+
+    .input-group button {
+      padding: 12px 30px;
+      border: none;
+      border-radius: 25px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .input-group button:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    .input-group button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .quick-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .quick-actions button {
+      padding: 8px;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>🚀 Chat Realtime Test Client</h1>
+    <p>WebSocket + STOMP Protocol Testing Tool</p>
+  </div>
+
+  <div class="main-content">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="config-section">
+        <h3>📡 Connection</h3>
+        <div class="status disconnected" id="connectionStatus">
+          ⚫ Disconnected
+        </div>
+
+        <div class="form-group">
+          <label>WebSocket URL</label>
+          <input id="wsUrl" type="text" value="http://localhost:9098/ws">
+        </div>
+
+        <div class="form-group">
+          <label>JWT Token</label>
+          <textarea id="jwtToken" placeholder="Paste your JWT token here..."></textarea>
+        </div>
+
+        <button class="btn btn-primary" id="connectBtn" onclick="connect()">
+          🔌 Connect
+        </button>
+        <button class="btn btn-danger" disabled id="disconnectBtn" onclick="disconnect()">
+          ⛔ Disconnect
+        </button>
+      </div>
+
+      <div class="config-section">
+        <h3>💬 Conversation</h3>
+        <div class="form-group">
+          <label>Conversation ID</label>
+          <input id="conversationId" placeholder="conv-123" type="text">
+        </div>
+
+        <div class="form-group">
+          <label>User ID</label>
+          <input id="userId" placeholder="user-1" type="text">
+        </div>
+      </div>
+
+      <div class="config-section">
+        <h3>⚡ Quick Actions</h3>
+        <button class="btn btn-success" disabled id="typingBtn" onclick="startTyping()">
+          ⌨️ Start Typing
+        </button>
+        <button class="btn btn-warning" disabled id="stopTypingBtn" onclick="stopTyping()">
+          🛑 Stop Typing
+        </button>
+        <button class="btn btn-primary" disabled id="readBtn" onclick="markAsRead()">
+          ✅ Mark as Read
+        </button>
+        <button class="btn btn-danger" onclick="clearMessages()">
+          🗑️ Clear Messages
+        </button>
+      </div>
+    </div>
+
+    <!-- Chat Area -->
+    <div class="chat-area">
+      <div class="messages-container" id="messagesContainer">
+        <div class="message system">
+          <div class="message-content">
+            👋 Welcome to Chat Realtime Test Client!<br>
+            Configure your connection and click Connect to start.
+          </div>
+        </div>
+      </div>
+
+      <div class="typing-indicator" id="typingIndicator">
+        <!-- Typing indicator will appear here -->
+      </div>
+
+      <div class="input-area">
+        <div class="input-group">
+          <input
+            disabled
+            id="messageInput"
+            onkeypress="handleKeyPress(event)"
+            placeholder="Type your message..."
+            type="text"
+          >
+          <button disabled id="sendBtn" onclick="sendMessage()">
+            📤 Send
+          </button>
+        </div>
+        <div class="quick-actions">
+          <button class="btn btn-primary" disabled id="testMsgBtn" onclick="sendTestMessage()">
+            🧪 Test Message
+          </button>
+          <button class="btn btn-primary" disabled id="replyBtn" onclick="sendReplyMessage()">
+            💬 Reply Test
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  let stompClient = null;
+  let lastMessageId = null;
+  let typingInterval = null;
+
+  function updateStatus(status, text) {
+    const statusEl = document.getElementById('connectionStatus');
+    statusEl.className = `status ${status}`;
+    statusEl.innerHTML = text;
+  }
+
+  function connect() {
+    const wsUrl = document.getElementById('wsUrl').value;
+    const jwtToken = document.getElementById('jwtToken').value.trim();
+
+    if (!jwtToken) {
+      alert('Please enter JWT token!');
+      return;
+    }
+
+    updateStatus('connecting', '🔄 Connecting...');
+
+    const socket = new SockJS(wsUrl);
+    stompClient = Stomp.over(socket);
+
+    // Disable console debug
+    stompClient.debug = null;
+
+    const headers = {
+      'Authorization': 'Bearer ' + jwtToken
+    };
+
+    stompClient.connect(headers, function (frame) {
+      updateStatus('connected', '🟢 Connected');
+      addSystemMessage('✅ Connected successfully!');
+
+      // Enable buttons
+      document.getElementById('connectBtn').disabled = true;
+      document.getElementById('disconnectBtn').disabled = false;
+      document.getElementById('messageInput').disabled = false;
+      document.getElementById('sendBtn').disabled = false;
+      document.getElementById('typingBtn').disabled = false;
+      document.getElementById('stopTypingBtn').disabled = false;
+      document.getElementById('readBtn').disabled = false;
+      document.getElementById('testMsgBtn').disabled = false;
+      document.getElementById('replyBtn').disabled = false;
+
+      // Subscribe to receive messages
+      stompClient.subscribe('/user/queue/messages', function (message) {
+        const msg = JSON.parse(message.body);
+        addReceivedMessage(msg);
+        lastMessageId = msg.messageId;
+      });
+
+      // Subscribe to typing indicators
+      const conversationId = document.getElementById('conversationId').value;
+      if (conversationId) {
+        stompClient.subscribe('/topic/conversation.' + conversationId + '/typing', function (event) {
+          const data = JSON.parse(event.body);
+          updateTypingIndicator(data);
+        });
+
+        // Subscribe to conversation events (read receipts, etc.)
+        stompClient.subscribe('/topic/conversation.' + conversationId, function (event) {
+          const data = JSON.parse(event.body);
+          addSystemMessage('📬 Event: ' + JSON.stringify(data, null, 2));
+        });
+      }
+
+    }, function (error) {
+      updateStatus('disconnected', '⚫ Connection Failed');
+      addSystemMessage('❌ Connection error: ' + error);
+      console.error('Connection error:', error);
+    });
+  }
+
+  function disconnect() {
+    if (stompClient !== null) {
+      stompClient.disconnect();
+      updateStatus('disconnected', '⚫ Disconnected');
+      addSystemMessage('👋 Disconnected');
+
+      // Disable buttons
+      document.getElementById('connectBtn').disabled = false;
+      document.getElementById('disconnectBtn').disabled = true;
+      document.getElementById('messageInput').disabled = true;
+      document.getElementById('sendBtn').disabled = true;
+      document.getElementById('typingBtn').disabled = true;
+      document.getElementById('stopTypingBtn').disabled = true;
+      document.getElementById('readBtn').disabled = true;
+      document.getElementById('testMsgBtn').disabled = true;
+      document.getElementById('replyBtn').disabled = true;
+    }
+  }
+
+  function sendMessage() {
+    const content = document.getElementById('messageInput').value.trim();
+    if (!content) return;
+
+    const conversationId = document.getElementById('conversationId').value;
+    if (!conversationId) {
+      alert('Please enter Conversation ID!');
+      return;
+    }
+
+    const message = {
+      conversationId: conversationId,
+      content: content,
+      messageType: 'TEXT',
+      clientMessageId: 'client-' + Date.now()
+    };
+
+    stompClient.send('/app/chat.send', {}, JSON.stringify(message));
+    addSentMessage(content);
+    document.getElementById('messageInput').value = '';
+
+    // Auto stop typing when message sent
+    stopTyping();
+  }
+
+  function sendTestMessage() {
+    document.getElementById('messageInput').value = 'This is a test message at ' + new Date().toLocaleTimeString();
+    sendMessage();
+  }
+
+  function sendReplyMessage() {
+    if (!lastMessageId) {
+      alert('No message to reply to!');
+      return;
+    }
+
+    const conversationId = document.getElementById('conversationId').value;
+    const message = {
+      conversationId: conversationId,
+      content: 'This is a reply to previous message',
+      messageType: 'TEXT',
+      replyToMessageId: lastMessageId,
+      clientMessageId: 'client-' + Date.now()
+    };
+
+    stompClient.send('/app/chat.send', {}, JSON.stringify(message));
+    addSentMessage('↩️ Reply: ' + message.content);
+  }
+
+  function startTyping() {
+    const conversationId = document.getElementById('conversationId').value;
+    if (!conversationId) {
+      alert('Please enter Conversation ID!');
+      return;
+    }
+
+    const typingEvent = {
+      conversationId: conversationId,
+      isTyping: true
+    };
+
+    // Send typing event every 3 seconds
+    stompClient.send('/app/chat.typing', {}, JSON.stringify(typingEvent));
+
+    if (!typingInterval) {
+      typingInterval = setInterval(() => {
+        stompClient.send('/app/chat.typing', {}, JSON.stringify(typingEvent));
+      }, 3000);
+    }
+
+    addSystemMessage('⌨️ Started typing indicator');
+  }
+
+  function stopTyping() {
+    if (typingInterval) {
+      clearInterval(typingInterval);
+      typingInterval = null;
+    }
+
+    const conversationId = document.getElementById('conversationId').value;
+    if (conversationId) {
+      const typingEvent = {
+        conversationId: conversationId,
+        isTyping: false
+      };
+      stompClient.send('/app/chat.typing', {}, JSON.stringify(typingEvent));
+      addSystemMessage('🛑 Stopped typing indicator');
+    }
+  }
+
+  function markAsRead() {
+    if (!lastMessageId) {
+      alert('No message to mark as read!');
+      return;
+    }
+
+    const conversationId = document.getElementById('conversationId').value;
+    const readReceipt = {
+      conversationId: conversationId,
+      lastReadMessageId: lastMessageId
+    };
+
+    stompClient.send('/app/chat.read', {}, JSON.stringify(readReceipt));
+    addSystemMessage('✅ Marked messages as read');
+  }
+
+  function addSentMessage(content) {
+    const container = document.getElementById('messagesContainer');
+    const messageDiv = document.createElement('div');
+    messageDiv.className = 'message sent';
+    messageDiv.innerHTML = `
+                <div class="message-content">${escapeHtml(content)}</div>
+                <div class="message-meta">${new Date().toLocaleTimeString()}</div>
+            `;
+    container.appendChild(messageDiv);
+    container.scrollTop = container.scrollHeight;
+  }
+
+  function addReceivedMessage(msg) {
+    const container = document.getElementById('messagesContainer');
+    const messageDiv = document.createElement('div');
+    messageDiv.className = 'message received';
+
+    let replyInfo = '';
+    if (msg.replyToMessageId) {
+      replyInfo = `<div style="font-size: 11px; opacity: 0.7; margin-bottom: 5px;">↩️ Reply to: ${msg.replyToPreview || msg.replyToMessageId}</div>`;
+    }
+
+    messageDiv.innerHTML = `
+                ${replyInfo}
+                <div class="message-content">${escapeHtml(msg.content)}</div>
+                <div class="message-meta">
+                    From: ${msg.senderName || msg.senderId} • ${new Date(msg.createdAt).toLocaleTimeString()}
+                </div>
+            `;
+    container.appendChild(messageDiv);
+    container.scrollTop = container.scrollHeight;
+  }
+
+  function addSystemMessage(content) {
+    const container = document.getElementById('messagesContainer');
+    const messageDiv = document.createElement('div');
+    messageDiv.className = 'message system';
+    messageDiv.innerHTML = `
+                <div class="message-content">${escapeHtml(content)}</div>
+                <div class="message-meta">${new Date().toLocaleTimeString()}</div>
+            `;
+    container.appendChild(messageDiv);
+    container.scrollTop = container.scrollHeight;
+  }
+
+  function updateTypingIndicator(data) {
+    const indicator = document.getElementById('typingIndicator');
+    if (data.typingUsers && data.typingUsers.length > 0) {
+      const userId = document.getElementById('userId').value;
+      const otherUsers = data.typingUsers.filter(u => u !== userId);
+      if (otherUsers.length > 0) {
+        indicator.textContent = `⌨️ ${otherUsers.join(', ')} ${otherUsers.length > 1 ? 'are' : 'is'} typing...`;
+      } else {
+        indicator.textContent = '';
+      }
+    } else {
+      indicator.textContent = '';
+    }
+  }
+
+  function clearMessages() {
+    const container = document.getElementById('messagesContainer');
+    container.innerHTML = '<div class="message system"><div class="message-content">🗑️ Messages cleared</div></div>';
+  }
+
+  function handleKeyPress(event) {
+    if (event.key === 'Enter') {
+      sendMessage();
+    }
+  }
+
+  function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
+  // Auto-disconnect on page unload
+  window.addEventListener('beforeunload', function () {
+    if (stompClient !== null) {
+      stompClient.disconnect();
+    }
+  });
+</script>
+</body>
+</html>

@@ -13,10 +13,12 @@ import com.theblood.shopservice.IntegrationTest;
 import com.theblood.shopservice.domain.ShopMember;
 import com.theblood.shopservice.repository.ShopMemberRepository;
 import jakarta.persistence.EntityManager;
+
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.UUID;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,7 +30,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Integration tests for the {@link ShopMemberResource} REST controller.
+ * Integration tests for the {@link ShopMemberResource} REST resources.
  */
 @IntegrationTest
 @AutoConfigureMockMvc
@@ -95,7 +97,7 @@ class ShopMemberResourceIT {
 
     /**
      * Create an entity for this test.
-     *
+     * <p>
      * This is a static method, as tests for other entities might also need it,
      * if they test an entity which requires the current entity.
      */
@@ -119,7 +121,7 @@ class ShopMemberResourceIT {
 
     /**
      * Create an updated entity for this test.
-     *
+     * <p>
      * This is a static method, as tests for other entities might also need it,
      * if they test an entity which requires the current entity.
      */

@@ -2,6 +2,7 @@ package com.theblood.notification;
 
 import com.theblood.notification.config.ApplicationProperties;
 import com.theblood.notification.config.CRLFLogConverter;
+import com.theblood.springfood.common.config.DotenvConfig;
 import jakarta.annotation.PostConstruct;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -40,6 +41,7 @@ public class NotificationApp {
      */
     public static void main(String[] args) {
         SpringApplication app = new SpringApplication(NotificationApp.class);
+        app.addInitializers(new DotenvConfig());
         DefaultProfileUtil.addDefaultProfile(app);
         Environment env = app.run(args).getEnvironment();
         logApplicationStartup(env);

@@ -1,6 +1,6 @@
 package com.theblood.minio.example;
 
-import com.theblood.minio.core.impl.MinIOClientImpl;
+import com.theblood.minio.core.impl.MinIOClientCustomImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
@@ -23,7 +23,7 @@ import java.io.InputStream;
 @RequiredArgsConstructor
 public class MinioExampleController {
 
-    private final MinIOClientImpl minioClient;
+    private final MinIOClientCustomImpl minioClient;
 
     /**
      * Upload file

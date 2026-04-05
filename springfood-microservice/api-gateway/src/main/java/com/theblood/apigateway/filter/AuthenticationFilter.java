@@ -1,10 +1,10 @@
 package com.theblood.apigateway.filter;
 
-import com.theblood.common.util.JwtUtil;
 import com.theblood.apigateway.util.RouterValidator;
-import com.theblood.common.dto.request.TokenRefreshRequest;
-import com.theblood.common.dto.response.TokenResponse;
-import com.theblood.common.enums.TokenType;
+import com.theblood.springfood.common.dto.request.TokenRefreshRequest;
+import com.theblood.springfood.common.dto.response.TokenResponse;
+import com.theblood.springfood.common.enums.TokenType;
+import com.theblood.springfood.common.util.JwtUtil;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
@@ -186,7 +186,7 @@ public class AuthenticationFilter implements GlobalFilter, GatewayFilter, Ordere
                     TokenRefreshRequest refreshRequest = new TokenRefreshRequest(refreshToken);
 
                     return webClientBuilder.build().post()
-                            .uri("lb://identity-service/auth/refresh")
+                            .uri("lb://authentication/auth/refresh")
                             .bodyValue(refreshRequest)
                             .retrieve()
                             .bodyToMono(TokenResponse.class)
@@ -221,6 +221,7 @@ public class AuthenticationFilter implements GlobalFilter, GatewayFilter, Ordere
         Claims claims = jwtUtil.extractAllClaims(token);
 
         String username = claims.get("username", String.class);
+        String shopId = claims.get("sid", String.class);
         UUID userId = UUID.fromString(claims.getSubject());
         List<?> authoritiesFromJwt = claims.get("permissions", List.class);
 
@@ -258,6 +259,7 @@ public class AuthenticationFilter implements GlobalFilter, GatewayFilter, Ordere
                 .header("X-User-Username", username)
                 .header("X-User-Roles", rolesHeader)
                 .header("X-User-Authorities", authoritiesHeader)
+                .header("X-Shop-ID", shopId)
                 .build();
 
         return exchange.mutate().request(mutatedRequest).build();

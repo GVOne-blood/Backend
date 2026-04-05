@@ -1,8 +1,8 @@
 package com.theblood.paymentservice.grpc.server_role;
 
-import com.theblood.common.grpc.PaymentRequest;
-import com.theblood.common.grpc.PaymentResponse;
-import com.theblood.common.grpc.PaymentServiceGrpc;
+import com.theblood.springfood.common.grpc.PaymentRequest;
+import com.theblood.springfood.common.grpc.PaymentResponse;
+import com.theblood.springfood.common.grpc.PaymentServiceGrpc;
 import com.theblood.paymentservice.dto.request.PaymentInfoRequest;
 import com.theblood.paymentservice.mapper.PaymentMapper;
 import com.theblood.paymentservice.model.PaymentTransactions;

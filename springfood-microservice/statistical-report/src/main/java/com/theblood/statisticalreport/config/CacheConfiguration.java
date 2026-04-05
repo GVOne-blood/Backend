@@ -55,7 +55,11 @@ public class CacheConfiguration {
                 .setConnectionPoolSize(jHipsterProperties.getCache().getRedis().getConnectionPoolSize())
                 .setConnectionMinimumIdleSize(jHipsterProperties.getCache().getRedis().getConnectionMinimumIdleSize())
                 .setSubscriptionConnectionPoolSize(jHipsterProperties.getCache().getRedis().getSubscriptionConnectionPoolSize())
-                .setAddress(jHipsterProperties.getCache().getRedis().getServer()[0]);
+                .setAddress(jHipsterProperties.getCache().getRedis().getServer()[0])
+                .setConnectTimeout(3000)       // 3s timeout thay vì mặc định 10s
+                .setRetryAttempts(1)           // chỉ retry 1 lần
+                .setRetryInterval(500)         // 500ms giữa các lần retry
+                .setTimeout(3000);             // operation timeout
 
             if (redisUri.getUserInfo() != null) {
                 singleServerConfig.setPassword(redisUri.getUserInfo().substring(redisUri.getUserInfo().indexOf(':') + 1));

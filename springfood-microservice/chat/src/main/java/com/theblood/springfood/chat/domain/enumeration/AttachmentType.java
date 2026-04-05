@@ -1,16 +1,15 @@
 package com.theblood.springfood.chat.domain.enumeration;
 
+import com.theblood.springfood.common.enums.FileType;
+
 /**
- * Type of attachment in a message.
+ * @deprecated Use {@link FileType} from common module instead.
+ * This class is kept for backward compatibility only.
  * 
- * <ul>
- *   <li><b>IMAGE</b> - Image files (jpg, png, gif, webp)</li>
- *   <li><b>VIDEO</b> - Video files (mp4, mov, avi)</li>
- *   <li><b>AUDIO</b> - Audio files (mp3, wav, voice messages)</li>
- *   <li><b>DOCUMENT</b> - Document files (pdf, doc, xls, ppt)</li>
- *   <li><b>OTHER</b> - Other file types</li>
- * </ul>
+ * Type of attachment in a message.
+ * All methods now delegate to FileType.
  */
+@Deprecated(since = "2.0", forRemoval = true)
 public enum AttachmentType {
     
     IMAGE("IMAGE", "Image", "image/*", new String[]{"jpg", "jpeg", "png", "gif", "webp", "bmp"}),
@@ -48,51 +47,35 @@ public enum AttachmentType {
     }
     
     public boolean isMedia() {
-        return this == IMAGE || this == VIDEO || this == AUDIO;
+        return toFileType().isMedia();
+    }
+    
+    /**
+     * Convert to FileType enum
+     */
+    public FileType toFileType() {
+        return FileType.valueOf(this.name());
+    }
+    
+    /**
+     * Create from FileType enum
+     */
+    public static AttachmentType fromFileType(FileType fileType) {
+        return AttachmentType.valueOf(fileType.name());
     }
     
     public static AttachmentType fromCode(String code) {
-        for (AttachmentType type : values()) {
-            if (type.code.equals(code)) {
-                return type;
-            }
-        }
-        throw new IllegalArgumentException("Unknown AttachmentType code: " + code);
+        FileType fileType = FileType.fromCode(code);
+        return fromFileType(fileType);
     }
     
     public static AttachmentType fromMimeType(String mimeType) {
-        if (mimeType == null) {
-            return OTHER;
-        }
-        String lowerMimeType = mimeType.toLowerCase();
-        if (lowerMimeType.startsWith("image/")) {
-            return IMAGE;
-        } else if (lowerMimeType.startsWith("video/")) {
-            return VIDEO;
-        } else if (lowerMimeType.startsWith("audio/")) {
-            return AUDIO;
-        } else if (lowerMimeType.startsWith("application/pdf") ||
-                   lowerMimeType.contains("document") ||
-                   lowerMimeType.contains("spreadsheet") ||
-                   lowerMimeType.contains("presentation") ||
-                   lowerMimeType.startsWith("text/")) {
-            return DOCUMENT;
-        }
-        return OTHER;
+        FileType fileType = FileType.fromMimeType(mimeType);
+        return fromFileType(fileType);
     }
     
     public static AttachmentType fromExtension(String extension) {
-        if (extension == null) {
-            return OTHER;
-        }
-        String lowerExt = extension.toLowerCase().replace(".", "");
-        for (AttachmentType type : values()) {
-            for (String ext : type.extensions) {
-                if (ext.equals(lowerExt)) {
-                    return type;
-                }
-            }
-        }
-        return OTHER;
+        FileType fileType = FileType.fromExtension(extension);
+        return fromFileType(fileType);
     }
 }

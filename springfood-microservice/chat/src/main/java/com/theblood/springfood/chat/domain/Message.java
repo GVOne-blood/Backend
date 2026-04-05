@@ -14,7 +14,14 @@ import org.springframework.data.domain.Persistable;
  * Message - Individual chat messages
  */
 @Entity
-@Table(name = "message")
+@Table(
+    name = "message",
+    indexes = {
+        @Index(name = "idx_msg_conv_created", columnList = "conversation_conversation_id,created_date"),
+        @Index(name = "idx_msg_sender", columnList = "sender_id,created_date"),
+        @Index(name = "idx_msg_client_id", columnList = "client_message_id")
+    }
+)
 @JsonIgnoreProperties(value = { "new", "id" })
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class Message extends AbstractAuditingEntity<String> implements Serializable, Persistable<String> {
@@ -44,6 +51,13 @@ public class Message extends AbstractAuditingEntity<String> implements Serializa
     private String senderAvatar;
 
     /**
+     * Type: USER, SHOP
+     */
+    @Size(max = 10)
+    @Column(name = "sender_type", length = 10)
+    private String senderType;
+
+    /**
      * Type: TEXT, IMAGE, VIDEO, FILE, AUDIO, LOCATION, STICKER, SYSTEM, ORDER_CARD, PRODUCT_CARD
      */
     @NotNull
@@ -53,6 +67,9 @@ public class Message extends AbstractAuditingEntity<String> implements Serializa
 
     @Column(name = "content", columnDefinition = "TEXT")
     private String content;
+
+    @Column(name = "metadata", columnDefinition = "TEXT")
+    private String metadata;
 
     @Size(max = 200)
     @Column(name = "content_preview", length = 200)
@@ -86,6 +103,9 @@ public class Message extends AbstractAuditingEntity<String> implements Serializa
     @Size(max = 20)
     @Column(name = "status", length = 20, nullable = false)
     private String status;
+
+    @Column(name = "is_read")
+    private Boolean isRead;
 
     @Column(name = "is_edited")
     private Integer isEdited;
@@ -124,6 +144,7 @@ public class Message extends AbstractAuditingEntity<String> implements Serializa
 
     @ManyToOne(optional = false)
     @NotNull
+    @JoinColumn(name = "conversation_conversation_id", nullable = false)
     @JsonIgnoreProperties(value = { "settings", "participants", "messages" }, allowSetters = true)
     private Conversation conversation;
 
@@ -194,6 +215,19 @@ public class Message extends AbstractAuditingEntity<String> implements Serializa
         this.senderAvatar = senderAvatar;
     }
 
+    public String getSenderType() {
+        return this.senderType;
+    }
+
+    public Message senderType(String senderType) {
+        this.setSenderType(senderType);
+        return this;
+    }
+
+    public void setSenderType(String senderType) {
+        this.senderType = senderType;
+    }
+
     public String getMessageType() {
         return this.messageType;
     }
@@ -218,6 +252,19 @@ public class Message extends AbstractAuditingEntity<String> implements Serializa
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public String getMetadata() {
+        return this.metadata;
+    }
+
+    public Message metadata(String metadata) {
+        this.setMetadata(metadata);
+        return this;
+    }
+
+    public void setMetadata(String metadata) {
+        this.metadata = metadata;
     }
 
     public String getContentPreview() {
@@ -322,6 +369,19 @@ public class Message extends AbstractAuditingEntity<String> implements Serializa
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public Boolean getIsRead() {
+        return this.isRead;
+    }
+
+    public Message isRead(Boolean isRead) {
+        this.setIsRead(isRead);
+        return this;
+    }
+
+    public void setIsRead(Boolean isRead) {
+        this.isRead = isRead;
     }
 
     public Integer getIsEdited() {
@@ -564,8 +624,10 @@ public class Message extends AbstractAuditingEntity<String> implements Serializa
             ", senderId='" + getSenderId() + "'" +
             ", senderName='" + getSenderName() + "'" +
             ", senderAvatar='" + getSenderAvatar() + "'" +
+            ", senderType='" + getSenderType() + "'" +
             ", messageType='" + getMessageType() + "'" +
             ", content='" + getContent() + "'" +
+            ", metadata='" + getMetadata() + "'" +
             ", contentPreview='" + getContentPreview() + "'" +
             ", replyToMessageId='" + getReplyToMessageId() + "'" +
             ", replyToPreview='" + getReplyToPreview() + "'" +
@@ -574,6 +636,7 @@ public class Message extends AbstractAuditingEntity<String> implements Serializa
             ", referenceType='" + getReferenceType() + "'" +
             ", referenceId='" + getReferenceId() + "'" +
             ", status='" + getStatus() + "'" +
+            ", isRead=" + getIsRead() +
             ", isEdited=" + getIsEdited() +
             ", editedAt='" + getEditedAt() + "'" +
             ", isDeleted=" + getIsDeleted() +

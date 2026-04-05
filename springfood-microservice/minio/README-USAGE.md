@@ -63,6 +63,7 @@ minio:
 Bạn có thể tạo nhiều file cấu hình cho các môi trường khác nhau:
 
 **application-dev.properties**
+
 ```properties
 minio.endpoint=http://localhost:9000
 minio.access-key=dev-user
@@ -71,6 +72,7 @@ minio.bucket=dev-bucket
 ```
 
 **application-prod.properties**
+
 ```properties
 minio.endpoint=https://minio.production.com
 minio.access-key=${MINIO_ACCESS_KEY}
@@ -84,18 +86,18 @@ minio.secure=true
 ### Inject MinIOClient vào service của bạn
 
 ```java
-import com.theblood.minio.core.impl.MinIOClientImpl;
+import com.theblood.minio.core.impl.MinIOClientCustomImpl;
 import org.springframework.stereotype.Service;
 
 @Service
 public class FileService {
-    
-    private final MinIOClientImpl minioClient;
-    
-    public FileService(MinIOClientImpl minioClient) {
+
+    private final MinIOClientCustomImpl minioClient;
+
+    public FileService(MinIOClientCustomImpl minioClient) {
         this.minioClient = minioClient;
     }
-    
+
     // Sử dụng minioClient để upload/download file
 }
 ```
@@ -113,9 +115,10 @@ minio.enabled=false
 ### Override MinIO client bean
 
 ```java
+
 @Configuration
 public class CustomMinioConfig {
-    
+
     @Bean
     @Primary
     public MinIOClientImpl customMinioClient() {
@@ -127,24 +130,25 @@ public class CustomMinioConfig {
 
 ## 📝 Các thuộc tính cấu hình
 
-| Thuộc tính | Bắt buộc | Mặc định | Mô tả |
-|-----------|----------|----------|-------|
-| `minio.endpoint` | ✅ | - | URL của MinIO server |
-| `minio.access-key` | ✅ | - | Access key để xác thực |
-| `minio.secret-key` | ✅ | - | Secret key để xác thực |
-| `minio.bucket` | ✅ | - | Tên bucket mặc định |
-| `minio.secure` | ❌ | false | Sử dụng HTTPS |
-| `minio.connect-timeout` | ❌ | 10000 | Timeout kết nối (ms) |
-| `minio.write-timeout` | ❌ | 60000 | Timeout ghi (ms) |
-| `minio.read-timeout` | ❌ | 10000 | Timeout đọc (ms) |
-| `minio.auto-create-bucket` | ❌ | true | Tự động tạo bucket nếu chưa tồn tại |
-| `minio.part-size` | ❌ | 104857600 | Kích thước part cho multipart upload (bytes) |
-| `minio.base-url` | ❌ | endpoint | Base URL để tạo file URL |
-| `minio.enabled` | ❌ | true | Bật/tắt auto-configuration |
+| Thuộc tính                 | Bắt buộc | Mặc định  | Mô tả                                        |
+|----------------------------|----------|-----------|----------------------------------------------|
+| `minio.endpoint`           | ✅        | -         | URL của MinIO server                         |
+| `minio.access-key`         | ✅        | -         | Access key để xác thực                       |
+| `minio.secret-key`         | ✅        | -         | Secret key để xác thực                       |
+| `minio.bucket`             | ✅        | -         | Tên bucket mặc định                          |
+| `minio.secure`             | ❌        | false     | Sử dụng HTTPS                                |
+| `minio.connect-timeout`    | ❌        | 10000     | Timeout kết nối (ms)                         |
+| `minio.write-timeout`      | ❌        | 60000     | Timeout ghi (ms)                             |
+| `minio.read-timeout`       | ❌        | 10000     | Timeout đọc (ms)                             |
+| `minio.auto-create-bucket` | ❌        | true      | Tự động tạo bucket nếu chưa tồn tại          |
+| `minio.part-size`          | ❌        | 104857600 | Kích thước part cho multipart upload (bytes) |
+| `minio.base-url`           | ❌        | endpoint  | Base URL để tạo file URL                     |
+| `minio.enabled`            | ❌        | true      | Bật/tắt auto-configuration                   |
 
 ### Giải thích Part Size
 
 `part-size` là kích thước mỗi phần khi upload file lớn:
+
 - **Mặc định: 100MB** (104857600 bytes)
 - MinIO tự động chia file thành nhiều part và upload song song (đa luồng)
 - File nhỏ hơn part-size sẽ upload trực tiếp

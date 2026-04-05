@@ -2,17 +2,17 @@ package com.theblood.productservice.kafka.consumer;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.theblood.common.dto.kafka.Event;
-import com.theblood.common.dto.kafka.OrderCreationEvent;
-import com.theblood.common.enums.MessageStatus;
-import com.theblood.common.enums.kafka.SagaOrderEventType;
-import com.theblood.common.exception.custom.InvalidDataException;
 import com.theblood.productservice.common.enums.ProductStatus;
 import com.theblood.productservice.domain.Product;
-import com.theblood.productservice.dto.request.ItemRequest;
 import com.theblood.productservice.kafka.model.OutboxMessage;
 import com.theblood.productservice.kafka.repository.OutboxMessageRepository;
 import com.theblood.productservice.repository.ProductRepository;
+import com.theblood.productservice.service.dto.request.ItemRequest;
+import com.theblood.springfood.common.dto.kafka.Event;
+import com.theblood.springfood.common.dto.kafka.OrderCreationEvent;
+import com.theblood.springfood.common.enums.MessageStatus;
+import com.theblood.springfood.common.enums.kafka.SagaOrderEventType;
+import com.theblood.springfood.common.exception.custom.InvalidDataException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -39,7 +39,7 @@ public class OrderServiceConsumer {
 
 
     // product process
-    @KafkaListener(topics = "order-creation-saga")
+    @KafkaListener(topics = "order-creation-saga", groupId = "product-service-order-group")
     @Transactional
     public void handleOrderCreate(String payload) throws JsonProcessingException {
         Event event = objectMapper.convertValue(payload, Event.class);
@@ -103,7 +103,7 @@ public class OrderServiceConsumer {
     }
 
     // rollback
-    @KafkaListener(topics = "order-creation-saga")
+    @KafkaListener(topics = "order-creation-saga", groupId = "product-service-rollback-group")
     @Transactional
     public void handleOrderProductRollback(String payload) {
         Event event = objectMapper.convertValue(payload, Event.class);

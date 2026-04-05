@@ -1,6 +1,6 @@
 package com.theblood.paymentservice.kafka.model;
 
-import com.theblood.common.enums.MessageStatus;
+import com.theblood.springfood.common.enums.MessageStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

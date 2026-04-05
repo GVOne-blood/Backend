@@ -74,8 +74,10 @@ public class MessageDTO implements Serializable {
 
     private Integer reactionCount;
 
+    private Instant createdAt;
+
     @NotNull
-    private ConversationDTO conversation;
+    private String conversationId;
 
     public String getMessageId() {
         return messageId;
@@ -245,12 +247,20 @@ public class MessageDTO implements Serializable {
         this.reactionCount = reactionCount;
     }
 
-    public ConversationDTO getConversation() {
-        return conversation;
+    public Instant getCreatedAt() {
+        return createdAt;
     }
 
-    public void setConversation(ConversationDTO conversation) {
-        this.conversation = conversation;
+    public void setCreatedAt(Instant createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public String getConversationId() {
+        return conversationId;
+    }
+
+    public void setConversationId(String conversationId) {
+        this.conversationId = conversationId;
     }
 
     @Override
@@ -299,7 +309,8 @@ public class MessageDTO implements Serializable {
             ", deletedAt='" + getDeletedAt() + "'" +
             ", deletedBy='" + getDeletedBy() + "'" +
             ", reactionCount=" + getReactionCount() +
-            ", conversation=" + getConversation() +
+            ", createdAt='" + getCreatedAt() + "'" +
+            ", conversationId='" + getConversationId() + "'" +
             "}";
     }
 }

@@ -1,7 +1,7 @@
 package com.theblood.springfood.actionlog.security;
 
 
-import com.theblood.common.dto.request.UserContextHolder;
+import com.theblood.springfood.common.dto.request.UserContextHolder;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.stereotype.Component;
 

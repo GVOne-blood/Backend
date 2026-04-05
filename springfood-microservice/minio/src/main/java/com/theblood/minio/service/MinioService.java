@@ -1,6 +1,6 @@
 package com.theblood.minio.service;
 
-import com.theblood.minio.core.impl.MinIOClientImpl;
+import com.theblood.minio.core.impl.MinIOClientCustomImpl;
 import com.theblood.minio.response.MinIOResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,20 +20,20 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class MinioService {
 
-    private final MinIOClientImpl minioClient;
+    private final MinIOClientCustomImpl minioClient;
 
     /**
      * Upload file with auto-generated unique filename
      */
     public String uploadWithUniqueFilename(MultipartFile file, String folder) {
         String originalFilename = file.getOriginalFilename();
-        String extension = originalFilename != null && originalFilename.contains(".") 
-            ? originalFilename.substring(originalFilename.lastIndexOf(".")) 
-            : "";
-        
+        String extension = originalFilename != null && originalFilename.contains(".")
+                ? originalFilename.substring(originalFilename.lastIndexOf("."))
+                : "";
+
         String uniqueFilename = UUID.randomUUID().toString() + extension;
         String objectKey = folder.isEmpty() ? uniqueFilename : folder + "/" + uniqueFilename;
-        
+
         return minioClient.upload(file, objectKey);
     }
 
@@ -43,7 +43,7 @@ public class MinioService {
     public String upload(MultipartFile file, String folder) {
         String filename = file.getOriginalFilename();
         String objectKey = folder.isEmpty() ? filename : folder + "/" + filename;
-        
+
         return minioClient.upload(file, objectKey);
     }
 
@@ -101,11 +101,11 @@ public class MinioService {
      */
     public String[] uploadMultiple(MultipartFile[] files, String folder) {
         String[] urls = new String[files.length];
-        
+
         for (int i = 0; i < files.length; i++) {
             urls[i] = upload(files[i], folder);
         }
-        
+
         return urls;
     }
 
@@ -114,11 +114,11 @@ public class MinioService {
      */
     public boolean[] deleteMultiple(String[] objectKeys) {
         boolean[] results = new boolean[objectKeys.length];
-        
+
         for (int i = 0; i < objectKeys.length; i++) {
             results[i] = delete(objectKeys[i]);
         }
-        
+
         return results;
     }
 }

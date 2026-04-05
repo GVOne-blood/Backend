@@ -125,7 +125,7 @@ apisix:
   api-key: your-api-key
   api-url: your-apisix-url
 carbone:
-  base-url: ${CARBONE_BASE_URL:http://117.5.148.63:8100/api/v1} # http://10.60.108.80:8100/api/v1
+  base-url: ${CARBONE_BASE_URL:http://localhost:4000/api/v1}
 kpi:
   database: postgresql
   datasource:

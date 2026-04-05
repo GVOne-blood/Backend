@@ -2,11 +2,11 @@ package com.theblood.productservice.service.impl;
 
 import com.theblood.productservice.background.process.ProductDetailProcess;
 import com.theblood.productservice.background.process.ProductRelateProcess;
-import com.theblood.productservice.dto.request.RelateProductRequest;
-import com.theblood.productservice.mapper.ProductMapper;
 import com.theblood.productservice.repository.FeedbackRepository;
 import com.theblood.productservice.repository.ProductCategoryRepository;
 import com.theblood.productservice.repository.ProductRepository;
+import com.theblood.productservice.service.dto.request.RelateProductRequest;
+import com.theblood.productservice.service.mapper.ProductMapper;
 import jakarta.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

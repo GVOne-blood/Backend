@@ -1,8 +1,8 @@
 package com.theblood.orderservice.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.theblood.common.dto.request.CustomUserPrincipal;
-import com.theblood.common.dto.response.ResponseData;
+import com.theblood.springfood.common.dto.request.CustomUserPrincipal;
+import com.theblood.springfood.common.dto.response.ResponseData;
 import com.theblood.orderservice.dto.request.OrderRequest;
 import com.theblood.orderservice.dto.response.OrderPaymentResponse;
 import com.theblood.orderservice.service.OrderService;

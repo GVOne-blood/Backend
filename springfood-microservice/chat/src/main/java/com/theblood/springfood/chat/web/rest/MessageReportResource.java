@@ -6,11 +6,13 @@ import com.theblood.springfood.chat.service.dto.MessageReportDTO;
 import com.theblood.springfood.chat.web.rest.errors.BadRequestAlertException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,7 +27,7 @@ import tech.jhipster.web.util.PaginationUtil;
 import tech.jhipster.web.util.ResponseUtil;
 
 /**
- * REST controller for managing {@link com.theblood.springfood.chat.domain.MessageReport}.
+ * REST resources for managing {@link com.theblood.springfood.chat.domain.MessageReport}.
  */
 @RestController
 @RequestMapping("/api/message-reports")
@@ -34,13 +36,10 @@ public class MessageReportResource {
     private static final Logger LOG = LoggerFactory.getLogger(MessageReportResource.class);
 
     private static final String ENTITY_NAME = "chatMessageReport";
-
+    private final MessageReportService messageReportService;
+    private final MessageReportRepository messageReportRepository;
     @Value("${jhipster.clientApp.name}")
     private String applicationName;
-
-    private final MessageReportService messageReportService;
-
-    private final MessageReportRepository messageReportRepository;
 
     public MessageReportResource(MessageReportService messageReportService, MessageReportRepository messageReportRepository) {
         this.messageReportService = messageReportService;
@@ -70,7 +69,7 @@ public class MessageReportResource {
     /**
      * {@code PUT  /message-reports/:reportId} : Updates an existing messageReport.
      *
-     * @param reportId the id of the messageReportDTO to save.
+     * @param reportId         the id of the messageReportDTO to save.
      * @param messageReportDTO the messageReportDTO to update.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated messageReportDTO,
      * or with status {@code 400 (Bad Request)} if the messageReportDTO is not valid,
@@ -103,7 +102,7 @@ public class MessageReportResource {
     /**
      * {@code PATCH  /message-reports/:reportId} : Partial updates given fields of an existing messageReport, field will ignore if it is null
      *
-     * @param reportId the id of the messageReportDTO to save.
+     * @param reportId         the id of the messageReportDTO to save.
      * @param messageReportDTO the messageReportDTO to update.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated messageReportDTO,
      * or with status {@code 400 (Bad Request)} if the messageReportDTO is not valid,
@@ -111,7 +110,7 @@ public class MessageReportResource {
      * or with status {@code 500 (Internal Server Error)} if the messageReportDTO couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PatchMapping(value = "/{reportId}", consumes = { "application/json", "application/merge-patch+json" })
+    @PatchMapping(value = "/{reportId}", consumes = {"application/json", "application/merge-patch+json"})
     public ResponseEntity<MessageReportDTO> partialUpdateMessageReport(
         @PathVariable(value = "reportId", required = false) final String reportId,
         @NotNull @RequestBody MessageReportDTO messageReportDTO

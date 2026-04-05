@@ -20,7 +20,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Optional;
 
-@SpringBootApplication(scanBasePackages = "com.theblood.common, com.theblood.shopservice")
+@SpringBootApplication(scanBasePackages = "com.theblood.springfood.common, com.theblood.shopservice")
 @EnableConfigurationProperties({LiquibaseProperties.class, ApplicationProperties.class})
 public class ShopServiceApp {
 

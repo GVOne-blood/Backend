@@ -1,12 +1,12 @@
 package com.theblood.productservice.background.process;
 
-import com.theblood.common.dto.response.ProductDetail;
-import com.theblood.common.exception.custom.InvalidDataException;
-import com.theblood.productservice.mapper.ProductMapper;
 import com.theblood.productservice.repository.FeedbackRepository;
 import com.theblood.productservice.repository.ProductRepository;
 import com.theblood.productservice.repository.projection.ProductProjection;
 import com.theblood.productservice.service.impl.RedisServiceWrapper;
+import com.theblood.productservice.service.mapper.ProductMapper;
+import com.theblood.springfood.common.dto.response.ProductDetail;
+import com.theblood.springfood.common.exception.custom.InvalidDataException;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.UUID;

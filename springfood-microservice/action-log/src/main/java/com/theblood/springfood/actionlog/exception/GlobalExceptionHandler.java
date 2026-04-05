@@ -1,11 +1,11 @@
 package com.theblood.springfood.actionlog.exception;
 
 
-import com.theblood.common.dto.response.ApiResponse;
-import com.theblood.common.exception.custom.BadRequestException;
-import com.theblood.common.exception.custom.NotFoundException;
-import com.theblood.common.exception.custom.ResourceExistedException;
-import com.theblood.common.util.MessageUtils;
+import com.theblood.springfood.common.dto.response.ApiResponse;
+import com.theblood.springfood.common.exception.custom.BadRequestException;
+import com.theblood.springfood.common.exception.custom.NotFoundException;
+import com.theblood.springfood.common.exception.custom.ResourceExistedException;
+import com.theblood.springfood.common.util.MessageUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

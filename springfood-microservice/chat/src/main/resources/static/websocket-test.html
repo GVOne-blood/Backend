@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket Chat Tester</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #0f172a;
+            color: #e2e8f0;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            border-bottom: 1px solid #334155;
+            padding: 12px 24px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 1.4rem;
+            color: #60a5fa;
+        }
+
+        .header p {
+            font-size: 0.8rem;
+            color: #94a3b8;
+            margin-top: 4px;
+        }
+
+        .config-bar {
+            background: #1e293b;
+            padding: 8px 24px;
+            border-bottom: 1px solid #334155;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .config-bar label {
+            font-size: 0.8rem;
+            color: #94a3b8;
+        }
+
+        .config-bar input {
+            background: #0f172a;
+            border: 1px solid #334155;
+            color: #fbbf24;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            width: 300px;
+            font-family: monospace;
+        }
+
+        .main {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            padding: 12px;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .panel {
+            background: #1e293b;
+            border-radius: 10px;
+            border: 1px solid #334155;
+            overflow: hidden;
+        }
+
+        .panel.pa {
+            border-top: 3px solid #3b82f6;
+        }
+
+        .panel.pb {
+            border-top: 3px solid #10b981;
+        }
+
+        .ph {
+            padding: 10px 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 1px solid #334155;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #ef4444;
+        }
+
+        .dot.on {
+            background: #22c55e;
+        }
+
+        .ph .lbl {
+            font-weight: 600;
+        }
+
+        .ph .st {
+            margin-left: auto;
+            font-size: 0.8rem;
+            color: #94a3b8;
+        }
+
+        .sec {
+            padding: 10px 14px;
+            border-bottom: 1px solid #1e293b44;
+        }
+
+        .stitle {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 6px;
+        }
+
+        .row {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 6px;
+        }
+
+        .row:last-child {
+            margin-bottom: 0;
+        }
+
+        input {
+            background: #0f172a;
+            border: 1px solid #334155;
+            color: #e2e8f0;
+            padding: 6px 10px;
+            border-radius: 5px;
+            font-size: 0.82rem;
+            flex: 1;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: #3b82f6;
+        }
+
+        button {
+            padding: 6px 14px;
+            border-radius: 5px;
+            border: none;
+            font-size: 0.82rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s;
+            white-space: nowrap;
+        }
+
+        .bp {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .bg {
+            background: #10b981;
+            color: white;
+        }
+
+        .br {
+            background: #ef4444;
+            color: white;
+        }
+
+        .by {
+            background: #f59e0b;
+            color: #0f172a;
+        }
+
+        .bv {
+            background: #8b5cf6;
+            color: white;
+        }
+
+        .bs {
+            padding: 4px 8px;
+            font-size: 0.72rem;
+        }
+
+        button:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .logs {
+            height: 300px;
+            overflow-y: auto;
+            background: #0f172a;
+            border-radius: 5px;
+            padding: 6px;
+            font-family: 'Cascadia Code', 'Fira Code', monospace;
+            font-size: 0.72rem;
+            line-height: 1.5;
+        }
+
+        .le {
+            padding: 1px 4px;
+            border-radius: 2px;
+        }
+
+        .le.i {
+            color: #60a5fa;
+        }
+
+        .le.s {
+            color: #34d399;
+        }
+
+        .le.e {
+            color: #f87171;
+        }
+
+        .le.w {
+            color: #fbbf24;
+        }
+
+        .le.mi {
+            color: #a78bfa;
+            background: #1e1a3a;
+        }
+
+        .le.mo {
+            color: #67e8f9;
+            background: #0c2d3d;
+        }
+
+        .msgs {
+            height: 180px;
+            overflow-y: auto;
+            background: #0f172a;
+            border-radius: 5px;
+            padding: 6px;
+        }
+
+        .cm {
+            padding: 6px 10px;
+            margin-bottom: 4px;
+            border-radius: 6px;
+            font-size: 0.82rem;
+        }
+
+        .cm.sent {
+            background: #1e3a5f;
+            margin-left: 25%;
+            text-align: right;
+        }
+
+        .cm.recv {
+            background: #1a2e1a;
+            margin-right: 25%;
+        }
+
+        .cm .sn {
+            font-size: 0.68rem;
+            color: #94a3b8;
+        }
+
+        .cm .tm {
+            font-size: 0.62rem;
+            color: #64748b;
+            margin-top: 2px;
+        }
+
+        .ti {
+            font-size: 0.72rem;
+            color: #94a3b8;
+            font-style: italic;
+            padding: 2px 6px;
+            min-height: 18px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <h1>🔌 WebSocket Chat Tester</h1>
+        <p>STOMP over WebSocket | Two user panels for real-time testing</p>
+    </div>
+    <div class="config-bar">
+        <label>Chat Service URL:</label>
+        <input id="baseUrl" value="http://localhost:9098" oninput="updateUrls()" />
+        <label style="margin-left:12px">WS URL:</label>
+        <input id="wsUrl" value="ws://localhost:9098/ws" readonly style="color:#94a3b8" />
+        <span style="margin-left:auto;font-size:0.72rem;color:#64748b" id="originInfo"></span>
+    </div>
+
+    <div class="main">
+        <!-- Panel A -->
+        <div class="panel pa">
+            <div class="ph">
+                <div class="dot" id="dA"></div><span class="lbl">👤 User A</span><span class="st"
+                    id="sA">Disconnected</span>
+            </div>
+            <div class="sec">
+                <div class="stitle">🔑 Auth</div>
+                <div class="row"><input id="tA" placeholder="Paste JWT Access Token" /></div>
+                <div class="row">
+                    <input id="uA" placeholder="User ID (auto)" readonly style="flex:0.4" />
+                    <button class="bp" id="cA" onclick="connect('A')">Connect</button>
+                    <button class="br bs" id="dcA" onclick="disconnect('A')" disabled>Disconnect</button>
+                </div>
+            </div>
+            <div class="sec">
+                <div class="stitle">💬 Create Conversation</div>
+                <div class="row">
+                    <input id="p1A" placeholder="User A ID" style="flex:0.5" />
+                    <input id="p2A" placeholder="User B ID" style="flex:0.5" />
+                    <button class="bg bs" onclick="createConv('A')">Create</button>
+                </div>
+            </div>
+            <div class="sec">
+                <div class="stitle">✉️ Chat</div>
+                <div class="row">
+                    <input id="ciA" placeholder="Conversation ID" oninput="sync('A')" />
+                    <button class="by bs" onclick="verify('A')">Verify</button>
+                </div>
+                <div class="row">
+                    <input id="miA" placeholder="Type a message..." onkeydown="if(event.key==='Enter')send('A')" />
+                    <button class="bp" onclick="send('A')">Send</button>
+                </div>
+            </div>
+            <div class="sec">
+                <div class="stitle">📨 Messages</div>
+                <div class="ti" id="tiA"></div>
+                <div class="msgs" id="msA"></div>
+            </div>
+            <div class="sec">
+                <div class="stitle">📋 Log</div>
+                <div class="logs" id="lA"></div>
+            </div>
+        </div>
+
+        <!-- Panel B -->
+        <div class="panel pb">
+            <div class="ph">
+                <div class="dot" id="dB"></div><span class="lbl">👤 User B</span><span class="st"
+                    id="sB">Disconnected</span>
+            </div>
+            <div class="sec">
+                <div class="stitle">🔑 Auth</div>
+                <div class="row"><input id="tB" placeholder="Paste JWT Access Token" /></div>
+                <div class="row">
+                    <input id="uB" placeholder="User ID (auto)" readonly style="flex:0.4" />
+                    <button class="bg" id="cB" onclick="connect('B')">Connect</button>
+                    <button class="br bs" id="dcB" onclick="disconnect('B')" disabled>Disconnect</button>
+                </div>
+            </div>
+            <div class="sec">
+                <div class="stitle">💬 Create Conversation</div>
+                <div class="row">
+                    <input id="p1B" placeholder="User A ID" style="flex:0.5" />
+                    <input id="p2B" placeholder="User B ID" style="flex:0.5" />
+                    <button class="bg bs" onclick="createConv('B')">Create</button>
+                </div>
+            </div>
+            <div class="sec">
+                <div class="stitle">✉️ Chat</div>
+                <div class="row">
+                    <input id="ciB" placeholder="Conversation ID" oninput="sync('B')" />
+                    <button class="by bs" onclick="verify('B')">Verify</button>
+                </div>
+                <div class="row">
+                    <input id="miB" placeholder="Type a message..." onkeydown="if(event.key==='Enter')send('B')" />
+                    <button class="bg" onclick="send('B')">Send</button>
+                </div>
+            </div>
+            <div class="sec">
+                <div class="stitle">📨 Messages</div>
+                <div class="ti" id="tiB"></div>
+                <div class="msgs" id="msB"></div>
+            </div>
+            <div class="sec">
+                <div class="stitle">📋 Log</div>
+                <div class="logs" id="lB"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================================
+        // CONFIG
+        // ============================================================
+        let BASE = 'http://localhost:9098';
+        let WS = 'ws://localhost:9098/ws';
+        const U = { A: { ws: null, ok: false, tk: null, id: null, lm: null }, B: { ws: null, ok: false, tk: null, id: null, lm: null } };
+        let subN = 0;
+
+        function updateUrls() {
+            BASE = document.getElementById('baseUrl').value.trim();
+            WS = BASE.replace('http', 'ws') + '/ws';
+            document.getElementById('wsUrl').value = WS;
+        }
+
+        document.getElementById('originInfo').textContent = `Page origin: ${window.location.origin || 'file://'}`;
+
+        // ============================================================
+        // LOGGING
+        // ============================================================
+        function L(u, m, t = 'i') {
+            const c = document.getElementById(`l${u}`);
+            const d = document.createElement('div');
+            d.className = `le ${t}`;
+            d.textContent = `[${new Date().toLocaleTimeString()}] ${m}`;
+            c.appendChild(d);
+            c.scrollTop = c.scrollHeight;
+            if (t === 'e') console.error(`[User ${u}]`, m);
+        }
+
+        function setSt(u, s, on) {
+            document.getElementById(`s${u}`).textContent = s;
+            document.getElementById(`d${u}`).classList.toggle('on', on);
+        }
+
+        function addMsg(u, msg, sent) {
+            const c = document.getElementById(`ms${u}`);
+            const d = document.createElement('div');
+            d.className = `cm ${sent ? 'sent' : 'recv'}`;
+            d.innerHTML = `<div class="sn">${msg.senderId || '?'}</div><div>${msg.content || ''}</div><div class="tm">${new Date().toLocaleTimeString()}</div>`;
+            c.appendChild(d);
+            c.scrollTop = c.scrollHeight;
+        }
+
+        function jwt(t) { try { return JSON.parse(atob(t.split('.')[1])); } catch { return null; } }
+        function sync(f) { const v = document.getElementById(`ci${f}`).value; document.getElementById(`ci${f === 'A' ? 'B' : 'A'}`).value = v; }
+
+        // ============================================================
+        // STOMP
+        // ============================================================
+        function enc(cmd, h = {}, b = '') {
+            let f = cmd + '\n';
+            for (const [k, v] of Object.entries(h)) f += `${k}:${v}\n`;
+            return f + '\n' + b + '\0';
+        }
+
+        function dec(d) {
+            if (!d || d.trim() === '' || d === '\n') return { cmd: 'HB' };
+            const i = d.indexOf('\n\n');
+            if (i === -1) return { cmd: '?', raw: d };
+            const top = d.substring(0, i);
+            let body = d.substring(i + 2);
+            if (body.endsWith('\0')) body = body.slice(0, -1);
+            const lines = top.split('\n');
+            const cmd = lines[0].trim();
+            const h = {};
+            for (let j = 1; j < lines.length; j++) {
+                const ci = lines[j].indexOf(':');
+                if (ci > 0) h[lines[j].substring(0, ci).trim()] = lines[j].substring(ci + 1).trim();
+            }
+            return { cmd, h, body };
+        }
+
+        // ============================================================
+        // CONNECT
+        // ============================================================
+        function connect(u) {
+            const tk = document.getElementById(`t${u}`).value.trim();
+            if (!tk) { L(u, 'Paste JWT token first!', 'e'); return; }
+
+            const d = jwt(tk);
+            if (!d) { L(u, 'Invalid JWT format', 'e'); return; }
+
+            const id = d.sub || d.userId;
+            document.getElementById(`u${u}`).value = id;
+            U[u].tk = tk; U[u].id = id;
+
+            L(u, `JWT: userId=${id}, type=${d.type || '?'}, exp=${d.exp ? new Date(d.exp * 1000).toLocaleString() : '?'}`, 'i');
+
+            // Auto-fill participant fields
+            document.getElementById(`p1${u}`).value = id;
+            const o = u === 'A' ? 'B' : 'A';
+            if (U[o].id) { document.getElementById(`p2${u}`).value = U[o].id; document.getElementById(`p2${o}`).value = id; }
+
+            L(u, `Connecting to ${WS}...`, 'i');
+            setSt(u, 'Connecting...', false);
+
+            try {
+                const ws = new WebSocket(WS);
+                U[u].ws = ws;
+
+                ws.onopen = () => {
+                    L(u, 'WS opened, sending STOMP CONNECT...', 'i');
+                    ws.send(enc('CONNECT', { 'accept-version': '1.2', 'heart-beat': '10000,10000', 'Authorization': `Bearer ${tk}` }));
+                };
+
+                ws.onmessage = (ev) => {
+                    const f = dec(ev.data);
+                    switch (f.cmd) {
+                        case 'CONNECTED':
+                            L(u, `✅ STOMP CONNECTED (v${f.h['version'] || '?'})`, 's');
+                            setSt(u, 'Connected', true);
+                            U[u].ok = true;
+                            document.getElementById(`c${u}`).disabled = true;
+                            document.getElementById(`dc${u}`).disabled = false;
+                            sub(u);
+                            break;
+                        case 'MESSAGE': onMsg(u, f); break;
+                        case 'ERROR':
+                            L(u, `❌ STOMP ERROR: ${f.h.message || ''} | ${f.body || ''}`, 'e');
+                            break;
+                        case 'RECEIPT': L(u, `Receipt: ${f.h['receipt-id']}`, 'i'); break;
+                        case 'HB': ws.send('\n'); break;
+                        default: L(u, `Frame: ${f.cmd}`, 'i');
+                    }
+                };
+
+                ws.onerror = () => { L(u, '❌ WS error - check if chat service is running', 'e'); };
+                ws.onclose = (ev) => {
+                    L(u, `WS closed (code=${ev.code}, reason=${ev.reason || 'N/A'})`, ev.code === 1000 ? 'i' : 'w');
+                    setSt(u, 'Disconnected', false); U[u].ok = false;
+                    document.getElementById(`c${u}`).disabled = false; document.getElementById(`dc${u}`).disabled = true;
+                };
+            } catch (e) { L(u, `❌ ${e.message}`, 'e'); }
+        }
+
+        function disconnect(u) {
+            if (U[u].ws) { try { U[u].ws.send(enc('DISCONNECT', { receipt: 'dc' })); } catch { } setTimeout(() => U[u].ws?.close(), 300); }
+        }
+
+        // ============================================================
+        // SUBSCRIBE - CRITICAL: use /user/queue/... WITHOUT userId
+        // Spring resolves user destinations by session, not by userId in path
+        // ============================================================
+        function sub(u) {
+            const ws = U[u].ws;
+            if (!ws || !U[u].ok) return;
+
+            // Messages - subscribe to /user/queue/messages (Spring resolves by session)
+            ws.send(enc('SUBSCRIBE', { id: `msg-${++subN}`, destination: '/user/queue/messages' }));
+            L(u, '📥 Subscribed to /user/queue/messages', 's');
+
+            // Errors
+            ws.send(enc('SUBSCRIBE', { id: `err-${++subN}`, destination: '/user/queue/errors' }));
+            L(u, '📥 Subscribed to /user/queue/errors', 's');
+        }
+
+        function subConv(u, cid) {
+            const ws = U[u].ws;
+            if (!ws || !U[u].ok || !cid) return;
+            ws.send(enc('SUBSCRIBE', { id: `typ-${++subN}`, destination: `/topic/conversation.${cid}.typing` }));
+            ws.send(enc('SUBSCRIBE', { id: `rd-${++subN}`, destination: `/topic/conversation.${cid}.read` }));
+            L(u, `📥 Subscribed to typing+read for conv ${cid.substring(0, 8)}...`, 's');
+        }
+
+        // ============================================================
+        // MESSAGE HANDLING
+        // ============================================================
+        function onMsg(u, f) {
+            const dest = f.h.destination || '';
+            try {
+                const p = f.body ? JSON.parse(f.body) : {};
+                if (dest.includes('/queue/messages')) {
+                    L(u, `📩 MSG from ${p.senderId || '?'}: "${(p.content || '').substring(0, 60)}"`, 'mi');
+                    addMsg(u, p, p.senderId === U[u].id);
+                    U[u].lm = p.messageId;
+                } else if (dest.includes('/queue/errors')) {
+                    L(u, `⚠️ SERVER ERROR: ${p.error || '?'} - ${p.message || JSON.stringify(p)}`, 'e');
+                } else if (dest.includes('.typing')) {
+                    if (p.userId !== U[u].id) {
+                        document.getElementById(`ti${u}`).textContent = p.isTyping ? `${p.userId} typing...` : '';
+                        if (p.isTyping) setTimeout(() => document.getElementById(`ti${u}`).textContent = '', 5000);
+                    }
+                } else if (dest.includes('.read')) {
+                    L(u, `✓✓ Read: ${p.userId} read ${p.lastReadMessageId}`, 'i');
+                } else {
+                    L(u, `📬 ${dest}: ${f.body.substring(0, 80)}`, 'mi');
+                }
+            } catch { L(u, `Raw frame on ${dest}: ${(f.body || '').substring(0, 100)}`, 'i'); }
+        }
+
+        // ============================================================
+        // SEND MESSAGE
+        // ============================================================
+        function send(u) {
+            if (!U[u].ws || !U[u].ok) { L(u, 'Not connected!', 'e'); return; }
+            const cid = document.getElementById(`ci${u}`).value.trim();
+            const txt = document.getElementById(`mi${u}`).value.trim();
+            if (!cid) { L(u, 'Enter Conversation ID!', 'e'); return; }
+            if (!txt) { L(u, 'Enter message!', 'e'); return; }
+
+            U[u].ws.send(enc('SEND', { destination: '/app/chat.send', 'content-type': 'application/json' },
+                JSON.stringify({ conversationId: cid, content: txt, clientMessageId: `c-${Date.now()}`, messageType: 'TEXT' })));
+
+            L(u, `📤 Sent: "${txt}" → conv ${cid.substring(0, 8)}...`, 'mo');
+            document.getElementById(`mi${u}`).value = '';
+        }
+
+        // ============================================================
+        // REST API CALLS
+        // ============================================================
+        async function api(u, method, path, body) {
+            const tk = U[u].tk || document.getElementById(`t${u}`).value.trim();
+            if (!tk) { L(u, 'JWT required!', 'e'); return null; }
+
+            const url = `${BASE}${path}`;
+            L(u, `🌐 ${method} ${url}`, 'i');
+
+            try {
+                const opts = { method, headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${tk}` } };
+                if (body) opts.body = JSON.stringify(body);
+
+                const r = await fetch(url, opts);
+                const txt = await r.text();
+
+                if (r.ok) {
+                    L(u, `✅ ${r.status} OK`, 's');
+                    try { return JSON.parse(txt); } catch { return txt; }
+                } else {
+                    L(u, `❌ ${r.status} ${r.statusText}: ${txt.substring(0, 200)}`, 'e');
+                    return null;
+                }
+            } catch (e) {
+                L(u, `❌ Network error: ${e.message}`, 'e');
+                L(u, `⚠️ Possible CORS issue. Page origin=${window.location.origin}, API=${BASE}`, 'w');
+                L(u, `💡 Try: Open browser console (F12) → Console tab for CORS errors`, 'w');
+                return null;
+            }
+        }
+
+        async function createConv(u) {
+            const p1 = document.getElementById(`p1${u}`).value.trim();
+            const p2 = document.getElementById(`p2${u}`).value.trim();
+            if (!p1 || !p2) { L(u, 'Both participant IDs needed!', 'e'); return; }
+
+            L(u, `Creating DIRECT conv: ${p1.substring(0, 12)}... ↔ ${p2.substring(0, 12)}...`, 'i');
+
+            const d = await api(u, 'POST', '/api/conversations', { conversationType: 'DIRECT', participantIds: [p1, p2] });
+            if (d && d.conversationId) {
+                L(u, `✅ Conv created: ${d.conversationId}`, 's');
+                document.getElementById('ciA').value = d.conversationId;
+                document.getElementById('ciB').value = d.conversationId;
+                subConv('A', d.conversationId);
+                subConv('B', d.conversationId);
+            } else {
+                L(u, '❌ Failed to create conversation - check logs above', 'e');
+            }
+        }
+
+        async function verify(u) {
+            const cid = document.getElementById(`ci${u}`).value.trim();
+            if (!cid) { L(u, 'Enter Conversation ID first!', 'e'); return; }
+
+            L(u, `🔍 Verifying conv ${cid.substring(0, 12)}...`, 'i');
+            const d = await api(u, 'GET', `/api/conversations/${cid}`);
+            if (d) {
+                L(u, `✅ You ARE a participant! type=${d.conversationType}`, 's');
+            } else {
+                L(u, `❌ You are NOT a participant or conv doesn't exist`, 'e');
+                L(u, `💡 Try creating a NEW conversation with the Create button`, 'w');
+            }
+
+            // List user's conversations
+            const list = await api(u, 'GET', '/api/conversations?size=5&sort=createdDate,desc');
+            if (list && Array.isArray(list)) {
+                L(u, `📋 Your ${list.length} conversations:`, 'i');
+                list.forEach(c => L(u, `  → ${c.conversationId} (${c.conversationType})`, 'i'));
+            }
+        }
+
+        // Auto-decode JWT on paste
+        ['A', 'B'].forEach(u => {
+            document.getElementById(`t${u}`).addEventListener('paste', () => {
+                setTimeout(() => { const d = jwt(document.getElementById(`t${u}`).value.trim()); if (d) document.getElementById(`u${u}`).value = d.sub || ''; }, 100);
+            });
+        });
+
+        L('A', 'Ready. Paste JWT token → Connect → Create conversation → Send messages', 'i');
+        L('B', 'Ready. Paste JWT token → Connect → Create conversation → Send messages', 'i');
+    </script>
+</body>
+
+</html>

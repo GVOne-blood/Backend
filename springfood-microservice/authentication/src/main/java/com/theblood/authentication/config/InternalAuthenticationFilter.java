@@ -1,6 +1,6 @@
 package com.theblood.authentication.config;
 
-import com.theblood.common.dto.request.CustomUserPrincipal;
+import com.theblood.springfood.common.dto.request.CustomUserPrincipal;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

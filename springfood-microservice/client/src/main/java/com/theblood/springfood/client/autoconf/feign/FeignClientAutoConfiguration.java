@@ -13,6 +13,7 @@ import feign.okhttp.OkHttpClient;
 import feign.slf4j.Slf4jLogger;
 import okhttp3.ConnectionPool;
 import okhttp3.Protocol;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -120,7 +121,7 @@ public class FeignClientAutoConfiguration {
             Logger.Level logLevel,
             QueryMapEncoder queryMapEncoder,
             ClientProperties clientProperties,
-            FeignRequestInterceptor requestInterceptor) {
+            @Autowired(required = false) FeignRequestInterceptor requestInterceptor) {
         return new FeignClientBuilderImpl(contract, encoder, decoder, client, logger, logLevel, queryMapEncoder, clientProperties, requestInterceptor);
     }
 

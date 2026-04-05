@@ -11,7 +11,12 @@ import org.springframework.data.domain.Persistable;
  * MessageReaction - Emoji reactions
  */
 @Entity
-@Table(name = "message_reaction")
+@Table(
+    name = "message_reaction",
+    indexes = {
+        @Index(name = "idx_reaction_msg_user_emoji", columnList = "message_id,user_id,emoji", unique = true)
+    }
+)
 @JsonIgnoreProperties(value = { "new", "id" })
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class MessageReaction extends AbstractAuditingEntity<String> implements Serializable, Persistable<String> {

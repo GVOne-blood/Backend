@@ -1,6 +1,6 @@
 package com.theblood.minio.config;
 
-import com.theblood.minio.core.impl.MinIOClientImpl;
+import com.theblood.minio.core.impl.MinIOClientCustomImpl;
 import io.minio.MinioClient;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -8,8 +8,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import java.util.concurrent.TimeUnit;
 
 /**
  * MinIO Auto Configuration
@@ -44,12 +42,12 @@ public class MinioConfig {
      */
     @Bean
     @ConditionalOnMissingBean
-    public MinIOClientImpl minIOClient(MinioClient minioClient) {
-        String baseUrl = minioProperties.getBaseUrl() != null 
-            ? minioProperties.getBaseUrl() 
-            : minioProperties.getEndpoint();
-            
-        return new MinIOClientImpl(
+    public MinIOClientCustomImpl minIOClient(MinioClient minioClient) {
+        String baseUrl = minioProperties.getBaseUrl() != null
+                ? minioProperties.getBaseUrl()
+                : minioProperties.getEndpoint();
+
+        return new MinIOClientCustomImpl(
                 minioClient,
                 minioProperties.getBucket(),
                 minioProperties.isAutoCreateBucket(),

@@ -1,0 +1,20 @@
+# Ignore sensitive deployment files
+*.key
+*.pem
+*.p12
+*.jks
+*-credentials.json
+*-secrets.yml
+*-secrets.yaml
+
+# Ignore Kafka certificates
+messaging/certs/
+
+# Ignore local deployment configs
+local/
+.local/
+
+# Ignore backup files
+*.backup
+*.bak
+*.old

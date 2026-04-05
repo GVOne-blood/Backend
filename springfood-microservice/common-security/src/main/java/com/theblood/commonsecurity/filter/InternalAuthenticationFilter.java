@@ -1,4 +1,4 @@
-package com.theblood.commonsecurity.filter;
+package com.theblood.springfood.commonsecurity.filter;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

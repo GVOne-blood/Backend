@@ -1,6 +1,6 @@
 package com.theblood.paymentservice.mapper;
 
-import com.theblood.common.grpc.PaymentRequest;
+import com.theblood.springfood.common.grpc.PaymentRequest;
 import com.theblood.paymentservice.dto.request.PaymentInfoRequest;
 import org.mapstruct.Mapper;
 

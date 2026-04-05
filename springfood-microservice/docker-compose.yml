@@ -1,14 +1,16 @@
 version: '3.8'
 
 services:
-  # PostgreSQL Database
+  # PostgreSQL Database with pgvector extension
   postgres:
-    image: postgres:15-alpine
-    container_name: springfood-postgres
+    image: pgvector/pgvector:0.8.2-pg17
+    container_name: springfood-postgres-pgvector-17
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 123456
+      POSTGRES_PASSWORD: "123456"
       POSTGRES_DB: springfood
+      POSTGRES_HOST_AUTH_METHOD: md5
+      POSTGRES_INITDB_ARGS: "--auth-host=md5"
     ports:
       - "5432:5432"
     volumes:
@@ -21,10 +23,11 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    restart: unless-stopped
 
   # Redis Cache
   redis:
-    image: redis:7-alpine
+    image: redis:latest
     container_name: springfood-redis
     command: redis-server --requirepass 123456
     ports:
@@ -34,22 +37,23 @@ services:
     networks:
       - springfood-network
     healthcheck:
-      test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
+      test: [ "CMD", "redis-cli", "-a", "123456", "ping" ]
       interval: 10s
       timeout: 5s
       retries: 5
+    restart: unless-stopped
 
   # MinIO Object Storage
   minio:
     image: minio/minio:latest
     container_name: springfood-minio
-    command: server /data --console-address ":9001"
+    command: server /data --console-address ":9002"
     environment:
       MINIO_ROOT_USER: minioadmin
       MINIO_ROOT_PASSWORD: minioadmin
     ports:
       - "9000:9000"  # API
-      - "9001:9001"  # Console UI
+      - "9002:9002"  # Console UI
     volumes:
       - F:/Document/TASC/Backend/storage:/data
     networks:
@@ -80,53 +84,198 @@ services:
     networks:
       - springfood-network
 
-  # Zookeeper for Kafka
-  zookeeper:
-    image: confluentinc/cp-zookeeper:7.5.0
-    container_name: springfood-zookeeper
-    environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
-      ZOOKEEPER_TICK_TIME: 2000
-    ports:
-      - "2181:2181"
-    volumes:
-      - zookeeper_data:/var/lib/zookeeper/data
-      - zookeeper_logs:/var/lib/zookeeper/log
-    networks:
-      - springfood-network
-
-  # Kafka Message Broker
+  # Kafka Message Broker (KRaft mode - no Zookeeper)
   kafka:
-    image: confluentinc/cp-kafka:7.5.0
+    image: apache/kafka:latest
     container_name: springfood-kafka
-    depends_on:
-      - zookeeper
     ports:
       - "9092:9092"
     environment:
-      KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@localhost:9093
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_LOG_DIRS: /var/lib/kafka/data
+      CLUSTER_ID: 4L6g3nShT-eMCtK--X86sw
     volumes:
       - kafka_data:/var/lib/kafka/data
     networks:
       - springfood-network
     healthcheck:
-      test: [ "CMD", "kafka-broker-api-versions", "--bootstrap-server", "localhost:9092" ]
+      test: [ "CMD", "kafka-broker-api-versions.sh", "--bootstrap-server", "localhost:9092" ]
       interval: 30s
       timeout: 10s
       retries: 5
+
+  # Carbone Server for Document Generation
+  carbone:
+    image: carbone/carbone-ee:latest
+    container_name: springfood-carbone
+    ports:
+      - "8100:4000"
+    environment:
+      CARBONE_STORAGE_PATH: /app/storage
+      MINIO_ENDPOINT: http://minio:9000
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_SECRET_KEY: minioadmin
+      MINIO_BUCKET_IN: springfood-input
+      MINIO_BUCKET_OUT: springfood-carbone-out
+    volumes:
+      - carbone_storage:/app/storage
+    networks:
+      - springfood-network
+    restart: unless-stopped
+
+  # MongoDB Database
+  mongodb:
+    image: bitnami/mongodb:latest
+    container_name: springfood-mongodb
+    ports:
+      - "27017:27017"
+    environment:
+      MONGODB_ROOT_USER: admin
+      MONGODB_ROOT_PASSWORD: admin123
+      MONGODB_USERNAME: springfood
+      MONGODB_PASSWORD: 123456
+      MONGODB_DATABASE: springfood
+    volumes:
+      - mongodb_data:/bitnami/mongodb
+    networks:
+      - springfood-network
+    healthcheck:
+      test: [ "CMD", "mongosh", "--eval", "db.adminCommand('ping')" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  # Elasticsearch for Search & Logging
+  elasticsearch:
+    image: elasticsearch:9.1.5
+    container_name: springfood-elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    networks:
+      - springfood-network
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f http://localhost:9200/_cluster/health || exit 1" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    restart: unless-stopped
+
+  # Kibana for Elasticsearch UI
+  kibana:
+    image: kibana:9.1.5
+    container_name: springfood-kibana
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    environment:
+      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+    ports:
+      - "5601:5601"
+    networks:
+      - springfood-network
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f http://localhost:5601/api/status || exit 1" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    restart: unless-stopped
+
+  # Prometheus for Metrics
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: springfood-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+      - '--web.enable-lifecycle'
+    networks:
+      - springfood-network
+    restart: unless-stopped
+
+  # Grafana for Monitoring Dashboard
+  grafana:
+    image: grafana/grafana:latest
+    container_name: springfood-grafana
+    depends_on:
+      - prometheus
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - grafana_data:/var/lib/grafana
+    networks:
+      - springfood-network
+    restart: unless-stopped
+
+  # Alertmanager for Alerts
+  alertmanager:
+    image: prom/alertmanager:latest
+    container_name: springfood-alertmanager
+    ports:
+      - "9093:9093"
+    volumes:
+      - ./monitoring/alertmanager.yml:/etc/alertmanager/alertmanager.yml
+      - alertmanager_data:/alertmanager
+    command:
+      - '--config.file=/etc/alertmanager/alertmanager.yml'
+      - '--storage.path=/alertmanager'
+    networks:
+      - springfood-network
+    restart: unless-stopped
+
+  # Kafka UI for Kafka Management
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: springfood-kafka-ui
+    depends_on:
+      - kafka
+    ports:
+      - "9003:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: springfood
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
+    networks:
+      - springfood-network
+    restart: unless-stopped
 
 volumes:
   postgres_data:
   redis_data:
   minio_data:
-  zookeeper_data:
-  zookeeper_logs:
   kafka_data:
+  carbone_storage:
+  mongodb_data:
+  elasticsearch_data:
+  prometheus_data:
+  grafana_data:
+  alertmanager_data:
 
 networks:
   springfood-network:

@@ -6,11 +6,13 @@ import com.theblood.springfood.chat.service.dto.MessageAttachmentDTO;
 import com.theblood.springfood.chat.web.rest.errors.BadRequestAlertException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,7 +27,7 @@ import tech.jhipster.web.util.PaginationUtil;
 import tech.jhipster.web.util.ResponseUtil;
 
 /**
- * REST controller for managing {@link com.theblood.springfood.chat.domain.MessageAttachment}.
+ * REST resources for managing {@link com.theblood.springfood.chat.domain.MessageAttachment}.
  */
 @RestController
 @RequestMapping("/api/message-attachments")
@@ -34,13 +36,10 @@ public class MessageAttachmentResource {
     private static final Logger LOG = LoggerFactory.getLogger(MessageAttachmentResource.class);
 
     private static final String ENTITY_NAME = "chatMessageAttachment";
-
+    private final MessageAttachmentService messageAttachmentService;
+    private final MessageAttachmentRepository messageAttachmentRepository;
     @Value("${jhipster.clientApp.name}")
     private String applicationName;
-
-    private final MessageAttachmentService messageAttachmentService;
-
-    private final MessageAttachmentRepository messageAttachmentRepository;
 
     public MessageAttachmentResource(
         MessageAttachmentService messageAttachmentService,
@@ -73,7 +72,7 @@ public class MessageAttachmentResource {
     /**
      * {@code PUT  /message-attachments/:attachmentId} : Updates an existing messageAttachment.
      *
-     * @param attachmentId the id of the messageAttachmentDTO to save.
+     * @param attachmentId         the id of the messageAttachmentDTO to save.
      * @param messageAttachmentDTO the messageAttachmentDTO to update.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated messageAttachmentDTO,
      * or with status {@code 400 (Bad Request)} if the messageAttachmentDTO is not valid,
@@ -106,7 +105,7 @@ public class MessageAttachmentResource {
     /**
      * {@code PATCH  /message-attachments/:attachmentId} : Partial updates given fields of an existing messageAttachment, field will ignore if it is null
      *
-     * @param attachmentId the id of the messageAttachmentDTO to save.
+     * @param attachmentId         the id of the messageAttachmentDTO to save.
      * @param messageAttachmentDTO the messageAttachmentDTO to update.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated messageAttachmentDTO,
      * or with status {@code 400 (Bad Request)} if the messageAttachmentDTO is not valid,
@@ -114,7 +113,7 @@ public class MessageAttachmentResource {
      * or with status {@code 500 (Internal Server Error)} if the messageAttachmentDTO couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PatchMapping(value = "/{attachmentId}", consumes = { "application/json", "application/merge-patch+json" })
+    @PatchMapping(value = "/{attachmentId}", consumes = {"application/json", "application/merge-patch+json"})
     public ResponseEntity<MessageAttachmentDTO> partialUpdateMessageAttachment(
         @PathVariable(value = "attachmentId", required = false) final String attachmentId,
         @NotNull @RequestBody MessageAttachmentDTO messageAttachmentDTO

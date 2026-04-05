@@ -1,4 +1,0 @@
-org.springframework.test.context.ContextCustomizerFactory = \
-    com.theblood.statisticalreport.config.\
-    SqlTestContainersSpringContextCustomizerFactory,com.theblood.\
-    statisticalreport.config.RedisTestContainersSpringContextCustomizerFactory

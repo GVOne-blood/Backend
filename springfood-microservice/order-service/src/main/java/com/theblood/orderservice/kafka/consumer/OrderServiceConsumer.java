@@ -1,6 +1,6 @@
 package com.theblood.orderservice.kafka.consumer;
 
-import com.theblood.common.exception.custom.InvalidDataException;
+import com.theblood.springfood.common.exception.custom.InvalidDataException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;

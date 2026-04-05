@@ -55,6 +55,9 @@ public class User extends AbstractEntity implements UserDetails {
     @Column(name = "last_login_at")
     private LocalDateTime lastLoginAt;
 
+    @Column(name = "shopId")
+    private String shopId;
+    
     @Column(name = "phone_verified", nullable = false)
     private boolean phoneVerified = false;
 

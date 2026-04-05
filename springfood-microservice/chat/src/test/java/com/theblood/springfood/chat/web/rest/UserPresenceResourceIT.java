@@ -14,9 +14,11 @@ import com.theblood.springfood.chat.repository.UserPresenceRepository;
 import com.theblood.springfood.chat.service.dto.UserPresenceDTO;
 import com.theblood.springfood.chat.service.mapper.UserPresenceMapper;
 import jakarta.persistence.EntityManager;
+
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.UUID;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,7 +30,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Integration tests for the {@link UserPresenceResource} REST controller.
+ * Integration tests for the {@link UserPresenceResource} REST resources.
  */
 @IntegrationTest
 @AutoConfigureMockMvc
@@ -86,7 +88,7 @@ class UserPresenceResourceIT {
 
     /**
      * Create an entity for this test.
-     *
+     * <p>
      * This is a static method, as tests for other entities might also need it,
      * if they test an entity which requires the current entity.
      */
@@ -106,7 +108,7 @@ class UserPresenceResourceIT {
 
     /**
      * Create an updated entity for this test.
-     *
+     * <p>
      * This is a static method, as tests for other entities might also need it,
      * if they test an entity which requires the current entity.
      */

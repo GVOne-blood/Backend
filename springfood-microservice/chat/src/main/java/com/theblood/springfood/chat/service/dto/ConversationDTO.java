@@ -44,11 +44,17 @@ public class ConversationDTO implements Serializable {
     @Size(max = 100)
     private String lastMessageSenderId;
 
+    private String lastMessageId;
+
     private Long messageCount;
+
+    private Integer unreadCount;
 
     private Integer isArchived;
 
     private Integer isPinned;
+
+    private Instant createdAt;
 
     private ConversationSettingsDTO settings;
 
@@ -132,12 +138,28 @@ public class ConversationDTO implements Serializable {
         this.lastMessageSenderId = lastMessageSenderId;
     }
 
+    public String getLastMessageId() {
+        return lastMessageId;
+    }
+
+    public void setLastMessageId(String lastMessageId) {
+        this.lastMessageId = lastMessageId;
+    }
+
     public Long getMessageCount() {
         return messageCount;
     }
 
     public void setMessageCount(Long messageCount) {
         this.messageCount = messageCount;
+    }
+
+    public Integer getUnreadCount() {
+        return unreadCount;
+    }
+
+    public void setUnreadCount(Integer unreadCount) {
+        this.unreadCount = unreadCount;
     }
 
     public Integer getIsArchived() {
@@ -154,6 +176,14 @@ public class ConversationDTO implements Serializable {
 
     public void setIsPinned(Integer isPinned) {
         this.isPinned = isPinned;
+    }
+
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Instant createdAt) {
+        this.createdAt = createdAt;
     }
 
     public ConversationSettingsDTO getSettings() {
@@ -199,9 +229,12 @@ public class ConversationDTO implements Serializable {
             ", lastMessagePreview='" + getLastMessagePreview() + "'" +
             ", lastMessageAt='" + getLastMessageAt() + "'" +
             ", lastMessageSenderId='" + getLastMessageSenderId() + "'" +
+            ", lastMessageId='" + getLastMessageId() + "'" +
             ", messageCount=" + getMessageCount() +
+            ", unreadCount=" + getUnreadCount() +
             ", isArchived=" + getIsArchived() +
             ", isPinned=" + getIsPinned() +
+            ", createdAt='" + getCreatedAt() + "'" +
             ", settings=" + getSettings() +
             "}";
     }

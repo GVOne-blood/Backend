@@ -2,7 +2,6 @@ package com.theblood.springfood.chat.service.mapper;
 
 import com.theblood.springfood.chat.domain.Message;
 import com.theblood.springfood.chat.domain.MessageReaction;
-import com.theblood.springfood.chat.service.dto.MessageDTO;
 import com.theblood.springfood.chat.service.dto.MessageReactionDTO;
 import org.mapstruct.*;
 
@@ -11,11 +10,10 @@ import org.mapstruct.*;
  */
 @Mapper(componentModel = "spring")
 public interface MessageReactionMapper extends EntityMapper<MessageReactionDTO, MessageReaction> {
-    @Mapping(target = "message", source = "message", qualifiedByName = "messageMessageId")
+    @Mapping(target = "messageId", source = "message.messageId")
     MessageReactionDTO toDto(MessageReaction s);
 
-    @Named("messageMessageId")
-    @BeanMapping(ignoreByDefault = true)
-    @Mapping(target = "messageId", source = "messageId")
-    MessageDTO toDtoMessageMessageId(Message message);
+    @Mapping(target = "message", ignore = true)
+    @Mapping(target = "createdDate", ignore = true)
+    MessageReaction toEntity(MessageReactionDTO dto);
 }

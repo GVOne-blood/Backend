@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đơn hàng đã được giao thành công</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f5f5f5;
+            padding: 0;
+            margin: 0;
+            line-height: 1.6;
+        }
+        .email-wrapper {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #f5f5f5;
+        }
+        .email-container {
+            background-color: #ffffff;
+            margin: 0;
+        }
+        
+        /* Header with Logo */
+        .header {
+            background: #ffffff;
+            padding: 24px 32px;
+            text-align: center;
+            border-bottom: 1px solid #e5e5e5;
+        }
+        .logo {
+            font-family: 'Courier New', monospace;
+            font-size: 7px;
+            line-height: 1.1;
+            white-space: pre;
+            display: inline-block;
+            margin-bottom: 8px;
+        }
+        .logo-spring { color: #7CB342; }
+        .logo-food { color: #FF6B35; }
+        
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, #FFF8F5 0%, #FFFFFF 100%);
+            padding: 32px;
+            text-align: center;
+            border-bottom: 1px solid #e5e5e5;
+        }
+        .hero-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+        }
+        .hero-subtitle {
+            font-size: 14px;
+            color: #666666;
+            margin-bottom: 20px;
+        }
+        .status-badge {
+            display: inline-block;
+            background: #E8F5E9;
+            color: #2E7D32;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+        
+        /* Content Section */
+        .content {
+            padding: 32px;
+        }
+        .greeting {
+            font-size: 15px;
+            color: #1a1a1a;
+            margin-bottom: 16px;
+        }
+        .message {
+            font-size: 14px;
+            color: #666666;
+            line-height: 1.6;
+            margin-bottom: 24px;
+        }
+        
+        /* Order Info Card */
+        .order-card {
+            background: #FAFAFA;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+        .order-card-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #e5e5e5;
+        }
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            font-size: 14px;
+        }
+        .info-label {
+            color: #666666;
+        }
+        .info-value {
+            color: #1a1a1a;
+            font-weight: 500;
+            text-align: right;
+        }
+        .order-id {
+            color: #FF6B35;
+            font-weight: 600;
+        }
+        
+        /* Product Item */
+        .product-section {
+            margin: 24px 0;
+        }
+        .product-item {
+            display: flex;
+            padding: 16px;
+            background: #FAFAFA;
+            border-radius: 8px;
+            margin-bottom: 12px;
+        }
+        .product-image {
+            width: 80px;
+            height: 80px;
+            background: #e5e5e5;
+            border-radius: 6px;
+            margin-right: 16px;
+            flex-shrink: 0;
+        }
+        .product-details {
+            flex: 1;
+        }
+        .product-name {
+            font-size: 14px;
+            color: #1a1a1a;
+            font-weight: 500;
+            margin-bottom: 6px;
+        }
+        .product-meta {
+            font-size: 13px;
+            color: #666666;
+            margin-bottom: 8px;
+        }
+        .product-price {
+            font-size: 14px;
+            color: #1a1a1a;
+            font-weight: 600;
+        }
+        
+        /* Summary Section */
+        .summary-section {
+            background: #FAFAFA;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 24px 0;
+        }
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            font-size: 14px;
+        }
+        .summary-label {
+            color: #666666;
+        }
+        .summary-value {
+            color: #1a1a1a;
+            font-weight: 500;
+        }
+        .summary-total {
+            border-top: 1px solid #e5e5e5;
+            margin-top: 12px;
+            padding-top: 12px;
+        }
+        .summary-total .summary-label {
+            color: #1a1a1a;
+            font-weight: 600;
+            font-size: 15px;
+        }
+        .summary-total .summary-value {
+            color: #FF6B35;
+            font-weight: 700;
+            font-size: 18px;
+        }
+        
+        /* Action Button */
+        .action-section {
+            text-align: center;
+            margin: 32px 0;
+        }
+        .btn-primary {
+            display: inline-block;
+            background: #FF6B35;
+            color: #ffffff;
+            padding: 14px 40px;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+        .btn-primary:hover {
+            background: #E55A2B;
+        }
+        
+        /* Help Section */
+        .help-section {
+            background: #FFF8F5;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 24px 0;
+            text-align: center;
+        }
+        .help-title {
+            font-size: 14px;
+            color: #1a1a1a;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .help-text {
+            font-size: 13px;
+            color: #666666;
+            line-height: 1.6;
+        }
+        .help-link {
+            color: #FF6B35;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        /* Footer */
+        .footer {
+            background: #FAFAFA;
+            padding: 24px 32px;
+            text-align: center;
+            border-top: 1px solid #e5e5e5;
+        }
+        .footer-text {
+            font-size: 12px;
+            color: #999999;
+            line-height: 1.6;
+            margin: 4px 0;
+        }
+        .footer-links {
+            margin: 16px 0 12px;
+        }
+        .footer-link {
+            color: #666666;
+            text-decoration: none;
+            font-size: 12px;
+            margin: 0 12px;
+        }
+        .footer-link:hover {
+            color: #FF6B35;
+        }
+        
+        /* Responsive */
+        @media only screen and (max-width: 600px) {
+            .content, .hero {
+                padding: 20px;
+            }
+            .product-item {
+                flex-direction: column;
+            }
+            .product-image {
+                margin-bottom: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="email-wrapper">
+        <div class="email-container">
+            
+            <!-- Header -->
+            <div class="header">
+                <div class="logo">
+<span class="logo-spring">███████╗██████╗ ██████╗ ██╗███╗   ██╗ ██████╗ </span><span class="logo-food">███████╗ ██████╗  ██████╗ ██████╗ </span>
+<span class="logo-spring">██╔════╝██╔══██╗██╔══██╗██║████╗  ██║██╔════╝ </span><span class="logo-food">██╔════╝██╔═══██╗██╔═══██╗██╔══██╗</span>
+<span class="logo-spring">███████╗██████╔╝██████╔╝██║██╔██╗ ██║██║  ███╗</span><span class="logo-food">█████╗  ██║   ██║██║   ██║██║  ██║</span>
+<span class="logo-spring">╚════██║██╔═══╝ ██╔══██╗██║██║╚██╗██║██║   ██║</span><span class="logo-food">██╔══╝  ██║   ██║██║   ██║██║  ██║</span>
+<span class="logo-spring">███████║██║     ██║  ██║██║██║ ╚████║╚██████╔╝</span><span class="logo-food">██║     ╚██████╔╝╚██████╔╝██████╔╝</span>
+<span class="logo-spring">╚══════╝╚═╝     ╚═╝  ╚═╝╚═╝╚═╝  ╚═══╝ ╚═════╝ </span><span class="logo-food">╚═╝      ╚═════╝  ╚═════╝ ╚═════╝ </span>
+                </div>
+            </div>
+            
+            <!-- Hero Section -->
+            <div class="hero">
+                <div class="hero-title">Đơn hàng <span class="order-id" th:text="'#' + ${data.orderId}">#12345</span> đã giao hàng thành công</div>
+                <div class="hero-subtitle" th:text="'Giao thành công ngày ' + ${data.deliveryDate}">Giao thành công ngày 24/02/2026</div>
+                <div class="status-badge">Đã giao hàng</div>
+            </div>
+            
+            <!-- Content -->
+            <div class="content">
+                <div class="greeting">Xin chào <span th:text="${data.customerName}">dev_ghe</span>,</div>
+                <div class="message">
+                    Đơn hàng <span class="order-id" th:text="'#' + ${data.orderId}">#2602208D4A10BQ</span> của bạn đã được giao thành công ngày <span th:text="${data.deliveryDate}">24/02/2026</span>.
+                    <br><br>
+                    Vui lòng đăng nhập SpringFood để xác nhận bạn đã nhận hàng và hài lòng với sản phẩm trong vòng 3 ngày. Sau khi bạn xác nhận, chúng tôi sẽ thanh toán cho Người bán.
+                    <br><br>
+                    Nếu bạn không xác nhận trong khoảng thời gian này, SpringFood cũng sẽ tự thành toán cho Người bán.
+                </div>
+                
+                <!-- Order Info Card -->
+                <div class="order-card">
+                    <div class="order-card-title">THÔNG TIN ĐƠN HÀNG - DÀNH CHO NGƯỜI MUA</div>
+                    <div class="info-row">
+                        <span class="info-label">Mã đơn hàng:</span>
+                        <span class="info-value order-id" th:text="'#' + ${data.orderId}">#2602208D4A10BQ</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Ngày đặt hàng:</span>
+                        <span class="info-value" th:text="${data.orderDate}">20/02/2026 19:16:22</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Người bán:</span>
+                        <span class="info-value" th:text="${data.sellerName}">giadungduyanh7979</span>
+                    </div>
+                </div>
+                
+                <!-- Products -->
+                <div class="product-section">
+                    <div class="product-item" th:each="item : ${data.items}">
+                        <div class="product-image">
+                            <!-- Product image placeholder -->
+                        </div>
+                        <div class="product-details">
+                            <div class="product-name" th:text="${item.name}">Thảm lau chân nhà tắm, nhà bếp đế cao su KT 40*120CM thấm hút nước chống trượt</div>
+                            <div class="product-meta">
+                                <span>Màu: <span th:text="${item.color}">Đỏ</span></span> | 
+                                <span>Số lượng: <span th:text="${item.quantity}">1</span></span>
+                            </div>
+                            <div class="product-price" th:text="${#numbers.formatDecimal(item.price, 0, 'COMMA', 0, 'POINT')} + 'đ'">₫18,999</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Summary -->
+                <div class="summary-section">
+                    <div class="summary-row">
+                        <span class="summary-label">Tổng tiền:</span>
+                        <span class="summary-value" th:text="${#numbers.formatDecimal(data.subtotal, 0, 'COMMA', 0, 'POINT')} + 'đ'">₫18,999</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="summary-label">Voucher từ SpringFood:</span>
+                        <span class="summary-value" th:text="'-' + ${#numbers.formatDecimal(data.voucherDiscount, 0, 'COMMA', 0, 'POINT')} + 'đ'">-₫2,658</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="summary-label">Mã giảm giá của SpringFood:</span>
+                        <span class="summary-value" th:text="${data.promoCode}">CRMMOLVGX1925226D</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="summary-label">Phí vận chuyển:</span>
+                        <span class="summary-value" th:text="${#numbers.formatDecimal(data.shippingFee, 0, 'COMMA', 0, 'POINT')} + 'đ'">₫0</span>
+                    </div>
+                    <div class="summary-row summary-total">
+                        <span class="summary-label">Tổng thanh toán:</span>
+                        <span class="summary-value" th:text="${#numbers.formatDecimal(data.totalAmount, 0, 'COMMA', 0, 'POINT')} + 'đ'">₫6,595</span>
+                    </div>
+                </div>
+                
+                <!-- Action Button -->
+                <div class="action-section">
+                    <a th:href="${data.orderUrl}" class="btn-primary">Xem đơn đặt hàng</a>
+                </div>
+                
+                <!-- Help Section -->
+<div class="help-section">
+                    <div class="help-title">Bạn không hài lòng với sản phẩm?</div>
+                    <div class="help-text">
+                        Bạn có thể <a href="#" class="help-link" th:href="${data.returnUrl}">yêu cầu trả hàng</a> trên ứng dụng SpringFood trong vòng 3 ngày kể từ khi nhận được email này.
+                        <br><br>
+                        Lưu ý: SpringFood sẽ tự chối hỗ trợ các khiếu nại sau khi Người mua nhận "Đã nhận được hàng" trên ứng dụng và Người bán đã nhận được thanh toán cho đơn hàng.
+                        <br><br>
+                        Tìm hiểu thêm về chính sách <a href="#" class="help-link">Trả hàng/Hoàn tiền</a> của SpringFood.
+                    </div>
+                </div>
+                
+                <div class="message" style="margin-top: 24px;">
+                    Chúc bạn luôn có những trải nghiệm tuyệt vời khi mua sắm tại SpringFood.
+                </div>
+            </div>
+            
+            <!-- Footer -->
+            <div class="footer">
+                <div class="footer-links">
+                    <a href="#" class="footer-link">Chính sách</a>
+                    <a href="#" class="footer-link">Hỗ trợ</a>
+                    <a href="#" class="footer-link">Liên hệ</a>
+                </div>
+                <div class="footer-text">© 2024 SpringFood. All rights reserved.</div>
+                <div class="footer-text">Email: thereisnogod256@gmail.com | Hotline: 1900-xxxx</div>
+                <div class="footer-text" style="margin-top: 12px;">Email này được gửi tự động, vui lòng không trả lời.</div>
+            </div>
+            
+        </div>
+    </div>
+</body>
+</html>

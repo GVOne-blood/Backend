@@ -1,7 +1,7 @@
 package com.theblood.paymentservice.controller;
 
 
-import com.theblood.common.enums.PaymentMethod;
+import com.theblood.springfood.common.enums.PaymentMethod;
 import com.theblood.paymentservice.dto.request.VNPayPaymentRequest;
 import com.theblood.paymentservice.service.PaymentService;
 import com.theblood.paymentservice.service.VNPayService;

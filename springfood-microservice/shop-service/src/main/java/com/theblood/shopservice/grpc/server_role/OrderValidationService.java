@@ -1,9 +1,9 @@
 package com.theblood.shopservice.grpc.server_role;
 
-import com.theblood.common.exception.custom.InvalidDataException;
-import com.theblood.common.grpc.ShopServiceGrpc;
-import com.theblood.common.grpc.ShopValidationRequest;
-import com.theblood.common.grpc.ShopValidationResponse;
+import com.theblood.springfood.common.exception.custom.InvalidDataException;
+import com.theblood.springfood.common.grpc.ShopServiceGrpc;
+import com.theblood.springfood.common.grpc.ShopValidationRequest;
+import com.theblood.springfood.common.grpc.ShopValidationResponse;
 import com.theblood.shopservice.common.enums.ShopStatus;
 import com.theblood.shopservice.domain.Shop;
 import com.theblood.shopservice.repository.ShopRepository;
@@ -40,16 +40,16 @@ public class OrderValidationService extends ShopServiceGrpc.ShopServiceImplBase 
                 throw new InvalidDataException("this shippingFee is empty");
             }
             ShopValidationResponse ans = ShopValidationResponse.newBuilder()
-                    .setIsValid(isValid)
-                    .setMessage(message)
-                    .build();
+                .setIsValid(isValid)
+                .setMessage(message)
+                .build();
             response.onNext(ans);
             response.onCompleted();
         } catch (Exception e) {
             log.error("❌ Error validating product update : ", e);
             response.onError(io.grpc.Status.INTERNAL
-                    .withDescription(e.getMessage())
-                    .asRuntimeException());
+                .withDescription(e.getMessage())
+                .asRuntimeException());
         }
     }
 }

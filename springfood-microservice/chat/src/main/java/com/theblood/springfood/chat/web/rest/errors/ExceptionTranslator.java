@@ -61,6 +61,101 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler {
         this.env = env;
     }
 
+    /**
+     * Handle Kafka exceptions with retry logic.
+     * Logs error and returns 500 Internal Server Error.
+     */
+    @ExceptionHandler(org.springframework.kafka.KafkaException.class)
+    public ResponseEntity<Object> handleKafkaException(org.springframework.kafka.KafkaException ex, NativeWebRequest request) {
+        LOG.error("Kafka error occurred: {}", ex.getMessage(), ex);
+        
+        ProblemDetailWithCause problem = ProblemDetailWithCauseBuilder.instance()
+            .withStatus(HttpStatus.INTERNAL_SERVER_ERROR.value())
+            .withType(ErrorConstants.DEFAULT_TYPE)
+            .withTitle("Message delivery failed")
+            .withDetail("Failed to publish message to Kafka after retries")
+            .withProperty("message", ErrorConstants.ERR_KAFKA)
+            .withProperty("path", getPathValue(request))
+            .build();
+        
+        return handleExceptionInternal(ex, problem, new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request);
+    }
+
+    /**
+     * Handle DataAccessException with retry logic.
+     * Logs error and returns 500 Internal Server Error.
+     */
+    @ExceptionHandler(DataAccessException.class)
+    public ResponseEntity<Object> handleDataAccessException(DataAccessException ex, NativeWebRequest request) {
+        LOG.error("Database error occurred: {}", ex.getMessage(), ex);
+        
+        ProblemDetailWithCause problem = ProblemDetailWithCauseBuilder.instance()
+            .withStatus(HttpStatus.INTERNAL_SERVER_ERROR.value())
+            .withType(ErrorConstants.DEFAULT_TYPE)
+            .withTitle("Database operation failed")
+            .withDetail("Failed to access database after retries")
+            .withProperty("message", ErrorConstants.ERR_DATABASE)
+            .withProperty("path", getPathValue(request))
+            .build();
+        
+        return handleExceptionInternal(ex, problem, new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request);
+    }
+
+    /**
+     * Handle Redis connection exceptions with graceful degradation.
+     * Logs warning but returns success to client (Redis is non-critical).
+     */
+    @ExceptionHandler(org.springframework.data.redis.RedisConnectionFailureException.class)
+    public ResponseEntity<Object> handleRedisConnectionException(
+        org.springframework.data.redis.RedisConnectionFailureException ex,
+        NativeWebRequest request
+    ) {
+        LOG.warn("Redis connection failed, degrading gracefully: {}", ex.getMessage());
+        
+        // For Redis failures, we degrade gracefully and don't fail the request
+        // This is handled at the service layer, but if it bubbles up, log and continue
+        ProblemDetailWithCause problem = ProblemDetailWithCauseBuilder.instance()
+            .withStatus(HttpStatus.OK.value())
+            .withType(ErrorConstants.DEFAULT_TYPE)
+            .withTitle("Operation completed with degraded functionality")
+            .withDetail("Redis unavailable, some features may be limited")
+            .withProperty("message", ErrorConstants.ERR_REDIS)
+            .withProperty("path", getPathValue(request))
+            .build();
+        
+        return handleExceptionInternal(ex, problem, new HttpHeaders(), HttpStatus.OK, request);
+    }
+
+    /**
+     * Handle custom AuthenticationException.
+     * Returns HTTP 401 Unauthorized.
+     */
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<Object> handleAuthenticationException(AuthenticationException ex, NativeWebRequest request) {
+        LOG.error("Authentication failed: {}", ex.getMessage());
+        return handleExceptionInternal(ex, ex.getBody(), new HttpHeaders(), HttpStatus.UNAUTHORIZED, request);
+    }
+
+    /**
+     * Handle custom AuthorizationException.
+     * Returns HTTP 403 Forbidden.
+     */
+    @ExceptionHandler(AuthorizationException.class)
+    public ResponseEntity<Object> handleAuthorizationException(AuthorizationException ex, NativeWebRequest request) {
+        LOG.warn("Authorization failed: {} for conversation: {}", ex.getMessage(), ex.getConversationId());
+        return handleExceptionInternal(ex, ex.getBody(), new HttpHeaders(), HttpStatus.FORBIDDEN, request);
+    }
+
+    /**
+     * Handle custom ValidationException.
+     * Returns HTTP 400 Bad Request.
+     */
+    @ExceptionHandler(ValidationException.class)
+    public ResponseEntity<Object> handleValidationException(ValidationException ex, NativeWebRequest request) {
+        LOG.warn("Validation failed: {} for field: {}", ex.getMessage(), ex.getField());
+        return handleExceptionInternal(ex, ex.getBody(), new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
+    }
+
     @ExceptionHandler
     public ResponseEntity<Object> handleAnyException(Throwable ex, NativeWebRequest request) {
         LOG.debug("Converting Exception to Problem Details:", ex);

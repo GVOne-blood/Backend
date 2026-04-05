@@ -1,8 +1,8 @@
 package com.theblood.springfood.actionlog.service.criteria;
 
-import com.theblood.common.enums.AuthType;
-import com.theblood.common.enums.DeviceType;
-import com.theblood.common.enums.LoginEventType;
+import com.theblood.springfood.common.enums.AuthType;
+import com.theblood.springfood.common.enums.DeviceType;
+import com.theblood.springfood.common.enums.LoginEventType;
 import com.theblood.springfood.actionlog.domain.AccLoginLog;
 import com.theblood.springfood.actionlog.web.rest.LogActionResource;
 import org.springdoc.core.annotations.ParameterObject;

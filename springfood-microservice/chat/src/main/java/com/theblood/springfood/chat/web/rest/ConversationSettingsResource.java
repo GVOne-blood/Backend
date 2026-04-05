@@ -6,11 +6,13 @@ import com.theblood.springfood.chat.service.dto.ConversationSettingsDTO;
 import com.theblood.springfood.chat.web.rest.errors.BadRequestAlertException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,7 +22,7 @@ import tech.jhipster.web.util.HeaderUtil;
 import tech.jhipster.web.util.ResponseUtil;
 
 /**
- * REST controller for managing {@link com.theblood.springfood.chat.domain.ConversationSettings}.
+ * REST resources for managing {@link com.theblood.springfood.chat.domain.ConversationSettings}.
  */
 @RestController
 @RequestMapping("/api/conversation-settings")
@@ -29,13 +31,10 @@ public class ConversationSettingsResource {
     private static final Logger LOG = LoggerFactory.getLogger(ConversationSettingsResource.class);
 
     private static final String ENTITY_NAME = "chatConversationSettings";
-
+    private final ConversationSettingsService conversationSettingsService;
+    private final ConversationSettingsRepository conversationSettingsRepository;
     @Value("${jhipster.clientApp.name}")
     private String applicationName;
-
-    private final ConversationSettingsService conversationSettingsService;
-
-    private final ConversationSettingsRepository conversationSettingsRepository;
 
     public ConversationSettingsResource(
         ConversationSettingsService conversationSettingsService,
@@ -69,7 +68,7 @@ public class ConversationSettingsResource {
     /**
      * {@code PUT  /conversation-settings/:settingsId} : Updates an existing conversationSettings.
      *
-     * @param settingsId the id of the conversationSettingsDTO to save.
+     * @param settingsId              the id of the conversationSettingsDTO to save.
      * @param conversationSettingsDTO the conversationSettingsDTO to update.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated conversationSettingsDTO,
      * or with status {@code 400 (Bad Request)} if the conversationSettingsDTO is not valid,
@@ -102,7 +101,7 @@ public class ConversationSettingsResource {
     /**
      * {@code PATCH  /conversation-settings/:settingsId} : Partial updates given fields of an existing conversationSettings, field will ignore if it is null
      *
-     * @param settingsId the id of the conversationSettingsDTO to save.
+     * @param settingsId              the id of the conversationSettingsDTO to save.
      * @param conversationSettingsDTO the conversationSettingsDTO to update.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated conversationSettingsDTO,
      * or with status {@code 400 (Bad Request)} if the conversationSettingsDTO is not valid,
@@ -110,7 +109,7 @@ public class ConversationSettingsResource {
      * or with status {@code 500 (Internal Server Error)} if the conversationSettingsDTO couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PatchMapping(value = "/{settingsId}", consumes = { "application/json", "application/merge-patch+json" })
+    @PatchMapping(value = "/{settingsId}", consumes = {"application/json", "application/merge-patch+json"})
     public ResponseEntity<ConversationSettingsDTO> partialUpdateConversationSettings(
         @PathVariable(value = "settingsId", required = false) final String settingsId,
         @NotNull @RequestBody ConversationSettingsDTO conversationSettingsDTO

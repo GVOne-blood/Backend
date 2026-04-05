@@ -1,0 +1,286 @@
+watch_config_changes: True
+enable_logging: False
+rendering_backend: V2
+
+global:
+  border_width: 1.5
+  border_offset: -1
+  border_radius: 10
+  border_z_order: AboveWindow
+  follow_native_border: True
+  initialize_delay: 200
+  unminimize_delay: 150
+
+  active_color:
+    colors: ["#00d4ff", "#a855f7"]
+    direction: 45deg
+
+  inactive_color:
+    colors: ["#00d4ff", "#a855f7"]
+    direction: 45deg
+
+  animations:
+    enabled: False
+
+  effects:
+    active:
+      - type: Glow
+        radius: 12.0
+        opacity: 0.7
+      - type: Shadow
+        radius: 3.0
+        opacity: 0.4
+        translation:
+          x: 0
+          y: 2
+    inactive:
+      - type: Glow
+        radius: 12.0
+        opacity: 0.7
+      - type: Shadow
+        radius: 3.0
+        opacity: 0.4
+        translation:
+          x: 0
+          y: 2
+    enabled: True
+
+window_rules:
+  # YouTube PWA - Match by window title (Pure red border) - MUST BE FIRST!
+  - match: Title
+    name: "YouTube"
+    active_color:
+      colors: ["#FF0000", "#CC0000"]
+      direction: 45deg
+    inactive_color:
+      colors: ["#FF0000", "#CC0000"]
+      direction: 45deg
+
+  # Facebook PWA - Facebook blue (single color)
+  - match: Title
+    name: "Facebook"
+    active_color:
+      colors: ["#1877F2", "#166FE5"]
+      direction: 45deg
+    inactive_color:
+      colors: ["#1877F2", "#166FE5"]
+      direction: 45deg
+
+  # IntelliJ IDEA - Red/Orange (left) + Blue (right)
+  - match: Process
+    name: "idea64"
+    active_color:
+      colors: ["#ff6b35", "#087cfa"]
+      direction: 45deg
+    inactive_color:
+      colors: ["#ff6b35", "#087cfa"]
+      direction: 45deg
+
+  # DataGrip - Green (left) + Purple (middle) + Blue (right) - 3 colors
+  - match: Process
+    name: "datagrip64"
+    active_color:
+      colors: ["#22d88f", "#9775fa", "#087cfa"]
+      direction: 45deg
+    inactive_color:
+      colors: ["#22d88f", "#9775fa", "#087cfa"]
+      direction: 45deg
+
+  # WebStorm - Blue (left) + Yellow (right)
+  - match: Process
+    name: "webstorm64"
+    active_color:
+      colors: ["#07c3f2", "#fcb900"]
+      direction: 45deg
+    inactive_color:
+      colors: ["#07c3f2", "#fcb900"]
+      direction: 45deg
+
+  # Postman - Orange gradient
+  - match: Process
+    name: "Postman"
+    active_color:
+      colors: ["#FF6C37", "#FF9500"]
+      direction: 45deg
+    inactive_color:
+      colors: ["#FF6C37", "#FF9500"]
+      direction: 45deg
+
+  # Docker Desktop - Deep mysterious blue gradient
+  - match: Process
+    name: "Docker Desktop"
+    active_color:
+      colors: ["#0db7ed", "#003f7f"]
+      direction: 45deg
+    inactive_color:
+      colors: ["#0db7ed", "#003f7f"]
+      direction: 45deg
+
+  # VS Code - Microsoft blue gradient
+  - match: Process
+    name: "Code"
+    active_color:
+      colors: ["#007acc", "#005a9e"]
+      direction: 45deg
+    inactive_color:
+      colors: ["#007acc", "#005a9e"]
+      direction: 45deg
+
+  # Cursor - Black to white contrast
+  - match: Process
+    name: "Cursor"
+    active_color:
+      colors: ["#000000", "#ffffff"]
+      direction: 45deg
+    inactive_color:
+      colors: ["#000000", "#ffffff"]
+      direction: 45deg
+
+  # Perplexity - Teal to bright cyan
+  - match: Process
+    name: "Perplexity- Ask Anything"
+    active_color:
+      colors: ["#20b2aa", "#00ffff"]
+      direction: 45deg
+    inactive_color:
+      colors: ["#20b2aa", "#00ffff"]
+      direction: 45deg
+
+  # Microsoft PC Manager - Green + Blue from logo
+  - match: Process
+    name: "Microsoft PC Manager"
+    active_color:
+      colors: ["#00d4aa", "#0078d4"]
+      direction: 45deg
+    inactive_color:
+      colors: ["#00d4aa", "#0078d4"]
+      direction: 45deg
+
+  # Task Manager - Windows system colors
+  - match: Process
+    name: "Taskmgr"
+    active_color:
+      colors: ["#0078d4", "#106ebe"]
+      direction: 45deg
+    inactive_color:
+      colors: ["#0078d4", "#106ebe"]
+      direction: 45deg
+
+  # File Explorer - 80% Yellow + 20% Blue at bottom
+  - match: Process
+    name: "explorer"
+    active_color:
+      colors: ["#ffc83d", "#ffc83d", "#ffc83d", "#ffc83d", "#0078d4"]
+      direction: 45deg
+    inactive_color:
+      colors: ["#ffc83d", "#ffc83d", "#ffc83d", "#ffc83d", "#0078d4"]
+      direction: 45deg
+
+  # Kiro Code - Purple theme
+  - match: Process
+    name: "Kiro"
+    active_color:
+      colors: ["#8b5cf6", "#a855f7"]
+      direction: 45deg
+    inactive_color:
+      colors: ["#8b5cf6", "#a855f7"]
+      direction: 45deg
+
+  # Microsoft Edge - Corrected gradient from image (Green → Cyan → Light Blue → Blue → Dark Blue)
+  - match: Process
+    name: "msedge"
+    active_color:
+      colors: ["#4CBB17", "#00CED1", "#87CEEB", "#4169E1", "#191970"]
+      direction: 45deg
+    inactive_color:
+      colors: ["#4CBB17", "#00CED1", "#87CEEB", "#4169E1", "#191970"]
+      direction: 45deg
+
+  # Microsoft Word - Rich blue gradient (Light Blue → Deep Blue → Navy)
+  - match: Process
+    name: "WINWORD"
+    active_color:
+      colors: ["#4A90E2", "#2B579A", "#1B365D"]
+      direction: 45deg
+    inactive_color:
+      colors: ["#4A90E2", "#2B579A", "#1B365D"]
+      direction: 45deg
+
+  # Microsoft Excel - Rich green gradient (Light Green → Forest Green → Dark Green)
+  - match: Process
+    name: "EXCEL"
+    active_color:
+      colors: ["#4CAF50", "#217346", "#0D5016"]
+      direction: 45deg
+    inactive_color:
+      colors: ["#4CAF50", "#217346", "#0D5016"]
+      direction: 45deg
+
+  # Microsoft PowerPoint - Rich orange/red gradient (Orange → Red → Dark Red)
+  - match: Process
+    name: "POWERPNT"
+    active_color:
+      colors: ["#FF6B35", "#D24726", "#B7472A"]
+      direction: 45deg
+    inactive_color:
+      colors: ["#FF6B35", "#D24726", "#B7472A"]
+      direction: 45deg
+
+  # Microsoft Teams - Rich purple gradient (Light Purple → Deep Purple → Dark Purple)
+  - match: Process
+    name: "Teams"
+    active_color:
+      colors: ["#8B5FBF", "#6264A7", "#464EB8"]
+      direction: 45deg
+    inactive_color:
+      colors: ["#8B5FBF", "#6264A7", "#464EB8"]
+      direction: 45deg
+
+  # Microsoft Outlook - Rich blue gradient (Sky Blue → Azure → Deep Blue)
+  - match: Process
+    name: "OUTLOOK"
+    active_color:
+      colors: ["#00A4EF", "#0078D4", "#106EBE"]
+      direction: 45deg
+    inactive_color:
+      colors: ["#00A4EF", "#0078D4", "#106EBE"]
+      direction: 45deg
+
+  # Microsoft OneNote - Rich purple gradient (Magenta → Purple → Deep Purple)
+  - match: Process
+    name: "ONENOTE"
+    active_color:
+      colors: ["#B146C2", "#7719AA", "#80397B"]
+      direction: 45deg
+    inactive_color:
+      colors: ["#B146C2", "#7719AA", "#80397B"]
+      direction: 45deg
+
+  # Disabled windows
+  - match: Class
+    name: "Windows.UI.Core.CoreWindow"
+    enabled: False
+
+  - match: Class
+    name: "XamlExplorerHostIslandWindow"
+    enabled: False
+
+  - match: Process
+    name: "tacky-borders"
+    enabled: False
+
+  - match: Process
+    name: "zebar"
+    enabled: False
+
+  - match: Title
+    name: "komorebi-bar"
+    enabled: False
+
+  - match: Title
+    name: "keyviz"
+    enabled: False
+
+  - match: Title
+    name: "Picture-in-Picture"
+    enabled: False

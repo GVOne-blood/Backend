@@ -43,6 +43,15 @@ public class GatewayConfig {
                 .route("payment-service", r -> r.path("/api/v1/payment/**")
                         .filters(f -> f.stripPrefix(2))
                         .uri("lb://PAYMENT-SERVICE"))
+
+                // Chat Service
+                .route("chat-service", r -> r.path("/api/v1/chat/**")
+                        .filters(f -> f.stripPrefix(2))
+                        .uri("lb://CHAT"))
+                
+                // Chat WebSocket
+                .route("chat-websocket", r -> r.path("/ws/**")
+                        .uri("lb://CHAT"))
                 
                 .build();
     }

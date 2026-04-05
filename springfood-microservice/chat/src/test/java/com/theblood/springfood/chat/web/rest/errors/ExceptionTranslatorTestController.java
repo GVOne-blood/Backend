@@ -52,6 +52,36 @@ public class ExceptionTranslatorTestController {
         throw new RuntimeException();
     }
 
+    @GetMapping("/authentication-exception")
+    public void authenticationException() {
+        throw new AuthenticationException("Invalid or expired JWT token");
+    }
+
+    @GetMapping("/authorization-exception")
+    public void authorizationException() {
+        throw new AuthorizationException("User is not a participant of this conversation", "conv-123");
+    }
+
+    @GetMapping("/validation-exception")
+    public void validationException() {
+        throw new ValidationException("DIRECT conversation must have exactly 2 participants", "participants", 3);
+    }
+
+    @GetMapping("/kafka-exception")
+    public void kafkaException() {
+        throw new org.springframework.kafka.KafkaException("Failed to publish message to Kafka");
+    }
+
+    @GetMapping("/database-exception")
+    public void databaseException() {
+        throw new org.springframework.dao.DataAccessResourceFailureException("Database connection failed");
+    }
+
+    @GetMapping("/redis-exception")
+    public void redisException() {
+        throw new org.springframework.data.redis.RedisConnectionFailureException("Redis connection failed");
+    }
+
     public static class TestDTO {
 
         @NotNull

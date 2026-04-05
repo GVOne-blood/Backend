@@ -15,7 +15,9 @@ import com.theblood.springfood.chat.repository.MessageReactionRepository;
 import com.theblood.springfood.chat.service.dto.MessageReactionDTO;
 import com.theblood.springfood.chat.service.mapper.MessageReactionMapper;
 import jakarta.persistence.EntityManager;
+
 import java.util.UUID;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,7 +29,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Integration tests for the {@link MessageReactionResource} REST controller.
+ * Integration tests for the {@link MessageReactionResource} REST resources.
  */
 @IntegrationTest
 @AutoConfigureMockMvc
@@ -67,7 +69,7 @@ class MessageReactionResourceIT {
 
     /**
      * Create an entity for this test.
-     *
+     * <p>
      * This is a static method, as tests for other entities might also need it,
      * if they test an entity which requires the current entity.
      */
@@ -92,7 +94,7 @@ class MessageReactionResourceIT {
 
     /**
      * Create an updated entity for this test.
-     *
+     * <p>
      * This is a static method, as tests for other entities might also need it,
      * if they test an entity which requires the current entity.
      */

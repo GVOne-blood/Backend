@@ -1,6 +1,6 @@
 package com.theblood.paymentservice.dto.request;
 
-import com.theblood.common.enums.PaymentMethod;
+import com.theblood.springfood.common.enums.PaymentMethod;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;

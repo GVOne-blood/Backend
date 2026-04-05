@@ -1,7 +1,7 @@
 package com.theblood.authentication.service;
 
 import com.theblood.authentication.dto.response.TokenResponse;
-import com.theblood.common.dto.response.LoginRequest;
+import com.theblood.springfood.common.dto.response.LoginRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 

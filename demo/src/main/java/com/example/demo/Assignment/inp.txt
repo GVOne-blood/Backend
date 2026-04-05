@@ -1,4 +1,0 @@
-WARN
-null
-null
-null

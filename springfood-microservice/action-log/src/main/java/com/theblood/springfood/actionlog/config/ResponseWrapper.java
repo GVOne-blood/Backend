@@ -1,8 +1,8 @@
 package com.theblood.springfood.actionlog.config;
 
 
-import com.theblood.common.dto.response.ApiResponse;
-import com.theblood.common.util.MessageUtils;
+import com.theblood.springfood.common.dto.response.ApiResponse;
+import com.theblood.springfood.common.util.MessageUtils;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;

@@ -2,10 +2,10 @@ package com.theblood.springfood.actionlog.web.rest;
 
 import com.theblood.springfood.actionlog.domain.LogAction;
 import com.theblood.springfood.actionlog.repository.LogActionRepository;
-import com.theblood.springfood.actionlog.service.CarboneService;
+import com.theblood.springfood.actionlog.carbone.CarboneService;
 import com.theblood.springfood.actionlog.service.LogActionService;
 import com.theblood.springfood.actionlog.service.dto.LogActionDTO;
-import com.theblood.springfood.actionlog.service.dto.carbone.CarboneResponseData;
+import com.theblood.springfood.actionlog.carbone.dto.CarboneResponseData;
 import com.theblood.springfood.actionlog.web.rest.errors.BadRequestAlertException;
 import com.theblood.springfood.client.api.LogActionsClient;
 import jakarta.validation.Valid;

@@ -1,6 +1,6 @@
 package com.theblood.authentication.model;
 
-import com.theblood.common.enums.TokenType;
+import com.theblood.springfood.common.enums.TokenType;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;

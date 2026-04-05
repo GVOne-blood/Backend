@@ -3,8 +3,8 @@ package com.theblood.authentication.controller;
 
 import com.theblood.authentication.dto.response.AddressDetail;
 import com.theblood.authentication.service.AddressService;
-import com.theblood.common.dto.request.CustomUserPrincipal;
-import com.theblood.common.dto.response.ResponseData;
+import com.theblood.springfood.common.dto.request.CustomUserPrincipal;
+import com.theblood.springfood.common.dto.response.ResponseData;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;

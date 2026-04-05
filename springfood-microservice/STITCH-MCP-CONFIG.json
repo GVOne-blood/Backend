@@ -1,0 +1,22 @@
+{
+  "stitch": {
+    "command": "npx",
+    "args": ["-y", "@_davideast/stitch-mcp@latest", "proxy"],
+    "env": {
+      "STITCH_API_KEY": "AQ.Ab8RN6IYTTzeU4Eell2rUTTLLcWXLIw1Ps2yt3PI66BnpGm9ww"
+    },
+    "disabled": false,
+    "autoApprove": [
+      "build_site",
+      "get_screen_code",
+      "get_screen_image",
+      "extract_design_context",
+      "generate_screen_from_text",
+      "list_screens",
+      "create_project",
+      "list_projects",
+      "get_project",
+      "get_screen"
+    ]
+  }
+}

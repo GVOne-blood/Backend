@@ -5,7 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 /**
- * REST controller for managing testing authentication token.
+ * REST resources for managing testing authentication token.
  */
 @RestController
 @RequestMapping("/api")

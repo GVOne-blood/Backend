@@ -1,9 +1,9 @@
 package com.theblood.shopservice.kafka.consumer;
 
-import com.theblood.common.dto.kafka.ProductValidationRequest;
-import com.theblood.common.enums.Role;
-import com.theblood.common.enums.kafka.ProductCreationMessage;
-import com.theblood.common.exception.custom.InvalidDataException;
+import com.theblood.springfood.common.dto.kafka.ProductValidationRequest;
+import com.theblood.springfood.common.enums.Role;
+import com.theblood.springfood.common.enums.kafka.ProductCreationMessage;
+import com.theblood.springfood.common.exception.custom.InvalidDataException;
 import com.theblood.shopservice.common.enums.ShopStatus;
 import com.theblood.shopservice.domain.Shop;
 import com.theblood.shopservice.repository.ShopMemberRepository;
@@ -31,7 +31,7 @@ public class ProductValidationConsumer {
     private final ShopMemberRepository shopMemberRepository;
     private final KafkaTemplate<String, Object> kafkaTemplate;
 
-    @KafkaListener(topics = "product-validation-request")
+    @KafkaListener(topics = "product-validation-request", groupId = "shop-service-validation-group")
     @Transactional
     public void validateProductCreation(ProductValidationRequest message) {
         Optional<Shop> shop = shopRepository.findById(message.getShopId());
@@ -43,7 +43,7 @@ public class ProductValidationConsumer {
         log.info("Validated product creation for shop id: {}", message.getShopId());
     }
 
-    @KafkaListener(topics = "product-update-request")
+    @KafkaListener(topics = "product-update-request", groupId = "shop-service-update-group")
     public void validateProductUpdate(ProductValidationRequest message) {
         if (shopMemberRepository.existsByIdAndUserIdAndRoleName(message.getShopId().toString(), message.getUserId().toString(), Role.SHOP_OWNER.name()))
             kafkaTemplate.send("product-update-validated", "validated");

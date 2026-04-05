@@ -166,6 +166,7 @@ spring:
       hibernate.criteria.literal_handling_mode: BIND
       hibernate.query.fail_on_pagination_over_collection_fetch: true
       hibernate.query.in_clause_parameter_padding: true
+      hibernate.default_schema: action_log
     hibernate:
       ddl-auto: none
       naming:

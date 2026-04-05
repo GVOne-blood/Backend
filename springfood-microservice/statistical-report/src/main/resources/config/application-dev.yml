@@ -19,6 +19,12 @@ logging:
     tech.jhipster: DEBUG
     org.hibernate.SQL: DEBUG
     com.theblood.statisticalreport: DEBUG
+    # Disable noisy JMX logging
+    javax.management.remote.rmi: WARN
+    javax.management.remote: WARN
+    # Enable OkHttp logging for debugging Carbone requests
+    okhttp3.OkHttpClient: DEBUG
+    okhttp3.logging.HttpLoggingInterceptor: DEBUG
 
 management:
   zipkin: # Use the "zipkin" Maven profile to have the Spring Cloud Zipkin dependencies
@@ -40,19 +46,15 @@ spring:
       indent-output: true
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
-    url: ${DEFAULT_DATABASE_URL}
-    username: ${DEFAULT_DATABASE_USERNAME}
-    password:
+    url: ${DEFAULT_DATABASE_URL:jdbc:postgresql://localhost:5432/springfood}
+    username: ${DEFAULT_DATABASE_USERNAME:postgres}
+    password: ${DEFAULT_DATABASE_PASSWORD:123456}
     hikari:
       poolName: Hikari
       auto-commit: false
   liquibase:
-    # Remove 'faker' if you do not want the sample data to be loaded automatically
-    contexts: dev, faker
-  messages:
-    cache-duration: PT1S # 1 second, see the ISO 8601 standard
-  thymeleaf:
-    cache: false
+    enabled: false
+  # Remove 'faker' if you do not want the sample data to be loaded automatically
 
 server:
   port: 8090
@@ -107,3 +109,26 @@ jhipster:
 # ===================================================================
 
 # application:
+
+# Carbone Configuration
+# Option 1: Self-hosted Carbone Server (Community Edition)
+carbone:
+  base-url: ${CARBONE_BASE_URL:http://localhost:8100}
+  template-path: ${CARBONE_TEMPLATE_PATH:statistical-report/src/main/resources/templates/reports}
+  # Option 2: Carbone Cloud (SaaS - Recommended for Production)
+  # Set enabled=true để dùng Carbone Cloud thay vì self-hosted
+  cloud:
+    enabled: ${CARBONE_CLOUD_ENABLED:true}
+    api-token: ${CARBONE_CLOUD_API_TOKEN:test_eyJhbGciOiJFUzUxMiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiIxMzc3MTYxOTI2NzM1NzY2NjYzIiwiYXVkIjoiY2FyYm9uZSIsImV4cCI6MjQzNTg4NTY5NSwiZGF0YSI6eyJ0eXBlIjoidGVzdCJ9fQ.AE5Dp9AL2c8-iKecKFye7U9PO-RmV4K-qmqwzO2On9VD9IhHUPVQrLw066L3edC4VuPp1gB2Rvjy0KeNLhU5xyxVAWwNZehyUbBUi4ET_lpP1jBphLopQK8Bp7vAbIl0ifGxoscMwka5ja-AcIblbXOJv8oQA7CHfFNTyNEoNQQRkkJX}
+    api-version: ${CARBONE_CLOUD_API_VERSION:4}
+
+# MinIO Configuration
+minio:
+  endpoint: ${MINIO_ENDPOINT:http://localhost:9000}
+  access-key: ${MINIO_ACCESS_KEY:minioadmin}
+  secret-key: ${MINIO_SECRET_KEY:minioadmin}
+  bucket: ${MINIO_BUCKET:springfood-carbone-out}
+  auto-create-bucket: true
+  # Buckets riêng cho templates và reports
+  template-bucket: ${MINIO_TEMPLATE_BUCKET:springfood-input}
+  report-bucket: ${MINIO_REPORT_BUCKET:springfood-carbone-out}

@@ -2,7 +2,7 @@ package com.theblood.authentication.service.impl;
 
 import com.theblood.authentication.model.User;
 import com.theblood.authentication.service.JwtService;
-import com.theblood.common.enums.TokenType;
+import com.theblood.springfood.common.enums.TokenType;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -49,6 +49,8 @@ public class JwtServiceImpl implements JwtService {
         claims.put("type", tokenType.name());
         claims.put("username", user.getUsername());
         claims.put("permissions", user.getAuthorities());
+        claims.put("sid", user.getShopId());
+        claims.put("iss", "springfood-auth");
 
         return createToken(claims, user.getId().toString(), tokenType);
     }

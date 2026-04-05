@@ -2,8 +2,8 @@ package com.theblood.paymentservice.service.impl;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.theblood.common.enums.PaymentMethod;
-import com.theblood.common.exception.custom.InvalidDataException;
+import com.theblood.springfood.common.enums.PaymentMethod;
+import com.theblood.springfood.common.exception.custom.InvalidDataException;
 import com.theblood.paymentservice.common.enums.TransactionStatus;
 import com.theblood.paymentservice.common.enums.TransactionType;
 import com.theblood.paymentservice.common.util.VNPayUtil;
@@ -297,7 +297,7 @@ public class VNPayServiceImpl implements VNPayService {
         } else transactionStatus = "Send request fail: " + response.get("vnp_Message");
 
         return transactionStatus;
-}
+    }
 
     @Transactional
     @Override

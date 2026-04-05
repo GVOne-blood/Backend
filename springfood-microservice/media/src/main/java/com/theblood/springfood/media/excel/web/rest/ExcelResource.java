@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * REST controller for Excel operations.
+ * REST resources for Excel operations.
  */
 @Slf4j
 @RestController
@@ -37,8 +37,8 @@ public class ExcelResource {
     @PostMapping("/headers")
     @Operation(summary = "Read headers from Excel file")
     public ResponseEntity<List<String>> readHeaders(
-            @RequestParam("file") MultipartFile file,
-            @RequestParam(value = "headerRow", defaultValue = "0") int headerRow) {
+        @RequestParam("file") MultipartFile file,
+        @RequestParam(value = "headerRow", defaultValue = "0") int headerRow) {
         try {
             List<String> headers = excelService.readHeaders(file, headerRow);
             return ResponseEntity.ok(headers);
@@ -56,8 +56,8 @@ public class ExcelResource {
     @PostMapping("/preview")
     @Operation(summary = "Preview Excel file data")
     public ResponseEntity<List<Map<String, String>>> previewExcel(
-            @RequestParam("file") MultipartFile file,
-            @RequestParam(value = "headerRow", defaultValue = "0") int headerRow) {
+        @RequestParam("file") MultipartFile file,
+        @RequestParam(value = "headerRow", defaultValue = "0") int headerRow) {
         try {
             List<Map<String, String>> data = excelService.importAsMap(file, headerRow);
             return ResponseEntity.ok(data);
@@ -75,17 +75,17 @@ public class ExcelResource {
     @PostMapping("/template")
     @Operation(summary = "Create Excel template with headers")
     public ResponseEntity<byte[]> createTemplate(
-            @RequestBody TemplateRequest request) {
+        @RequestBody TemplateRequest request) {
         try {
             byte[] template = excelService.createTemplate(
-                request.headers(), 
+                request.headers(),
                 request.sheetName() != null ? request.sheetName() : "Template"
             );
-            
+
             String filename = request.filename() != null ? request.filename() : "template.xlsx";
-            
+
             return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, 
+                .header(HttpHeaders.CONTENT_DISPOSITION,
                     "attachment; filename=\"" + encodeFilename(filename) + "\"")
                 .contentType(MediaType.parseMediaType(
                     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
@@ -108,11 +108,11 @@ public class ExcelResource {
                 request.data(),
                 request.sheetName()
             );
-            
+
             String filename = request.filename() != null ? request.filename() : "export.xlsx";
-            
+
             return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, 
+                .header(HttpHeaders.CONTENT_DISPOSITION,
                     "attachment; filename=\"" + encodeFilename(filename) + "\"")
                 .contentType(MediaType.parseMediaType(
                     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
@@ -129,24 +129,24 @@ public class ExcelResource {
     @PostMapping("/export-from-template")
     @Operation(summary = "Export data using Excel template")
     public ResponseEntity<byte[]> exportFromTemplate(
-            @RequestParam("template") MultipartFile template,
-            @RequestParam("data") String dataJson) {
+        @RequestParam("template") MultipartFile template,
+        @RequestParam("data") String dataJson) {
         try {
             // Parse JSON data
-            com.fasterxml.jackson.databind.ObjectMapper mapper = 
+            com.fasterxml.jackson.databind.ObjectMapper mapper =
                 new com.fasterxml.jackson.databind.ObjectMapper();
             @SuppressWarnings("unchecked")
             Map<String, Object> data = mapper.readValue(dataJson, Map.class);
-            
+
             byte[] excelBytes = excelService.exportFromTemplate(
                 template.getBytes(),
                 data
             );
-            
+
             String filename = "export_" + System.currentTimeMillis() + ".xlsx";
-            
+
             return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, 
+                .header(HttpHeaders.CONTENT_DISPOSITION,
                     "attachment; filename=\"" + encodeFilename(filename) + "\"")
                 .contentType(MediaType.parseMediaType(
                     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
@@ -168,12 +168,14 @@ public class ExcelResource {
         List<String> headers,
         String sheetName,
         String filename
-    ) {}
+    ) {
+    }
 
     public record ExportRequest(
         List<String> headers,
         List<List<Object>> data,
         String sheetName,
         String filename
-    ) {}
+    ) {
+    }
 }

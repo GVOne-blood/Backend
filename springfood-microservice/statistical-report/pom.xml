@@ -33,7 +33,7 @@
     <argLine>-Djava.security.egd=file:/dev/./urandom -Xmx1G</argLine>
     <m2e.apt.activation>jdt_apt</m2e.apt.activation>
     <run.addResources>false</run.addResources>
-    <spring-boot.version>${project.parent.version}</spring-boot.version>
+    <spring-boot.version>3.5.2</spring-boot.version>
     <archunit-junit5.version>1.4.0</archunit-junit5.version>
     <checkstyle.version>10.23.1</checkstyle.version>
     <git-commit-id-maven-plugin.version>9.0.1</git-commit-id-maven-plugin.version>
@@ -46,7 +46,7 @@
     <liquibase-plugin.password/>
     <liquibase-plugin.url/>
     <liquibase-plugin.username/>
-    <mapstruct.version>1.6.3</mapstruct.version>
+    <!-- mapstruct.version inherited from parent POM (1.6.3) -->
     <maven-checkstyle-plugin.version>3.6.0</maven-checkstyle-plugin.version>
     <maven-clean-plugin.version>3.4.1</maven-clean-plugin.version>
     <maven-compiler-plugin.version>3.14.0</maven-compiler-plugin.version>
@@ -70,7 +70,7 @@
     <resource.delimiter>@</resource.delimiter>
     <sonar-maven-plugin.version>5.1.0.4751</sonar-maven-plugin.version>
     <spotless-maven-plugin.version>2.44.4</spotless-maven-plugin.version>
-    <spring-cloud-dependencies.version>2024.0.1</spring-cloud-dependencies.version>
+    <spring-cloud-dependencies.version>${spring-cloud.version}</spring-cloud-dependencies.version>
     <spring.profiles.active>dev</spring.profiles.active>
     <springdoc-openapi-starter-webmvc-api.version>2.8.8</springdoc-openapi-starter-webmvc-api.version>
   </properties>
@@ -88,6 +88,11 @@
   </dependencyManagement>
 
   <dependencies>
+    <dependency>
+      <groupId>com.theblood</groupId>
+      <artifactId>common</artifactId>
+      <version>1.0-SNAPSHOT</version>
+    </dependency>
     <dependency>
       <groupId>tech.jhipster</groupId>
       <artifactId>jhipster-framework</artifactId>
@@ -126,10 +131,7 @@
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-mail</artifactId>
     </dependency>
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
-    </dependency>
+    <!-- Security enabled but configured to permitAll() -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-security</artifactId>
@@ -166,10 +168,7 @@
       <artifactId>spring-boot-test</artifactId>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>org.springframework.security</groupId>
-      <artifactId>spring-security-data</artifactId>
-    </dependency>
+    <!-- Security test dependency -->
     <dependency>
       <groupId>org.springframework.security</groupId>
       <artifactId>spring-security-test</artifactId>
@@ -301,6 +300,33 @@
       <artifactId>testcontainers</artifactId>
       <scope>test</scope>
     </dependency>
+    <!-- Lombok - version managed by parent POM -->
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <!-- Carbone integration: OkHttp + Gson -->
+    <dependency>
+      <groupId>com.squareup.okhttp3</groupId>
+      <artifactId>okhttp</artifactId>
+      <version>4.12.0</version>
+    </dependency>
+    <dependency>
+      <groupId>com.squareup.okhttp3</groupId>
+      <artifactId>logging-interceptor</artifactId>
+      <version>4.12.0</version>
+    </dependency>
+    <dependency>
+      <groupId>com.google.code.gson</groupId>
+      <artifactId>gson</artifactId>
+    </dependency>
+    <!-- MinIO integration -->
+    <dependency>
+      <groupId>com.theblood</groupId>
+      <artifactId>minio</artifactId>
+      <version>0.0.1-SNAPSHOT</version>
+    </dependency>
   </dependencies>
 
   <build>
@@ -425,8 +451,14 @@
             <parameters>true</parameters>
             <annotationProcessorPaths>
               <path>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>${lombok.version}</version>
+              </path>
+              <path>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-configuration-processor</artifactId>
+                <version>${spring-boot.version}</version>
               </path>
               <path>
                 <groupId>org.mapstruct</groupId>

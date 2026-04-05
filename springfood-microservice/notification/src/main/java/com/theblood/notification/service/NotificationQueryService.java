@@ -1,7 +1,7 @@
 package com.theblood.notification.service;
 
-import com.theblood.common.exception.custom.CustomException;
-import com.theblood.common.exception.custom.StatusCode;
+import com.theblood.springfood.common.exception.custom.CustomException;
+import com.theblood.springfood.common.exception.custom.StatusCode;
 import com.theblood.notification.domain.Notification;
 import com.theblood.notification.service.dto.NotificationDataDTO;
 import com.theblood.springfood.client.api.AuthenticationClient;

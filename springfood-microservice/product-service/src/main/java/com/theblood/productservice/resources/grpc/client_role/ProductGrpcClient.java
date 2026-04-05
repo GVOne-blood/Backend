@@ -1,9 +1,9 @@
 package com.theblood.productservice.resources.grpc.client_role;
 
 
-import com.theblood.common.grpc.ProductServiceGrpc;
-import com.theblood.common.grpc.ValidateProductCreationRequest;
-import com.theblood.common.grpc.ValidateProductCreationResponse;
+import com.theblood.springfood.common.grpc.ProductServiceGrpc;
+import com.theblood.springfood.common.grpc.ValidateProductCreationRequest;
+import com.theblood.springfood.common.grpc.ValidateProductCreationResponse;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import lombok.extern.slf4j.Slf4j;

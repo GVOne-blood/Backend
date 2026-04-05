@@ -31,6 +31,7 @@
         <module>cart-service</module>
         <module>order-service</module>
         <module>common</module>
+        <module>common-security</module>
         <module>grpc</module>
         <module>statistical-report</module>
         <module>media</module>
@@ -63,7 +64,7 @@
         
         <!-- Library versions -->
         <lombok.version>1.18.38</lombok.version>
-        <mapstruct.version>1.5.5.Final</mapstruct.version>
+        <mapstruct.version>1.6.3</mapstruct.version>
         <jhipster.version>8.11.0</jhipster.version>
     </properties>
 
@@ -111,6 +112,14 @@
                 <artifactId>lombok</artifactId>
                 <version>${lombok.version}</version>
                 <scope>provided</scope>
+            </dependency>
+            <!-- gRPC BOM - Centralized version management -->
+            <dependency>
+                <groupId>io.grpc</groupId>
+                <artifactId>grpc-bom</artifactId>
+                <version>${grpc.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>org.projectlombok</groupId>

@@ -3,6 +3,7 @@ package com.theblood.springfood.actionlog;
 import com.ulisesbocchio.jasyptspringboot.annotation.EnableEncryptableProperties;
 import com.theblood.springfood.actionlog.config.ApplicationProperties;
 import com.theblood.springfood.actionlog.config.CRLFLogConverter;
+import com.theblood.springfood.common.config.DotenvConfig;
 import jakarta.annotation.PostConstruct;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -41,6 +42,7 @@ public class ActionLogApp {
      */
     public static void main(String[] args) {
         SpringApplication app = new SpringApplication(ActionLogApp.class);
+        app.addInitializers(new DotenvConfig());
         DefaultProfileUtil.addDefaultProfile(app);
         Environment env = app.run(args).getEnvironment();
         logApplicationStartup(env);

@@ -1,8 +1,8 @@
 package com.theblood.productservice.kafka.consumer;
 
-import com.theblood.common.enums.kafka.ProductCreationMessage;
-import com.theblood.common.exception.custom.InvalidDataException;
-import com.theblood.common.exception.custom.KafkaMessageIsFailException;
+import com.theblood.springfood.common.enums.kafka.ProductCreationMessage;
+import com.theblood.springfood.common.exception.custom.InvalidDataException;
+import com.theblood.springfood.common.exception.custom.KafkaMessageIsFailException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class ProductServiceConsumer {
 
-    @KafkaListener(topics = "product-creation-validated")
+    @KafkaListener(topics = "product-creation-validated", groupId = "product-service-creation-group")
     public boolean handleProductCreationValidated(String message) {
         log.info("Received product creation validated message: {}", message);
         if (message != null || message.isEmpty())

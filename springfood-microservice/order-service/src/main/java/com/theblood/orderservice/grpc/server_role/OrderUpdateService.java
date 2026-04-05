@@ -1,8 +1,8 @@
 package com.theblood.orderservice.grpc.server_role;
 
-import com.theblood.common.enums.OrderStatus;
-import com.theblood.common.grpc.OrderUpdateRequest;
-import com.theblood.common.grpc.OrderUpdateResponse;
+import com.theblood.springfood.common.enums.OrderStatus;
+import com.theblood.springfood.common.grpc.OrderUpdateRequest;
+import com.theblood.springfood.common.grpc.OrderUpdateResponse;
 import com.theblood.orderservice.common.enums.TransactionType;
 import com.theblood.orderservice.dto.request.OrdersUpdateRequest;
 import com.theblood.orderservice.mapper.OrderMapper;

@@ -1,0 +1,57 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "com.theblood.springfood.media.grpc";
+option java_outer_classname = "MediaServiceProto";
+
+package media;
+
+// Media Service - Handle file uploads and storage
+service MediaService {
+  // Upload file to MinIO storage
+  rpc UploadFile(UploadFileRequest) returns (UploadFileResponse);
+
+  // Get file URL from MinIO
+  rpc GetFileUrl(GetFileUrlRequest) returns (GetFileUrlResponse);
+
+  // Delete file from MinIO
+  rpc DeleteFile(DeleteFileRequest) returns (DeleteFileResponse);
+}
+
+message UploadFileRequest {
+  bytes file_data = 1;           // File content as bytes
+  string filename = 2;           // Original filename
+  string content_type = 3;       // MIME type (application/pdf, etc.)
+  string bucket_name = 4;        // Optional: specific bucket (default: springfood-media)
+  map<string, string> metadata = 5; // Optional metadata
+}
+
+message UploadFileResponse {
+  bool success = 1;
+  string message = 2;
+  string file_url = 3;           // Presigned URL to access file
+  string file_path = 4;          // Path in MinIO
+  string bucket_name = 5;
+}
+
+message GetFileUrlRequest {
+  string file_path = 1;          // Path in MinIO
+  string bucket_name = 2;        // Bucket name
+  int32 expiry_seconds = 3;      // URL expiry time (default: 7 days)
+}
+
+message GetFileUrlResponse {
+  bool success = 1;
+  string message = 2;
+  string file_url = 3;
+}
+
+message DeleteFileRequest {
+  string file_path = 1;
+  string bucket_name = 2;
+}
+
+message DeleteFileResponse {
+  bool success = 1;
+  string message = 2;
+}

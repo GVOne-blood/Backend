@@ -27,7 +27,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 /**
- * REST controller for managing {@link com.theblood.notification.domain.Notification}.
+ * REST resources for managing {@link com.theblood.notification.domain.Notification}.
  */
 @RestController
 @CrossOrigin("*")
@@ -208,7 +208,7 @@ public class NotificationResource {
         LOG.debug("REST request to delete batch Notifications : {}", ids);
         return ResponseEntity.ok().body(notificationService.deleteBatch(ids, request));
     }
-
+0
     @PostMapping({"/list", "/bulk"})
     public ResponseEntity<List<NotificationDTO>> createListNotifications(@RequestBody List<NotificationDTO> notificationsDTOS) {
         LOG.debug("REST request to create list Notifications");

@@ -1,5 +1,6 @@
 package com.theblood.springfood.actionlog.service;
 
+import com.theblood.springfood.actionlog.carbone.CarboneService;
 import com.theblood.springfood.actionlog.domain.LogActionAnnualUpdate;
 import com.theblood.springfood.actionlog.domain.LogActionAnnualUpdate_;
 import com.theblood.springfood.actionlog.repository.LogActionAnnualUpdateRepository;

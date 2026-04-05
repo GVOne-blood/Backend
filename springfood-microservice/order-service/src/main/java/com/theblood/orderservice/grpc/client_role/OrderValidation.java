@@ -1,10 +1,10 @@
 package com.theblood.orderservice.grpc.client_role;
 
 
-import com.theblood.common.dto.request.ShopOrderRequest;
-import com.theblood.common.grpc.ShopServiceGrpc;
-import com.theblood.common.grpc.ShopValidationRequest;
-import com.theblood.common.grpc.ShopValidationResponse;
+import com.theblood.springfood.common.dto.request.ShopOrderRequest;
+import com.theblood.springfood.common.grpc.ShopServiceGrpc;
+import com.theblood.springfood.common.grpc.ShopValidationRequest;
+import com.theblood.springfood.common.grpc.ShopValidationResponse;
 import com.theblood.orderservice.repository.OrderItemRepository;
 import com.theblood.orderservice.repository.OrderRepository;
 import io.grpc.StatusRuntimeException;

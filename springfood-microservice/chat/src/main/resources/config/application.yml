@@ -14,15 +14,16 @@
 # http://docs.spring.io/spring-boot/docs/current/reference/html/common-application-properties.html
 # ===================================================================
 
----
-# Conditionally disable springdoc on missing api-docs profile
-spring:
-  config:
-    activate:
-      on-profile: '!api-docs'
 springdoc:
   api-docs:
     enabled: false
+  kafka:
+    producer:
+      acks: all
+      retries: 2147483647
+      properties:
+        enable.idempotence: true
+        max.in.flight.requests.per.connection: 5
 ---
 feign:
   circuitbreaker:
@@ -127,6 +128,17 @@ spring:
     jpa:
       repositories:
         bootstrap-mode: deferred
+    redis:
+      host: localhost
+      port: 6379
+      password:
+      timeout: 2000ms
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+          max-wait: -1ms
   jpa:
     open-in-view: false
     properties:
@@ -178,6 +190,8 @@ spring:
   output:
     ansi:
       console-available: true
+  websocket:
+    allowed-origins: 'http://localhost:3000,http://localhost:8080,http://localhost:9000'
 
 server:
   servlet:
@@ -238,3 +252,29 @@ jhipster:
 # ===================================================================
 
 # application:
+
+# ===================================================================
+# WebSocket Configuration for Chat Realtime Core
+# ===================================================================
+# Moved to main spring configuration above
+
+spring:
+  ai:
+    # Google AI Gemini Configuration (Direct API - simpler than Vertex AI)
+    # Requires GEMINI_API_KEY in .env file
+    google:
+      ai:
+        gemini:
+          api-key: ${GEMINI_API_KEY}
+          model: ${GEMINI_MODEL:gemini-1.5-flash}
+          # Optional: temperature, top-p, top-k, max-output-tokens
+    
+    # Vector Store Configuration
+    vectorstore:
+      pgvector:
+        schema-name: chat
+        index-type: HNSW
+        distance-type: COSINE_DISTANCE
+        dimensions: 768
+        # Khởi tạo bảng vector trong db tự động vào trong schema-name đã khai báo
+        initialize-schema: true

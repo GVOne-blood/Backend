@@ -1,10 +1,10 @@
 package com.theblood.orderservice.grpc.client_role;
 
 
-import com.theblood.common.enums.OrderStatus;
-import com.theblood.common.grpc.PaymentRequest;
-import com.theblood.common.grpc.PaymentResponse;
-import com.theblood.common.grpc.PaymentServiceGrpc;
+import com.theblood.springfood.common.enums.OrderStatus;
+import com.theblood.springfood.common.grpc.PaymentRequest;
+import com.theblood.springfood.common.grpc.PaymentResponse;
+import com.theblood.springfood.common.grpc.PaymentServiceGrpc;
 import com.theblood.orderservice.repository.OrderRepository;
 import com.theblood.orderservice.service.OrderService;
 import lombok.RequiredArgsConstructor;

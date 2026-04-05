@@ -1,6 +1,6 @@
 package com.theblood.paymentservice.background.job;
 
-import com.theblood.common.enums.MessageStatus;
+import com.theblood.springfood.common.enums.MessageStatus;
 import com.theblood.paymentservice.kafka.model.OutboxMessage;
 import com.theblood.paymentservice.repository.OutboxMessageRepository;
 import jakarta.transaction.Transactional;

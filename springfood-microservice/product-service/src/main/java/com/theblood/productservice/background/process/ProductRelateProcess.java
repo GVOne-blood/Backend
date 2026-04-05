@@ -1,7 +1,7 @@
 package com.theblood.productservice.background.process;
 
-import com.theblood.productservice.dto.request.RelateProductRequest;
 import com.theblood.productservice.repository.ProductCategoryRepository;
+import com.theblood.productservice.service.dto.request.RelateProductRequest;
 import com.theblood.productservice.service.impl.RedisServiceWrapper;
 import lombok.extern.slf4j.Slf4j;
 

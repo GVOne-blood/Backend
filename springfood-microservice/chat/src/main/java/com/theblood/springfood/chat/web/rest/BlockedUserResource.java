@@ -6,11 +6,13 @@ import com.theblood.springfood.chat.service.dto.BlockedUserDTO;
 import com.theblood.springfood.chat.web.rest.errors.BadRequestAlertException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,7 +22,7 @@ import tech.jhipster.web.util.HeaderUtil;
 import tech.jhipster.web.util.ResponseUtil;
 
 /**
- * REST controller for managing {@link com.theblood.springfood.chat.domain.BlockedUser}.
+ * REST resources for managing {@link com.theblood.springfood.chat.domain.BlockedUser}.
  */
 @RestController
 @RequestMapping("/api/blocked-users")
@@ -29,13 +31,10 @@ public class BlockedUserResource {
     private static final Logger LOG = LoggerFactory.getLogger(BlockedUserResource.class);
 
     private static final String ENTITY_NAME = "chatBlockedUser";
-
+    private final BlockedUserService blockedUserService;
+    private final BlockedUserRepository blockedUserRepository;
     @Value("${jhipster.clientApp.name}")
     private String applicationName;
-
-    private final BlockedUserService blockedUserService;
-
-    private final BlockedUserRepository blockedUserRepository;
 
     public BlockedUserResource(BlockedUserService blockedUserService, BlockedUserRepository blockedUserRepository) {
         this.blockedUserService = blockedUserService;
@@ -64,7 +63,7 @@ public class BlockedUserResource {
     /**
      * {@code PUT  /blocked-users/:blockId} : Updates an existing blockedUser.
      *
-     * @param blockId the id of the blockedUserDTO to save.
+     * @param blockId        the id of the blockedUserDTO to save.
      * @param blockedUserDTO the blockedUserDTO to update.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated blockedUserDTO,
      * or with status {@code 400 (Bad Request)} if the blockedUserDTO is not valid,
@@ -97,7 +96,7 @@ public class BlockedUserResource {
     /**
      * {@code PATCH  /blocked-users/:blockId} : Partial updates given fields of an existing blockedUser, field will ignore if it is null
      *
-     * @param blockId the id of the blockedUserDTO to save.
+     * @param blockId        the id of the blockedUserDTO to save.
      * @param blockedUserDTO the blockedUserDTO to update.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated blockedUserDTO,
      * or with status {@code 400 (Bad Request)} if the blockedUserDTO is not valid,
@@ -105,7 +104,7 @@ public class BlockedUserResource {
      * or with status {@code 500 (Internal Server Error)} if the blockedUserDTO couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PatchMapping(value = "/{blockId}", consumes = { "application/json", "application/merge-patch+json" })
+    @PatchMapping(value = "/{blockId}", consumes = {"application/json", "application/merge-patch+json"})
     public ResponseEntity<BlockedUserDTO> partialUpdateBlockedUser(
         @PathVariable(value = "blockId", required = false) final String blockId,
         @NotNull @RequestBody BlockedUserDTO blockedUserDTO

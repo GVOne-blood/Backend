@@ -1,0 +1,8 @@
+${AnsiColor.GREEN}███████╗██████╗ ██████╗ ██╗███╗   ██╗ ██████╗ ${AnsiColor.BRIGHT_RED}███████╗ ██████╗  ██████╗ ██████╗ ${AnsiColor.DEFAULT}      ██████╗ ██████╗  ██████╗ ██████╗ ██╗   ██╗ ██████╗████████╗
+${AnsiColor.GREEN}██╔════╝██╔══██╗██╔══██╗██║████╗  ██║██╔════╝ ${AnsiColor.BRIGHT_RED}██╔════╝██╔═══██╗██╔═══██╗██╔══██╗${AnsiColor.DEFAULT}      ██╔══██╗██╔══██╗██╔═══██╗██╔══██╗██║   ██║██╔════╝╚══██╔══╝
+${AnsiColor.GREEN}███████╗██████╔╝██████╔╝██║██╔██╗ ██║██║  ███╗${AnsiColor.BRIGHT_RED}█████╗  ██║   ██║██║   ██║██║  ██║${AnsiColor.DEFAULT}█████╗██████╔╝██████╔╝██║   ██║██║  ██║██║   ██║██║        ██║   
+${AnsiColor.GREEN}╚════██║██╔═══╝ ██╔══██╗██║██║╚██╗██║██║   ██║${AnsiColor.BRIGHT_RED}██╔══╝  ██║   ██║██║   ██║██║  ██║${AnsiColor.DEFAULT}╚════╝██╔═══╝ ██╔══██╗██║   ██║██║  ██║██║   ██║██║        ██║   
+${AnsiColor.GREEN}███████║██║     ██║  ██║██║██║ ╚████║╚██████╔╝${AnsiColor.BRIGHT_RED}██║     ╚██████╔╝╚██████╔╝██████╔╝${AnsiColor.DEFAULT}      ██║     ██║  ██║╚██████╔╝██████╔╝╚██████╔╝╚██████╗   ██║   
+${AnsiColor.GREEN}╚══════╝╚═╝     ╚═╝  ╚═╝╚═╝╚═╝  ╚═══╝ ╚═════╝ ${AnsiColor.BRIGHT_RED}╚═╝      ╚═════╝  ╚═════╝ ╚═════╝ ${AnsiColor.DEFAULT}      ╚═╝     ╚═╝  ╚═╝ ╚═════╝ ╚═════╝  ╚═════╝  ╚═════╝   ╚═╝   
+
+${AnsiColor.BRIGHT_BLUE}:: SpringFood Product 🍔  :: Running Spring Boot ${spring-boot.version} :: Startup profile(s) ${spring.profiles.active} ::${AnsiColor.DEFAULT}

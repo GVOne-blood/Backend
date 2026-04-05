@@ -15,7 +15,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 /**
- * Integration tests {@link ExceptionTranslator} controller advice.
+ * Integration tests {@link ExceptionTranslator} resources advice.
  */
 @WithMockUser
 @AutoConfigureMockMvc

@@ -15,7 +15,9 @@ import com.theblood.springfood.chat.repository.MessageAttachmentRepository;
 import com.theblood.springfood.chat.service.dto.MessageAttachmentDTO;
 import com.theblood.springfood.chat.service.mapper.MessageAttachmentMapper;
 import jakarta.persistence.EntityManager;
+
 import java.util.UUID;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,7 +29,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Integration tests for the {@link MessageAttachmentResource} REST controller.
+ * Integration tests for the {@link MessageAttachmentResource} REST resources.
  */
 @IntegrationTest
 @AutoConfigureMockMvc
@@ -91,7 +93,7 @@ class MessageAttachmentResourceIT {
 
     /**
      * Create an entity for this test.
-     *
+     * <p>
      * This is a static method, as tests for other entities might also need it,
      * if they test an entity which requires the current entity.
      */
@@ -124,7 +126,7 @@ class MessageAttachmentResourceIT {
 
     /**
      * Create an updated entity for this test.
-     *
+     * <p>
      * This is a static method, as tests for other entities might also need it,
      * if they test an entity which requires the current entity.
      */

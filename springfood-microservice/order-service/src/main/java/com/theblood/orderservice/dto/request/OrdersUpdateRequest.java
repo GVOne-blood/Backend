@@ -1,8 +1,8 @@
 package com.theblood.orderservice.dto.request;
 
 
-import com.theblood.common.enums.OrderStatus;
-import com.theblood.common.enums.PaymentMethod;
+import com.theblood.springfood.common.enums.OrderStatus;
+import com.theblood.springfood.common.enums.PaymentMethod;
 import com.theblood.orderservice.common.enums.TransactionType;
 import lombok.*;
 import lombok.experimental.FieldDefaults;

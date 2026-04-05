@@ -1,6 +1,6 @@
 package com.theblood.orderservice.model;
 
-import com.theblood.common.model.AbstractEntity;
+import com.theblood.springfood.common.model.AbstractEntity;
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

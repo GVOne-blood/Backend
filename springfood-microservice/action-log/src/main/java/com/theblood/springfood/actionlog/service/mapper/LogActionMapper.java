@@ -2,7 +2,8 @@ package com.theblood.springfood.actionlog.service.mapper;
 
 import com.theblood.springfood.actionlog.domain.LogAction;
 import com.theblood.springfood.actionlog.service.dto.LogActionDTO;
-import org.mapstruct.*;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 /**
  * Mapper for the entity {@link LogAction} and its DTO {@link LogActionDTO}.

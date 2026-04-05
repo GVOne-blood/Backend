@@ -6,6 +6,9 @@ server:
 spring:
   application:
     name: product-service
+  # Load .env file
+  config:
+    import: optional:file:.env[.properties]
   datasource:
     driver-class-name: org.postgresql.Driver
     url: ${DEFAULT_DATABASE_URL}
@@ -18,6 +21,7 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
+        default_schema: springfood_product
   servlet:
     multipart:
       enabled: true

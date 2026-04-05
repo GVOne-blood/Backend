@@ -6,11 +6,13 @@ import com.theblood.springfood.chat.service.dto.ConversationParticipantDTO;
 import com.theblood.springfood.chat.web.rest.errors.BadRequestAlertException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,7 +27,7 @@ import tech.jhipster.web.util.PaginationUtil;
 import tech.jhipster.web.util.ResponseUtil;
 
 /**
- * REST controller for managing {@link com.theblood.springfood.chat.domain.ConversationParticipant}.
+ * REST resources for managing {@link com.theblood.springfood.chat.domain.ConversationParticipant}.
  */
 @RestController
 @RequestMapping("/api/conversation-participants")
@@ -34,13 +36,10 @@ public class ConversationParticipantResource {
     private static final Logger LOG = LoggerFactory.getLogger(ConversationParticipantResource.class);
 
     private static final String ENTITY_NAME = "chatConversationParticipant";
-
+    private final ConversationParticipantService conversationParticipantService;
+    private final ConversationParticipantRepository conversationParticipantRepository;
     @Value("${jhipster.clientApp.name}")
     private String applicationName;
-
-    private final ConversationParticipantService conversationParticipantService;
-
-    private final ConversationParticipantRepository conversationParticipantRepository;
 
     public ConversationParticipantResource(
         ConversationParticipantService conversationParticipantService,
@@ -76,7 +75,7 @@ public class ConversationParticipantResource {
     /**
      * {@code PUT  /conversation-participants/:participantId} : Updates an existing conversationParticipant.
      *
-     * @param participantId the id of the conversationParticipantDTO to save.
+     * @param participantId              the id of the conversationParticipantDTO to save.
      * @param conversationParticipantDTO the conversationParticipantDTO to update.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated conversationParticipantDTO,
      * or with status {@code 400 (Bad Request)} if the conversationParticipantDTO is not valid,
@@ -109,7 +108,7 @@ public class ConversationParticipantResource {
     /**
      * {@code PATCH  /conversation-participants/:participantId} : Partial updates given fields of an existing conversationParticipant, field will ignore if it is null
      *
-     * @param participantId the id of the conversationParticipantDTO to save.
+     * @param participantId              the id of the conversationParticipantDTO to save.
      * @param conversationParticipantDTO the conversationParticipantDTO to update.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated conversationParticipantDTO,
      * or with status {@code 400 (Bad Request)} if the conversationParticipantDTO is not valid,
@@ -117,7 +116,7 @@ public class ConversationParticipantResource {
      * or with status {@code 500 (Internal Server Error)} if the conversationParticipantDTO couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PatchMapping(value = "/{participantId}", consumes = { "application/json", "application/merge-patch+json" })
+    @PatchMapping(value = "/{participantId}", consumes = {"application/json", "application/merge-patch+json"})
     public ResponseEntity<ConversationParticipantDTO> partialUpdateConversationParticipant(
         @PathVariable(value = "participantId", required = false) final String participantId,
         @NotNull @RequestBody ConversationParticipantDTO conversationParticipantDTO

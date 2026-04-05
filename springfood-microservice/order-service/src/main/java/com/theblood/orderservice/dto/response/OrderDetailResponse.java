@@ -1,8 +1,8 @@
 package com.theblood.orderservice.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.theblood.common.dto.response.ProductDetail;
-import com.theblood.common.enums.OrderStatus;
+import com.theblood.springfood.common.dto.response.ProductDetail;
+import com.theblood.springfood.common.enums.OrderStatus;
 import com.theblood.orderservice.common.enums.TransactionStatus;
 import lombok.*;
 import lombok.experimental.FieldDefaults;

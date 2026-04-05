@@ -23,6 +23,7 @@
     <include file="config/liquibase/changelog/20260204095356_added_entity_BlockedUser.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20260204095357_added_entity_MessageReport.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20260204095358_added_entity_ConversationSettings.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20260226_added_entity_AIMessage.xml" relativeToChangelogFile="false"/>
     <!-- jhipster-needle-liquibase-add-changelog - JHipster will add liquibase changelogs here -->
     <include file="config/liquibase/changelog/20260204095348_added_entity_constraints_Conversation.xml" relativeToChangelogFile="false"/>
     <include file="config/liquibase/changelog/20260204095349_added_entity_constraints_ConversationParticipant.xml" relativeToChangelogFile="false"/>

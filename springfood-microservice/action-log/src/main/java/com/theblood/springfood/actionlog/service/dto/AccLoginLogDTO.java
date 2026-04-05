@@ -1,9 +1,9 @@
 package com.theblood.springfood.actionlog.service.dto;
 
 
-import com.theblood.common.enums.AuthType;
-import com.theblood.common.enums.DeviceType;
-import com.theblood.common.enums.LoginEventType;
+import com.theblood.springfood.common.enums.AuthType;
+import com.theblood.springfood.common.enums.DeviceType;
+import com.theblood.springfood.common.enums.LoginEventType;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;

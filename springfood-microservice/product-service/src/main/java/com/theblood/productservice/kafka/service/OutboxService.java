@@ -2,7 +2,7 @@ package com.theblood.productservice.kafka.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.theblood.common.enums.MessageStatus;
+import com.theblood.springfood.common.enums.MessageStatus;
 import com.theblood.productservice.kafka.model.OutboxMessage;
 import com.theblood.productservice.kafka.repository.OutboxMessageRepository;
 import jakarta.transaction.Transactional;

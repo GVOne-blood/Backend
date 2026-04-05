@@ -1,8 +1,8 @@
 package com.theblood.paymentservice.grpc.client_role;
 
-import com.theblood.common.grpc.OrderServiceGrpc;
-import com.theblood.common.grpc.OrderUpdateRequest;
-import com.theblood.common.grpc.OrderUpdateResponse;
+import com.theblood.springfood.common.grpc.OrderServiceGrpc;
+import com.theblood.springfood.common.grpc.OrderUpdateRequest;
+import com.theblood.springfood.common.grpc.OrderUpdateResponse;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;

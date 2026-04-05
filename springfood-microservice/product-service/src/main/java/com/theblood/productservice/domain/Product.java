@@ -26,6 +26,7 @@ public class Product extends AbstractEntity {
 //    @JoinColumn(name = "shop_id", nullable = false)
 //    private Shop shop;
 
+
     @Column(name = "shop_id")
     private UUID shopId;
 

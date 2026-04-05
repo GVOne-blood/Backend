@@ -1,9 +1,9 @@
 package com.theblood.springfood.actionlog.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.theblood.common.enums.AuthType;
-import com.theblood.common.enums.DeviceType;
-import com.theblood.common.enums.LoginEventType;
+import com.theblood.springfood.common.enums.AuthType;
+import com.theblood.springfood.common.enums.DeviceType;
+import com.theblood.springfood.common.enums.LoginEventType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;

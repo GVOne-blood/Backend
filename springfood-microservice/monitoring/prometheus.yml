@@ -1,0 +1,114 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    cluster: 'springfood-microservices'
+    environment: 'development'
+
+# Alertmanager configuration
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+            - alertmanager:9093
+
+# Load rules once and periodically evaluate them
+rule_files:
+  # - "alerts/*.yml"
+
+# Scrape configurations
+scrape_configs:
+  # Prometheus self-monitoring
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # API Gateway
+  - job_name: 'api-gateway'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['host.docker.internal:8080']
+        labels:
+          service: 'api-gateway'
+          type: 'gateway'
+
+  # User Service
+  - job_name: 'user-service'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['host.docker.internal:8081']
+        labels:
+          service: 'user-service'
+          type: 'microservice'
+
+  # Product Service
+  - job_name: 'product-service'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['host.docker.internal:8082']
+        labels:
+          service: 'product-service'
+          type: 'microservice'
+
+  # Order Service
+  - job_name: 'order-service'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['host.docker.internal:8083']
+        labels:
+          service: 'order-service'
+          type: 'microservice'
+
+  # Shop Service
+  - job_name: 'shop-service'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['host.docker.internal:8084']
+        labels:
+          service: 'shop-service'
+          type: 'microservice'
+
+  # Media Service
+  - job_name: 'media-service'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['host.docker.internal:8085']
+        labels:
+          service: 'media-service'
+          type: 'microservice'
+
+  # Chat Service
+  - job_name: 'chat-service'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['host.docker.internal:8086']
+        labels:
+          service: 'chat-service'
+          type: 'microservice'
+
+  # Notification Service
+  - job_name: 'notification-service'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['host.docker.internal:8087']
+        labels:
+          service: 'notification-service'
+          type: 'microservice'
+
+  # Statistical Report Service
+  - job_name: 'statistical-report-service'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['host.docker.internal:8088']
+        labels:
+          service: 'statistical-report-service'
+          type: 'microservice'
+
+  # Action Log Service
+  - job_name: 'action-log-service'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['host.docker.internal:8089']
+        labels:
+          service: 'action-log-service'
+          type: 'microservice'

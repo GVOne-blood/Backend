@@ -1,7 +1,7 @@
 package com.theblood.productservice.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.theblood.common.dto.kafka.ProductValidationResponse;
+import com.theblood.springfood.common.dto.kafka.ProductValidationResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;

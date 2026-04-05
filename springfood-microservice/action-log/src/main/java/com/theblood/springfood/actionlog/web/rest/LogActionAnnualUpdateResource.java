@@ -2,13 +2,13 @@ package com.theblood.springfood.actionlog.web.rest;
 
 import com.theblood.springfood.actionlog.domain.LogActionAnnualUpdate;
 import com.theblood.springfood.actionlog.repository.LogActionAnnualUpdateRepository;
-import com.theblood.springfood.actionlog.service.CarboneService;
+import com.theblood.springfood.actionlog.carbone.CarboneService;
+import com.theblood.springfood.actionlog.carbone.dto.CarboneResponseData;
 import com.theblood.springfood.actionlog.service.LogActionAnnualUpdateQueryService;
 import com.theblood.springfood.actionlog.service.LogActionAnnualUpdateService;
 import com.theblood.springfood.actionlog.service.criteria.LogActionAnnualUpdateCriteria;
 import com.theblood.springfood.actionlog.service.dto.LogActionAnnualUpdateDTO;
 import com.theblood.springfood.actionlog.service.dto.LogActionRequest;
-import com.theblood.springfood.actionlog.service.dto.carbone.CarboneResponseData;
 import com.theblood.springfood.actionlog.web.rest.errors.BadRequestAlertException;
 import com.theblood.springfood.client.api.LogActionAnnualUpdateClient;
 import jakarta.validation.Valid;

@@ -2,14 +2,14 @@ package com.theblood.productservice.resources;
 
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.theblood.common.dto.request.CustomUserPrincipal;
-import com.theblood.common.dto.response.ProductDetail;
-import com.theblood.common.dto.response.ResponseData;
-import com.theblood.common.exception.custom.InvalidDataException;
 import com.theblood.productservice.domain.Product;
-import com.theblood.productservice.dto.request.ProductRequest;
-import com.theblood.productservice.dto.response.ProductImageResponse;
 import com.theblood.productservice.service.ProductService;
+import com.theblood.productservice.service.dto.request.ProductRequest;
+import com.theblood.productservice.service.dto.response.ProductImageResponse;
+import com.theblood.springfood.common.dto.request.CustomUserPrincipal;
+import com.theblood.springfood.common.dto.response.ProductDetail;
+import com.theblood.springfood.common.dto.response.ResponseData;
+import com.theblood.springfood.common.exception.custom.InvalidDataException;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +28,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
+
 
 @RestController
 @RequiredArgsConstructor
@@ -153,4 +154,6 @@ public class ProductResource {
 //            );
 //        }
 //    }
+
+
 }

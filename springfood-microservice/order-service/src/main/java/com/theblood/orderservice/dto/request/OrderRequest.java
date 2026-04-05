@@ -1,7 +1,7 @@
 package com.theblood.orderservice.dto.request;
 
-import com.theblood.common.dto.request.ShopOrderRequest;
-import com.theblood.common.enums.PaymentMethod;
+import com.theblood.springfood.common.dto.request.ShopOrderRequest;
+import com.theblood.springfood.common.enums.PaymentMethod;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;

@@ -2,7 +2,6 @@ package com.theblood.springfood.chat.service.mapper;
 
 import com.theblood.springfood.chat.domain.Conversation;
 import com.theblood.springfood.chat.domain.ConversationParticipant;
-import com.theblood.springfood.chat.service.dto.ConversationDTO;
 import com.theblood.springfood.chat.service.dto.ConversationParticipantDTO;
 import org.mapstruct.*;
 
@@ -11,11 +10,9 @@ import org.mapstruct.*;
  */
 @Mapper(componentModel = "spring")
 public interface ConversationParticipantMapper extends EntityMapper<ConversationParticipantDTO, ConversationParticipant> {
-    @Mapping(target = "conversation", source = "conversation", qualifiedByName = "conversationConversationId")
+    @Mapping(target = "conversationId", source = "conversation.conversationId")
     ConversationParticipantDTO toDto(ConversationParticipant s);
 
-    @Named("conversationConversationId")
-    @BeanMapping(ignoreByDefault = true)
-    @Mapping(target = "conversationId", source = "conversationId")
-    ConversationDTO toDtoConversationConversationId(Conversation conversation);
+    @Mapping(target = "conversation", ignore = true)
+    ConversationParticipant toEntity(ConversationParticipantDTO dto);
 }

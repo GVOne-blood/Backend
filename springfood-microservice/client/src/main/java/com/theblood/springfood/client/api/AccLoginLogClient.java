@@ -2,9 +2,9 @@ package com.theblood.springfood.client.api;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.theblood.common.enums.AuthType;
-import com.theblood.common.enums.DeviceType;
-import com.theblood.common.enums.LoginEventType;
+import com.theblood.springfood.common.enums.AuthType;
+import com.theblood.springfood.common.enums.DeviceType;
+import com.theblood.springfood.common.enums.LoginEventType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

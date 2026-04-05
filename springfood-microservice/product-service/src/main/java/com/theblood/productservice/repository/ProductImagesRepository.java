@@ -9,6 +9,6 @@ import java.util.UUID;
 
 @Repository
 public interface ProductImagesRepository extends JpaRepository<ProductImages, UUID> {
-    @Query("SELECT COUNT(pi.id) FROM ProductImages pi WHERE pi.product_id = ?1 AND pi.status = com.theblood.common.enums.FileStatus.ACTIVE")
+    @Query("SELECT COUNT(pi.id) FROM ProductImages pi WHERE pi.product_id = ?1 AND pi.status = com.theblood.springfood.common.enums.FileStatus.ACTIVE")
     int totalFileCurrentStore(UUID productId);
 }

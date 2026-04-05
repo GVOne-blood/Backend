@@ -1,8 +1,8 @@
 package com.theblood.orderservice.model;
 
-import com.theblood.common.enums.OrderStatus;
-import com.theblood.common.enums.PaymentMethod;
-import com.theblood.common.model.AbstractEntity;
+import com.theblood.springfood.common.enums.OrderStatus;
+import com.theblood.springfood.common.enums.PaymentMethod;
+import com.theblood.springfood.common.model.AbstractEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;

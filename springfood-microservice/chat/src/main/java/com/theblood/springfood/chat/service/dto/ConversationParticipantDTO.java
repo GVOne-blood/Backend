@@ -61,7 +61,7 @@ public class ConversationParticipantDTO implements Serializable {
     private String addedBy;
 
     @NotNull
-    private ConversationDTO conversation;
+    private String conversationId;
 
     public String getParticipantId() {
         return participantId;
@@ -199,12 +199,12 @@ public class ConversationParticipantDTO implements Serializable {
         this.addedBy = addedBy;
     }
 
-    public ConversationDTO getConversation() {
-        return conversation;
+    public String getConversationId() {
+        return conversationId;
     }
 
-    public void setConversation(ConversationDTO conversation) {
-        this.conversation = conversation;
+    public void setConversationId(String conversationId) {
+        this.conversationId = conversationId;
     }
 
     @Override
@@ -249,7 +249,7 @@ public class ConversationParticipantDTO implements Serializable {
             ", joinedAt='" + getJoinedAt() + "'" +
             ", leftAt='" + getLeftAt() + "'" +
             ", addedBy='" + getAddedBy() + "'" +
-            ", conversation=" + getConversation() +
+            ", conversationId='" + getConversationId() + "'" +
             "}";
     }
 }

@@ -66,8 +66,17 @@ public class Conversation extends AbstractAuditingEntity<String> implements Seri
     @Column(name = "last_message_sender_id", length = 100)
     private String lastMessageSenderId;
 
+    @Column(name = "last_message_id")
+    private String lastMessageId;
+
     @Column(name = "message_count")
     private Long messageCount;
+
+    @Column(name = "participant1_id")
+    private String participant1Id;
+
+    @Column(name = "participant2_id")
+    private String participant2Id;
 
     @Column(name = "is_archived")
     private Integer isArchived;
@@ -224,6 +233,19 @@ public class Conversation extends AbstractAuditingEntity<String> implements Seri
         this.lastMessageSenderId = lastMessageSenderId;
     }
 
+    public String getLastMessageId() {
+        return this.lastMessageId;
+    }
+
+    public Conversation lastMessageId(String lastMessageId) {
+        this.setLastMessageId(lastMessageId);
+        return this;
+    }
+
+    public void setLastMessageId(String lastMessageId) {
+        this.lastMessageId = lastMessageId;
+    }
+
     public Long getMessageCount() {
         return this.messageCount;
     }
@@ -235,6 +257,32 @@ public class Conversation extends AbstractAuditingEntity<String> implements Seri
 
     public void setMessageCount(Long messageCount) {
         this.messageCount = messageCount;
+    }
+
+    public String getParticipant1Id() {
+        return this.participant1Id;
+    }
+
+    public Conversation participant1Id(String participant1Id) {
+        this.setParticipant1Id(participant1Id);
+        return this;
+    }
+
+    public void setParticipant1Id(String participant1Id) {
+        this.participant1Id = participant1Id;
+    }
+
+    public String getParticipant2Id() {
+        return this.participant2Id;
+    }
+
+    public Conversation participant2Id(String participant2Id) {
+        this.setParticipant2Id(participant2Id);
+        return this;
+    }
+
+    public void setParticipant2Id(String participant2Id) {
+        this.participant2Id = participant2Id;
     }
 
     public Integer getIsArchived() {
@@ -399,7 +447,10 @@ public class Conversation extends AbstractAuditingEntity<String> implements Seri
             ", lastMessagePreview='" + getLastMessagePreview() + "'" +
             ", lastMessageAt='" + getLastMessageAt() + "'" +
             ", lastMessageSenderId='" + getLastMessageSenderId() + "'" +
+            ", lastMessageId='" + getLastMessageId() + "'" +
             ", messageCount=" + getMessageCount() +
+            ", participant1Id='" + getParticipant1Id() + "'" +
+            ", participant2Id='" + getParticipant2Id() + "'" +
             ", isArchived=" + getIsArchived() +
             ", isPinned=" + getIsPinned() +
             "}";

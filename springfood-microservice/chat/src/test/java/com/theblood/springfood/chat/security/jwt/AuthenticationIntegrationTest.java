@@ -1,15 +1,15 @@
 package com.theblood.springfood.chat.security.jwt;
 
 import com.theblood.springfood.chat.config.SecurityConfiguration;
-import com.theblood.springfood.chat.config.SecurityJwtConfiguration;
 import com.theblood.springfood.chat.config.WebConfigurer;
 import com.theblood.springfood.chat.management.SecurityMetersService;
+import org.springframework.boot.test.context.SpringBootTest;
+import tech.jhipster.config.JHipsterProperties;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import org.springframework.boot.test.context.SpringBootTest;
-import tech.jhipster.config.JHipsterProperties;
 
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
@@ -18,7 +18,6 @@ import tech.jhipster.config.JHipsterProperties;
         JHipsterProperties.class,
         WebConfigurer.class,
         SecurityConfiguration.class,
-        SecurityJwtConfiguration.class,
         SecurityMetersService.class,
         JwtAuthenticationTestUtils.class,
     }

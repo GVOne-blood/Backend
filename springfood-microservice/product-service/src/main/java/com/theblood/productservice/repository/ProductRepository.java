@@ -1,8 +1,8 @@
 package com.theblood.productservice.repository;
 
-import com.theblood.common.dto.response.ProductDetail;
 import com.theblood.productservice.domain.Product;
 import com.theblood.productservice.repository.projection.ProductProjection;
+import com.theblood.springfood.common.dto.response.ProductDetail;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -77,7 +77,7 @@ public interface ProductRepository extends
 
     List<Product> findAllByUpdatedAtGreaterThan(LocalDateTime updatedAtIsGreaterThan);
 
-    @Query("SELECT new com.theblood.common.dto.response.ProductDetail(p.id, p.name, p.description, p.price, p.images, p.quantity, p.msg, p.exp, p.averageRating,  p.totalFeedbacks) FROM Product p WHERE p.id = :productId ")
+    @Query("SELECT new com.theblood.springfood.common.dto.response.ProductDetail(p.id, p.name, p.description, p.price, p.images, p.quantity, p.msg, p.exp, p.averageRating,  p.totalFeedbacks) FROM Product p WHERE p.id = :productId ")
     Optional<ProductDetail> findProductDetailById(@Param("productId") UUID productId);
 
 }

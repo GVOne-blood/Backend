@@ -17,6 +17,9 @@
     <properties>
         <!-- gRPC specific -->
         <grpc-spring.version>3.1.0.RELEASE</grpc-spring.version>
+        <!-- Use parent pom gRPC version -->
+        <grpc.version>1.76.0</grpc.version>
+        <protobuf.version>3.25.1</protobuf.version>
     </properties>
 
     <dependencies>

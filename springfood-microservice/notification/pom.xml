@@ -46,7 +46,7 @@
     <liquibase-plugin.password/>
     <liquibase-plugin.url/>
     <liquibase-plugin.username/>
-    <mapstruct.version>1.6.3</mapstruct.version>
+    <!-- mapstruct.version inherited from parent POM (1.6.3) -->
     <maven-checkstyle-plugin.version>3.6.0</maven-checkstyle-plugin.version>
     <maven-clean-plugin.version>3.4.1</maven-clean-plugin.version>
     <maven-compiler-plugin.version>3.14.0</maven-compiler-plugin.version>
@@ -70,7 +70,7 @@
     <resource.delimiter>@</resource.delimiter>
     <sonar-maven-plugin.version>5.1.0.4751</sonar-maven-plugin.version>
     <spotless-maven-plugin.version>2.44.4</spotless-maven-plugin.version>
-    <spring-cloud-dependencies.version>2024.0.1</spring-cloud-dependencies.version>
+    <spring-cloud-dependencies.version>${spring-cloud.version}</spring-cloud-dependencies.version>
     <spring.profiles.active>dev</spring.profiles.active>
     <springdoc-openapi-starter-webmvc-api.version>2.8.8</springdoc-openapi-starter-webmvc-api.version>
   </properties>
@@ -463,6 +463,11 @@
             <target>${java.version}</target>
             <parameters>true</parameters>
             <annotationProcessorPaths>
+              <path>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>${lombok.version}</version>
+              </path>
               <path>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-configuration-processor</artifactId>

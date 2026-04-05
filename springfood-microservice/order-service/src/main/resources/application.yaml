@@ -1,5 +1,5 @@
 server:
-  port: 8087
+  port: 8083
 
 spring:
   application:
@@ -16,6 +16,7 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
+        default_schema: springfood_order
   redis:
     # Redis Cluster 2 - Shared cho các read-heavy services
     shared:

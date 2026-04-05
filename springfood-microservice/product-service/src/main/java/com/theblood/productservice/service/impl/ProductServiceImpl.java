@@ -2,30 +2,32 @@ package com.theblood.productservice.service.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.theblood.common.dto.response.ProductDetail;
-import com.theblood.common.enums.FileStatus;
-import com.theblood.common.enums.MimeType;
-import com.theblood.common.exception.custom.InvalidDataException;
-import com.theblood.common.grpc.ValidateProductCreationResponse;
-import com.theblood.productservice.util.ProductExcelUtil;
-import com.theblood.minio.core.MinioClient;
+import com.theblood.minio.core.MinioClientCustom;
 import com.theblood.minio.response.MinIOResponse;
 import com.theblood.productservice.domain.Categories;
 import com.theblood.productservice.domain.Product;
 import com.theblood.productservice.domain.ProductCategory;
 import com.theblood.productservice.domain.ProductImages;
-import com.theblood.productservice.dto.UploadResult;
-import com.theblood.productservice.dto.request.ProductRequest;
-import com.theblood.productservice.dto.request.RelateProductRequest;
-import com.theblood.productservice.dto.response.ProductImageResponse;
 import com.theblood.productservice.exception.custom.InvalidExcelFormatException;
 import com.theblood.productservice.kafka.consumer.ProductServiceConsumer;
 import com.theblood.productservice.kafka.service.OutboxService;
-import com.theblood.productservice.mapper.ProductMapper;
 import com.theblood.productservice.repository.*;
 import com.theblood.productservice.repository.projection.ProductProjection;
 import com.theblood.productservice.resources.grpc.client_role.ProductGrpcClient;
 import com.theblood.productservice.service.ProductService;
+import com.theblood.productservice.service.ProductVariantsService;
+import com.theblood.productservice.service.dto.UploadResult;
+import com.theblood.productservice.service.dto.request.ProductRequest;
+import com.theblood.productservice.service.dto.request.RelateProductRequest;
+import com.theblood.productservice.service.dto.response.ProductImageResponse;
+import com.theblood.productservice.service.mapper.ProductMapper;
+import com.theblood.productservice.util.ProductExcelUtil;
+import com.theblood.springfood.client.service.LoggingService;
+import com.theblood.springfood.common.dto.response.ProductDetail;
+import com.theblood.springfood.common.enums.FileStatus;
+import com.theblood.springfood.common.enums.MimeType;
+import com.theblood.springfood.common.exception.custom.InvalidDataException;
+import com.theblood.springfood.common.grpc.ValidateProductCreationResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -65,7 +67,7 @@ public class ProductServiceImpl implements ProductService {
     private final ExecutorService uploadFileExecutor;
     private final ProductImagesRepository productImagesRepository;
     private final KafkaTemplate<String, Object> kafkaTemplate;
-    private final MinioClient minioClient;
+    private final MinioClientCustom minioClientCustom;
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
     private final ProductMapper productMapper;
@@ -78,6 +80,9 @@ public class ProductServiceImpl implements ProductService {
     private final OutboxService outboxService;
     private final FeedbackRepository feedbackRepository;
     private final ProductGrpcClient productGrpcClient;
+    private final ProductVariantsService productVariantsService;
+    private final LoggingService loggingService;
+
     @Qualifier("redisObjectMapper")
     private final ObjectMapper objectMapper;
     @Value("${minio.bucket}")
@@ -458,7 +463,6 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductImageResponse uploadImages(UUID userId, UUID productId, List<MultipartFile> files) {
 
-
         validateProductImages(files, productId);
 
         List<Future<UploadResult>> futures = new ArrayList<>();
@@ -471,10 +475,11 @@ public class ProductServiceImpl implements ProductService {
                 outputStream.write(file.getBytes());
                 String objectName = "products/" + productId + "/" + "_" + file.getOriginalFilename();
                 String originalFilename = file.getOriginalFilename();
-                if (minioClient.objectExists(objectName)) throw new IllegalArgumentException("Object already exists");
+                if (minioClientCustom.objectExists(objectName))
+                    throw new IllegalArgumentException("Object already exists");
                 Future<UploadResult> future = uploadFileExecutor.submit(() -> {
                     try {
-                        MinIOResponse response = minioClient.upload(outputStream, objectName);
+                        MinIOResponse response = minioClientCustom.upload(outputStream, objectName);
                         return new UploadResult(response, originalFilename, response.getMessage(), response.getContentType());
                     } catch (Exception e) {
                         log.error("Failed to upload file: {}", originalFilename, e);
@@ -525,7 +530,7 @@ public class ProductServiceImpl implements ProductService {
         if (productImages == null) {
             throw new InvalidDataException("Product image not found with ID: " + productImagesId);
         }
-        boolean res = minioClient.deleteObject(productImages.getObjectName());
+        boolean res = minioClientCustom.deleteObject(productImages.getObjectName());
         if (res) {
             productImagesRepository.deleteById(productImagesId);
         } else {

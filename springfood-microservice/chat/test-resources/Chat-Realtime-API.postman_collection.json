@@ -1,0 +1,335 @@
+{
+  "info": {
+    "name": "Chat Realtime Core API",
+    "description": "Complete API collection for testing Chat Realtime Core system",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:9098",
+      "type": "string"
+    },
+    {
+      "key": "jwtToken",
+      "value": "YOUR_JWT_TOKEN_HERE",
+      "type": "string"
+    },
+    {
+      "key": "conversationId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "messageId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Conversation Management",
+      "item": [
+        {
+          "name": "Create DIRECT Conversation",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.collectionVariables.set('conversationId', jsonData.conversationId);",
+                  "    pm.test('Conversation created successfully', function() {",
+                  "        pm.expect(jsonData.conversationId).to.exist;",
+                  "    });",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"conversationType\": \"DIRECT\",\n  \"name\": \"Chat với User 2\",\n  \"participantIds\": [\"user-1\", \"user-2\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/conversations",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "conversations"]
+            }
+          }
+        },
+        {
+          "name": "Create ORDER_SUPPORT Conversation",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"conversationType\": \"ORDER_SUPPORT\",\n  \"name\": \"Hỗ trợ đơn hàng #12345\",\n  \"participantIds\": [\"user-1\", \"support-agent-1\"],\n  \"referenceType\": \"ORDER\",\n  \"referenceId\": \"order-12345\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/conversations",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "conversations"]
+            }
+          }
+        },
+        {
+          "name": "Get User Conversations",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has conversations array', function() {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.content).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/conversations?page=0&size=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "conversations"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0"
+                },
+                {
+                  "key": "size",
+                  "value": "20"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Conversation Details",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/conversations/{{conversationId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "conversations", "{{conversationId}}"]
+            }
+          }
+        },
+        {
+          "name": "Search Conversations",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/conversations/search?keyword=order",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "conversations", "search"],
+              "query": [
+                {
+                  "key": "keyword",
+                  "value": "order"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Message Management",
+      "item": [
+        {
+          "name": "Get Message History",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.content && jsonData.content.length > 0) {",
+                  "    pm.collectionVariables.set('messageId', jsonData.content[0].messageId);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/conversations/{{conversationId}}/messages?page=0&size=50",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "conversations", "{{conversationId}}", "messages"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0"
+                },
+                {
+                  "key": "size",
+                  "value": "50"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Unread Count",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/conversations/{{conversationId}}/unread-count",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "conversations", "{{conversationId}}", "unread-count"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Participant Management",
+      "item": [
+        {
+          "name": "Add Participant",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwtToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"user-3\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/conversations/{{conversationId}}/participants",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "conversations", "{{conversationId}}", "participants"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Health & Metrics",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/actuator/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["actuator", "health"]
+            }
+          }
+        },
+        {
+          "name": "All Metrics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/actuator/metrics",
+              "host": ["{{baseUrl}}"],
+              "path": ["actuator", "metrics"]
+            }
+          }
+        },
+        {
+          "name": "Messages Sent Metric",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/actuator/metrics/chat.messages.sent",
+              "host": ["{{baseUrl}}"],
+              "path": ["actuator", "metrics", "chat.messages.sent"]
+            }
+          }
+        },
+        {
+          "name": "WebSocket Connections Metric",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/actuator/metrics/chat.websocket.connections",
+              "host": ["{{baseUrl}}"],
+              "path": ["actuator", "metrics", "chat.websocket.connections"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

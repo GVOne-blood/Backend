@@ -1,7 +1,7 @@
 package com.theblood.authentication.service;
 
 import com.theblood.authentication.model.User;
-import com.theblood.common.enums.TokenType;
+import com.theblood.springfood.common.enums.TokenType;
 import org.springframework.security.core.userdetails.UserDetails;
 
 public interface JwtService {

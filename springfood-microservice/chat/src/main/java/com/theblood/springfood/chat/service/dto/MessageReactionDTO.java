@@ -26,7 +26,7 @@ public class MessageReactionDTO implements Serializable {
     private String emojiDisplay;
 
     @NotNull
-    private MessageDTO message;
+    private String messageId;
 
     public String getReactionId() {
         return reactionId;
@@ -60,12 +60,12 @@ public class MessageReactionDTO implements Serializable {
         this.emojiDisplay = emojiDisplay;
     }
 
-    public MessageDTO getMessage() {
-        return message;
+    public String getMessageId() {
+        return messageId;
     }
 
-    public void setMessage(MessageDTO message) {
-        this.message = message;
+    public void setMessageId(String messageId) {
+        this.messageId = messageId;
     }
 
     @Override
@@ -97,7 +97,7 @@ public class MessageReactionDTO implements Serializable {
             ", userId='" + getUserId() + "'" +
             ", emoji='" + getEmoji() + "'" +
             ", emojiDisplay='" + getEmojiDisplay() + "'" +
-            ", message=" + getMessage() +
+            ", messageId='" + getMessageId() + "'" +
             "}";
     }
 }

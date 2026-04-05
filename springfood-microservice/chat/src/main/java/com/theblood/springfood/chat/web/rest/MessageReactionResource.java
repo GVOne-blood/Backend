@@ -6,11 +6,13 @@ import com.theblood.springfood.chat.service.dto.MessageReactionDTO;
 import com.theblood.springfood.chat.web.rest.errors.BadRequestAlertException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,7 +27,7 @@ import tech.jhipster.web.util.PaginationUtil;
 import tech.jhipster.web.util.ResponseUtil;
 
 /**
- * REST controller for managing {@link com.theblood.springfood.chat.domain.MessageReaction}.
+ * REST resources for managing {@link com.theblood.springfood.chat.domain.MessageReaction}.
  */
 @RestController
 @RequestMapping("/api/message-reactions")
@@ -34,13 +36,10 @@ public class MessageReactionResource {
     private static final Logger LOG = LoggerFactory.getLogger(MessageReactionResource.class);
 
     private static final String ENTITY_NAME = "chatMessageReaction";
-
+    private final MessageReactionService messageReactionService;
+    private final MessageReactionRepository messageReactionRepository;
     @Value("${jhipster.clientApp.name}")
     private String applicationName;
-
-    private final MessageReactionService messageReactionService;
-
-    private final MessageReactionRepository messageReactionRepository;
 
     public MessageReactionResource(MessageReactionService messageReactionService, MessageReactionRepository messageReactionRepository) {
         this.messageReactionService = messageReactionService;
@@ -70,7 +69,7 @@ public class MessageReactionResource {
     /**
      * {@code PUT  /message-reactions/:reactionId} : Updates an existing messageReaction.
      *
-     * @param reactionId the id of the messageReactionDTO to save.
+     * @param reactionId         the id of the messageReactionDTO to save.
      * @param messageReactionDTO the messageReactionDTO to update.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated messageReactionDTO,
      * or with status {@code 400 (Bad Request)} if the messageReactionDTO is not valid,
@@ -103,7 +102,7 @@ public class MessageReactionResource {
     /**
      * {@code PATCH  /message-reactions/:reactionId} : Partial updates given fields of an existing messageReaction, field will ignore if it is null
      *
-     * @param reactionId the id of the messageReactionDTO to save.
+     * @param reactionId         the id of the messageReactionDTO to save.
      * @param messageReactionDTO the messageReactionDTO to update.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated messageReactionDTO,
      * or with status {@code 400 (Bad Request)} if the messageReactionDTO is not valid,
@@ -111,7 +110,7 @@ public class MessageReactionResource {
      * or with status {@code 500 (Internal Server Error)} if the messageReactionDTO couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PatchMapping(value = "/{reactionId}", consumes = { "application/json", "application/merge-patch+json" })
+    @PatchMapping(value = "/{reactionId}", consumes = {"application/json", "application/merge-patch+json"})
     public ResponseEntity<MessageReactionDTO> partialUpdateMessageReaction(
         @PathVariable(value = "reactionId", required = false) final String reactionId,
         @NotNull @RequestBody MessageReactionDTO messageReactionDTO

@@ -12,7 +12,14 @@ import org.springframework.data.domain.Persistable;
  * ConversationParticipant - Users in conversations
  */
 @Entity
-@Table(name = "conversation_participant")
+@Table(
+    name = "conversation_participant",
+    indexes = {
+        @Index(name = "idx_participant_conv_user", columnList = "conversation_id,user_id", unique = true),
+        @Index(name = "idx_participant_user", columnList = "user_id"),
+        @Index(name = "idx_participant_unread", columnList = "user_id,unread_count")
+    }
+)
 @JsonIgnoreProperties(value = { "new", "id" })
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class ConversationParticipant extends AbstractAuditingEntity<String> implements Serializable, Persistable<String> {

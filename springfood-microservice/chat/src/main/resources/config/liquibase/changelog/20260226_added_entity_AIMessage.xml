@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+        Added the entity AIMessage.
+        Lưu lịch sử chat với AI Assistant
+    -->
+    <changeSet id="20260226-1" author="system">
+        <createTable tableName="ai_message">
+            <column name="message_id" type="varchar(50)">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="conversation_id" type="varchar(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_id" type="varchar(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="message_type" type="varchar(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="content" type="text"/>
+            <column name="content_preview" type="varchar(200)"/>
+            <column name="metadata" type="text"/>
+            <column name="token_count" type="integer"/>
+            <column name="response_time_ms" type="integer"/>
+            <column name="model_name" type="varchar(50)"/>
+            <column name="is_deleted" type="integer" defaultValueNumeric="0"/>
+            <column name="deleted_at" type="timestamp"/>
+            
+            <!-- Audit fields from AbstractAuditingEntity -->
+            <column name="created_by" type="varchar(50)"/>
+            <column name="created_date" type="timestamp"/>
+            <column name="last_modified_by" type="varchar(50)"/>
+            <column name="last_modified_date" type="timestamp"/>
+        </createTable>
+
+        <!-- Index for conversation queries -->
+        <createIndex indexName="idx_ai_msg_conv_created" tableName="ai_message">
+            <column name="conversation_id"/>
+            <column name="created_date"/>
+        </createIndex>
+
+        <!-- Index for user queries -->
+        <createIndex indexName="idx_ai_msg_user" tableName="ai_message">
+            <column name="user_id"/>
+            <column name="created_date"/>
+        </createIndex>
+
+        <!-- Index for message type filtering -->
+        <createIndex indexName="idx_ai_msg_type" tableName="ai_message">
+            <column name="message_type"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

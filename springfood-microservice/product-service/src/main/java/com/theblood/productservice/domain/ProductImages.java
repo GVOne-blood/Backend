@@ -1,6 +1,6 @@
 package com.theblood.productservice.domain;
 
-import com.theblood.common.enums.FileStatus;
+import com.theblood.springfood.common.enums.FileStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;

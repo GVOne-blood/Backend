@@ -6,11 +6,13 @@ import com.theblood.springfood.chat.service.dto.MessageDTO;
 import com.theblood.springfood.chat.web.rest.errors.BadRequestAlertException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,7 +27,7 @@ import tech.jhipster.web.util.PaginationUtil;
 import tech.jhipster.web.util.ResponseUtil;
 
 /**
- * REST controller for managing {@link com.theblood.springfood.chat.domain.Message}.
+ * REST resources for managing {@link com.theblood.springfood.chat.domain.Message}.
  */
 @RestController
 @RequestMapping("/api/messages")
@@ -34,13 +36,10 @@ public class MessageResource {
     private static final Logger LOG = LoggerFactory.getLogger(MessageResource.class);
 
     private static final String ENTITY_NAME = "chatMessage";
-
+    private final MessageService messageService;
+    private final MessageRepository messageRepository;
     @Value("${jhipster.clientApp.name}")
     private String applicationName;
-
-    private final MessageService messageService;
-
-    private final MessageRepository messageRepository;
 
     public MessageResource(MessageService messageService, MessageRepository messageRepository) {
         this.messageService = messageService;
@@ -69,7 +68,7 @@ public class MessageResource {
     /**
      * {@code PUT  /messages/:messageId} : Updates an existing message.
      *
-     * @param messageId the id of the messageDTO to save.
+     * @param messageId  the id of the messageDTO to save.
      * @param messageDTO the messageDTO to update.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated messageDTO,
      * or with status {@code 400 (Bad Request)} if the messageDTO is not valid,
@@ -102,7 +101,7 @@ public class MessageResource {
     /**
      * {@code PATCH  /messages/:messageId} : Partial updates given fields of an existing message, field will ignore if it is null
      *
-     * @param messageId the id of the messageDTO to save.
+     * @param messageId  the id of the messageDTO to save.
      * @param messageDTO the messageDTO to update.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated messageDTO,
      * or with status {@code 400 (Bad Request)} if the messageDTO is not valid,
@@ -110,7 +109,7 @@ public class MessageResource {
      * or with status {@code 500 (Internal Server Error)} if the messageDTO couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PatchMapping(value = "/{messageId}", consumes = { "application/json", "application/merge-patch+json" })
+    @PatchMapping(value = "/{messageId}", consumes = {"application/json", "application/merge-patch+json"})
     public ResponseEntity<MessageDTO> partialUpdateMessage(
         @PathVariable(value = "messageId", required = false) final String messageId,
         @NotNull @RequestBody MessageDTO messageDTO

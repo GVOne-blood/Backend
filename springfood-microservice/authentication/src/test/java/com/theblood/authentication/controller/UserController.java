@@ -6,7 +6,7 @@ import com.theblood.authentication.dto.response.UserDetail;
 import com.theblood.authentication.model.User;
 import com.theblood.authentication.service.AuthService;
 import com.theblood.authentication.service.UserService;
-import com.theblood.common.dto.request.CustomUserPrincipal;
+import com.theblood.springfood.common.dto.request.CustomUserPrincipal;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

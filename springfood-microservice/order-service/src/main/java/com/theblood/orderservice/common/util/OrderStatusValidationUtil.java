@@ -1,8 +1,8 @@
 package com.theblood.orderservice.common.util;
 
 
-import com.theblood.common.enums.OrderStatus;
-import com.theblood.common.exception.custom.InvalidDataException;
+import com.theblood.springfood.common.enums.OrderStatus;
+import com.theblood.springfood.common.exception.custom.InvalidDataException;
 import lombok.RequiredArgsConstructor;
 
 import java.util.ArrayList;

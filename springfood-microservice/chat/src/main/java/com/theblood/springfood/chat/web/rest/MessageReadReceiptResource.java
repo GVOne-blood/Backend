@@ -6,11 +6,13 @@ import com.theblood.springfood.chat.service.dto.MessageReadReceiptDTO;
 import com.theblood.springfood.chat.web.rest.errors.BadRequestAlertException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,7 +27,7 @@ import tech.jhipster.web.util.PaginationUtil;
 import tech.jhipster.web.util.ResponseUtil;
 
 /**
- * REST controller for managing {@link com.theblood.springfood.chat.domain.MessageReadReceipt}.
+ * REST resources for managing {@link com.theblood.springfood.chat.domain.MessageReadReceipt}.
  */
 @RestController
 @RequestMapping("/api/message-read-receipts")
@@ -34,13 +36,10 @@ public class MessageReadReceiptResource {
     private static final Logger LOG = LoggerFactory.getLogger(MessageReadReceiptResource.class);
 
     private static final String ENTITY_NAME = "chatMessageReadReceipt";
-
+    private final MessageReadReceiptService messageReadReceiptService;
+    private final MessageReadReceiptRepository messageReadReceiptRepository;
     @Value("${jhipster.clientApp.name}")
     private String applicationName;
-
-    private final MessageReadReceiptService messageReadReceiptService;
-
-    private final MessageReadReceiptRepository messageReadReceiptRepository;
 
     public MessageReadReceiptResource(
         MessageReadReceiptService messageReadReceiptService,
@@ -73,7 +72,7 @@ public class MessageReadReceiptResource {
     /**
      * {@code PUT  /message-read-receipts/:receiptId} : Updates an existing messageReadReceipt.
      *
-     * @param receiptId the id of the messageReadReceiptDTO to save.
+     * @param receiptId             the id of the messageReadReceiptDTO to save.
      * @param messageReadReceiptDTO the messageReadReceiptDTO to update.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated messageReadReceiptDTO,
      * or with status {@code 400 (Bad Request)} if the messageReadReceiptDTO is not valid,
@@ -106,7 +105,7 @@ public class MessageReadReceiptResource {
     /**
      * {@code PATCH  /message-read-receipts/:receiptId} : Partial updates given fields of an existing messageReadReceipt, field will ignore if it is null
      *
-     * @param receiptId the id of the messageReadReceiptDTO to save.
+     * @param receiptId             the id of the messageReadReceiptDTO to save.
      * @param messageReadReceiptDTO the messageReadReceiptDTO to update.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated messageReadReceiptDTO,
      * or with status {@code 400 (Bad Request)} if the messageReadReceiptDTO is not valid,
@@ -114,7 +113,7 @@ public class MessageReadReceiptResource {
      * or with status {@code 500 (Internal Server Error)} if the messageReadReceiptDTO couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PatchMapping(value = "/{receiptId}", consumes = { "application/json", "application/merge-patch+json" })
+    @PatchMapping(value = "/{receiptId}", consumes = {"application/json", "application/merge-patch+json"})
     public ResponseEntity<MessageReadReceiptDTO> partialUpdateMessageReadReceipt(
         @PathVariable(value = "receiptId", required = false) final String receiptId,
         @NotNull @RequestBody MessageReadReceiptDTO messageReadReceiptDTO

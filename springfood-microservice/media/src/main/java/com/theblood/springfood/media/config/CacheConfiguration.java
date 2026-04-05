@@ -55,7 +55,11 @@ public class CacheConfiguration {
                 .setConnectionPoolSize(jHipsterProperties.getCache().getRedis().getConnectionPoolSize())
                 .setConnectionMinimumIdleSize(jHipsterProperties.getCache().getRedis().getConnectionMinimumIdleSize())
                 .setSubscriptionConnectionPoolSize(jHipsterProperties.getCache().getRedis().getSubscriptionConnectionPoolSize())
-                .setAddress(jHipsterProperties.getCache().getRedis().getServer()[0]);
+                .setAddress(jHipsterProperties.getCache().getRedis().getServer()[0])
+                .setConnectTimeout(3000)
+                .setRetryAttempts(1)
+                .setRetryInterval(500)
+                .setTimeout(3000);
 
             if (redisUri.getUserInfo() != null) {
                 singleServerConfig.setPassword(redisUri.getUserInfo().substring(redisUri.getUserInfo().indexOf(':') + 1));

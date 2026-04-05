@@ -18,6 +18,7 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
+        default_schema: springfood_shop
   kafka:
     bootstrap-servers: localhost:9092
     consumer:

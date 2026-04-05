@@ -22,10 +22,10 @@
         Build properties
         The spring-boot version should match the one managed by https://mvnrepository.com/artifact/tech.jhipster/jhipster-dependencies/${jhipster-dependencies.version}
     -->
-    <grpc.version>1.58.0</grpc.version>
-    <protobuf.version>3.25.1</protobuf.version>
+    <!-- grpc.version, mapstruct.version được kế thừa từ parent POM -->
     <maven.version>3.2.5</maven.version>
     <java.version>21</java.version>
+    <spring-ai.version>1.0.0</spring-ai.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <maven.build.timestamp.format>yyyyMMddHHmmss</maven.build.timestamp.format>
@@ -48,7 +48,7 @@
     <liquibase-plugin.password/>
     <liquibase-plugin.url/>
     <liquibase-plugin.username/>
-    <mapstruct.version>1.6.3</mapstruct.version>
+    <!-- mapstruct.version inherited from parent POM (1.6.3) -->
     <maven-checkstyle-plugin.version>3.6.0</maven-checkstyle-plugin.version>
     <maven-clean-plugin.version>3.4.1</maven-clean-plugin.version>
     <maven-compiler-plugin.version>3.14.0</maven-compiler-plugin.version>
@@ -72,7 +72,7 @@
     <resource.delimiter>@</resource.delimiter>
     <sonar-maven-plugin.version>5.1.0.4751</sonar-maven-plugin.version>
     <spotless-maven-plugin.version>2.44.4</spotless-maven-plugin.version>
-    <spring-cloud-dependencies.version>2024.0.1</spring-cloud-dependencies.version>
+    <spring-cloud-dependencies.version>${spring-cloud.version}</spring-cloud-dependencies.version>
     <spring.profiles.active>dev</spring.profiles.active>
     <springdoc-openapi-starter-webmvc-api.version>2.8.8</springdoc-openapi-starter-webmvc-api.version>
   </properties>
@@ -90,7 +90,7 @@
         <artifactId>protobuf-java-util</artifactId>
         <version>3.25.1</version>
       </dependency>
-      
+
       <dependency>
         <groupId>org.springframework.cloud</groupId>
         <artifactId>spring-cloud-dependencies</artifactId>
@@ -98,12 +98,21 @@
         <type>pom</type>
         <scope>import</scope>
       </dependency>
-      
+
       <!-- gRPC BOM to force consistent versions -->
       <dependency>
         <groupId>io.grpc</groupId>
         <artifactId>grpc-bom</artifactId>
         <version>${grpc.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+
+      <!-- Spring AI BOM -->
+      <dependency>
+        <groupId>org.springframework.ai</groupId>
+        <artifactId>spring-ai-bom</artifactId>
+        <version>${spring-ai.version}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -174,11 +183,6 @@
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-validation</artifactId>
     </dependency>
-
-    <!-- ============================================== -->
-    <!-- WEBSOCKET DEPENDENCIES FOR REAL-TIME CHAT     -->
-    <!-- ============================================== -->
-
     <!-- Spring WebSocket - Core WebSocket support -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -203,24 +207,70 @@
       <artifactId>reactor-netty-http</artifactId>
     </dependency>
 
-    <!-- ============================================== -->
-    <!-- REDIS FOR WEBSOCKET SESSION & PUB/SUB         -->
-    <!-- ============================================== -->
-
     <!-- Redis for session management and pub/sub -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-data-redis</artifactId>
     </dependency>
 
-    <!-- ============================================== -->
-    <!-- KAFKA FOR MESSAGE EVENTS                      -->
-    <!-- ============================================== -->
-
     <!-- Spring Kafka - For message events -->
     <dependency>
       <groupId>org.springframework.kafka</groupId>
       <artifactId>spring-kafka</artifactId>
+    </dependency>
+
+    <!-- Spring Kafka Test - For testing Kafka integration -->
+    <dependency>
+      <groupId>org.springframework.kafka</groupId>
+      <artifactId>spring-kafka-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- Spring AI Vertex AI Gemini (Google Cloud) -->
+    <dependency>
+      <groupId>org.springframework.ai</groupId>
+      <artifactId>spring-ai-starter-model-vertex-ai-gemini</artifactId>
+    </dependency>
+
+    <!-- Spring AI JDBC Chat Memory Repository -->
+    <dependency>
+      <groupId>org.springframework.ai</groupId>
+      <artifactId>spring-ai-starter-model-chat-memory-repository-jdbc</artifactId>
+      <version>${spring-ai.version}</version>
+    </dependency>
+
+    <!-- Spring AI PDF Document Reader (Trích xuất dữ liệu cho RAG) -->
+    <dependency>
+      <groupId>org.springframework.ai</groupId>
+      <artifactId>spring-ai-pdf-document-reader</artifactId>
+      <version>${spring-ai.version}</version>
+    </dependency>
+
+    <!-- Spring AI PgVector Store (Vector Database for RAG) -->
+    <dependency>
+      <groupId>org.springframework.ai</groupId>
+      <artifactId>spring-ai-starter-vector-store-pgvector</artifactId>
+    </dependency>
+
+    <!-- Spring AI Advisors Vector Store (QuestionAnswerAdvisor) -->
+    <dependency>
+      <groupId>org.springframework.ai</groupId>
+      <artifactId>spring-ai-advisors-vector-store</artifactId>
+      <version>${spring-ai.version}</version>
+    </dependency>
+
+    <!-- pgvector JDBC driver support -->
+    <dependency>
+      <groupId>com.pgvector</groupId>
+      <artifactId>pgvector</artifactId>
+      <version>0.1.6</version>
+    </dependency>
+
+    <!-- Hibernate Types for JSONB and Array support -->
+    <dependency>
+      <groupId>io.hypersistence</groupId>
+      <artifactId>hypersistence-utils-hibernate-63</artifactId>
+      <version>3.9.0</version>
     </dependency>
 
     <!-- ============================================== -->
@@ -352,6 +402,10 @@
       <artifactId>spring-cloud-starter-circuitbreaker-resilience4j</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.springframework.cloud</groupId>
+      <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.springframework.retry</groupId>
       <artifactId>spring-retry</artifactId>
     </dependency>
@@ -376,8 +430,33 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>kafka</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- ============================================== -->
+    <!-- PROPERTY-BASED TESTING WITH JQWIK             -->
+    <!-- ============================================== -->
+
+    <!-- jqwik for property-based testing -->
+    <dependency>
+      <groupId>net.jqwik</groupId>
+      <artifactId>jqwik</artifactId>
+      <version>1.9.2</version>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- ============================================== -->
+
+    <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.github.cdimascio</groupId>
+      <artifactId>dotenv-java</artifactId>
+      <version>3.0.0</version>
     </dependency>
     <dependency>
       <groupId>com.theblood</groupId>
@@ -1105,4 +1184,16 @@
       </dependencies>
     </profile>
   </profiles>
+
+  <!-- Spring Milestones Repository - BẮT BUỘC cho Spring AI 1.0.0 GA -->
+  <repositories>
+    <repository>
+      <id>spring-milestones</id>
+      <name>Spring Milestones</name>
+      <url>https://repo.spring.io/milestone</url>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
 </project>

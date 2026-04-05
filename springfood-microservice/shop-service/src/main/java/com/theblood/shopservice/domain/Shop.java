@@ -25,6 +25,9 @@ public class Shop extends AbstractAuditingEntity<String> implements Serializable
     @Column(name = "shop_id", length = 50, nullable = false)
     private String shopId;
 
+    @Column(name = "ownerId")
+    private String ownerId;
+
     @Column(name = "shop_name", length = 255)
     private String shopName;
 

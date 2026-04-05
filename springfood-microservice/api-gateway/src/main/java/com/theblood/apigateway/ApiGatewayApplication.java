@@ -7,7 +7,7 @@ import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.reactive.function.client.WebClient;
 
-@SpringBootApplication(scanBasePackages = {"com.theblood.apigateway", "com.theblood.common.util"})
+@SpringBootApplication(scanBasePackages = {"com.theblood.apigateway", "com.theblood.springfood.common.util"})
 @EnableDiscoveryClient
 public class ApiGatewayApplication {
 

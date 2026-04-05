@@ -5,11 +5,13 @@ import com.theblood.shopservice.repository.ShopMemberRepository;
 import com.theblood.shopservice.web.rest.errors.BadRequestAlertException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,7 +22,7 @@ import tech.jhipster.web.util.HeaderUtil;
 import tech.jhipster.web.util.ResponseUtil;
 
 /**
- * REST controller for managing {@link com.theblood.shopservice.domain.ShopMember}.
+ * REST resources for managing {@link com.theblood.shopservice.domain.ShopMember}.
  */
 @RestController
 @RequestMapping("/api/shop-members")
@@ -30,11 +32,9 @@ public class ShopMemberResource {
     private static final Logger LOG = LoggerFactory.getLogger(ShopMemberResource.class);
 
     private static final String ENTITY_NAME = "shopServiceShopMember";
-
+    private final ShopMemberRepository shopMemberRepository;
     @Value("${jhipster.clientApp.name}")
     private String applicationName;
-
-    private final ShopMemberRepository shopMemberRepository;
 
     public ShopMemberResource(ShopMemberRepository shopMemberRepository) {
         this.shopMemberRepository = shopMemberRepository;
@@ -63,7 +63,7 @@ public class ShopMemberResource {
      * {@code PUT  /shop-members/:shopMemberId} : Updates an existing shopMember.
      *
      * @param shopMemberId the id of the shopMember to save.
-     * @param shopMember the shopMember to update.
+     * @param shopMember   the shopMember to update.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated shopMember,
      * or with status {@code 400 (Bad Request)} if the shopMember is not valid,
      * or with status {@code 500 (Internal Server Error)} if the shopMember couldn't be updated.
@@ -97,14 +97,14 @@ public class ShopMemberResource {
      * {@code PATCH  /shop-members/:shopMemberId} : Partial updates given fields of an existing shopMember, field will ignore if it is null
      *
      * @param shopMemberId the id of the shopMember to save.
-     * @param shopMember the shopMember to update.
+     * @param shopMember   the shopMember to update.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated shopMember,
      * or with status {@code 400 (Bad Request)} if the shopMember is not valid,
      * or with status {@code 404 (Not Found)} if the shopMember is not found,
      * or with status {@code 500 (Internal Server Error)} if the shopMember couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PatchMapping(value = "/{shopMemberId}", consumes = { "application/json", "application/merge-patch+json" })
+    @PatchMapping(value = "/{shopMemberId}", consumes = {"application/json", "application/merge-patch+json"})
     public ResponseEntity<ShopMember> partialUpdateShopMember(
         @PathVariable(value = "shopMemberId", required = false) final String shopMemberId,
         @NotNull @RequestBody ShopMember shopMember

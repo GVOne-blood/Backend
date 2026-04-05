@@ -1,8 +1,8 @@
 package com.theblood.paymentservice.service.impl;
 
 
-import com.theblood.common.exception.custom.InvalidDataException;
-import com.theblood.common.grpc.OrderUpdateRequest;
+import com.theblood.springfood.common.exception.custom.InvalidDataException;
+import com.theblood.springfood.common.grpc.OrderUpdateRequest;
 import com.theblood.paymentservice.common.enums.TransactionStatus;
 import com.theblood.paymentservice.common.enums.TransactionType;
 import com.theblood.paymentservice.dto.request.PaymentInfoRequest;

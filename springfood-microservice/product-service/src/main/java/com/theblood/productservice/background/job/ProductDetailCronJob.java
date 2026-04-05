@@ -1,11 +1,11 @@
 package com.theblood.productservice.background.job;
 
 
-import com.theblood.common.dto.response.ProductDetail;
-import com.theblood.productservice.mapper.ProductMapper;
 import com.theblood.productservice.repository.ProductRepository;
 import com.theblood.productservice.service.ProductService;
 import com.theblood.productservice.service.impl.RedisServiceWrapper;
+import com.theblood.productservice.service.mapper.ProductMapper;
+import com.theblood.springfood.common.dto.response.ProductDetail;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;

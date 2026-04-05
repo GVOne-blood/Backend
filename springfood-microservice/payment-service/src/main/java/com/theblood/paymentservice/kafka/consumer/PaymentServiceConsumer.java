@@ -2,8 +2,8 @@ package com.theblood.paymentservice.kafka.consumer;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.theblood.common.dto.kafka.Event;
-import com.theblood.common.dto.kafka.OrderCreationEvent;
+import com.theblood.springfood.common.dto.kafka.Event;
+import com.theblood.springfood.common.dto.kafka.OrderCreationEvent;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;

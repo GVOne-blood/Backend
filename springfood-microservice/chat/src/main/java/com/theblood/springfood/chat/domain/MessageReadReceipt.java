@@ -12,7 +12,12 @@ import org.springframework.data.domain.Persistable;
  * MessageReadReceipt - Read tracking
  */
 @Entity
-@Table(name = "message_read_receipt")
+@Table(
+    name = "message_read_receipt",
+    indexes = {
+        @Index(name = "idx_receipt_msg_user", columnList = "message_id,user_id", unique = true)
+    }
+)
 @JsonIgnoreProperties(value = { "new", "id" })
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class MessageReadReceipt extends AbstractAuditingEntity<String> implements Serializable, Persistable<String> {

@@ -1,11 +1,11 @@
 package com.theblood.shopservice.grpc.server_role;
 
-import com.theblood.common.enums.Role;
-import com.theblood.common.grpc.*;
+import com.theblood.springfood.common.enums.Role;
 import com.theblood.shopservice.common.enums.ShopStatus;
 import com.theblood.shopservice.domain.Shop;
 import com.theblood.shopservice.repository.ShopMemberRepository;
 import com.theblood.shopservice.repository.ShopRepository;
+import com.theblood.springfood.common.grpc.*;
 import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -15,7 +15,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 /**
- * Integration tests {@link ExceptionTranslator} controller advice.
+ * Integration tests {@link ExceptionTranslator} resources advice.
  */
 @WithMockUser
 @AutoConfigureMockMvc
@@ -113,5 +113,74 @@ class ExceptionTranslatorIT {
             .andExpect(content().contentType(MediaType.APPLICATION_PROBLEM_JSON))
             .andExpect(jsonPath("$.message").value("error.http.500"))
             .andExpect(jsonPath("$.title").value("Internal Server Error"));
+    }
+
+    @Test
+    void testAuthenticationException() throws Exception {
+        mockMvc
+            .perform(get("/api/exception-translator-test/authentication-exception"))
+            .andExpect(status().isUnauthorized())
+            .andExpect(content().contentType(MediaType.APPLICATION_PROBLEM_JSON))
+            .andExpect(jsonPath("$.message").value(ErrorConstants.ERR_AUTHENTICATION))
+            .andExpect(jsonPath("$.title").value("Authentication failed"))
+            .andExpect(jsonPath("$.detail").value("Invalid or expired JWT token"));
+    }
+
+    @Test
+    void testAuthorizationException() throws Exception {
+        mockMvc
+            .perform(get("/api/exception-translator-test/authorization-exception"))
+            .andExpect(status().isForbidden())
+            .andExpect(content().contentType(MediaType.APPLICATION_PROBLEM_JSON))
+            .andExpect(jsonPath("$.message").value(ErrorConstants.ERR_AUTHORIZATION))
+            .andExpect(jsonPath("$.title").value("Authorization failed"))
+            .andExpect(jsonPath("$.detail").value("User is not a participant of this conversation"))
+            .andExpect(jsonPath("$.conversationId").value("conv-123"));
+    }
+
+    @Test
+    void testValidationException() throws Exception {
+        mockMvc
+            .perform(get("/api/exception-translator-test/validation-exception"))
+            .andExpect(status().isBadRequest())
+            .andExpect(content().contentType(MediaType.APPLICATION_PROBLEM_JSON))
+            .andExpect(jsonPath("$.message").value(ErrorConstants.ERR_VALIDATION))
+            .andExpect(jsonPath("$.title").value("Validation failed"))
+            .andExpect(jsonPath("$.detail").value("DIRECT conversation must have exactly 2 participants"))
+            .andExpect(jsonPath("$.field").value("participants"))
+            .andExpect(jsonPath("$.rejectedValue").value(3));
+    }
+
+    @Test
+    void testKafkaException() throws Exception {
+        mockMvc
+            .perform(get("/api/exception-translator-test/kafka-exception"))
+            .andExpect(status().isInternalServerError())
+            .andExpect(content().contentType(MediaType.APPLICATION_PROBLEM_JSON))
+            .andExpect(jsonPath("$.message").value(ErrorConstants.ERR_KAFKA))
+            .andExpect(jsonPath("$.title").value("Message delivery failed"))
+            .andExpect(jsonPath("$.detail").value("Failed to publish message to Kafka after retries"));
+    }
+
+    @Test
+    void testDatabaseException() throws Exception {
+        mockMvc
+            .perform(get("/api/exception-translator-test/database-exception"))
+            .andExpect(status().isInternalServerError())
+            .andExpect(content().contentType(MediaType.APPLICATION_PROBLEM_JSON))
+            .andExpect(jsonPath("$.message").value(ErrorConstants.ERR_DATABASE))
+            .andExpect(jsonPath("$.title").value("Database operation failed"))
+            .andExpect(jsonPath("$.detail").value("Failed to access database after retries"));
+    }
+
+    @Test
+    void testRedisException() throws Exception {
+        mockMvc
+            .perform(get("/api/exception-translator-test/redis-exception"))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_PROBLEM_JSON))
+            .andExpect(jsonPath("$.message").value(ErrorConstants.ERR_REDIS))
+            .andExpect(jsonPath("$.title").value("Operation completed with degraded functionality"))
+            .andExpect(jsonPath("$.detail").value("Redis unavailable, some features may be limited"));
     }
 }
