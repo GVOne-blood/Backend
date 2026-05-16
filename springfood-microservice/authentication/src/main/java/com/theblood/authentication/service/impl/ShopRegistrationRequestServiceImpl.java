@@ -7,7 +7,7 @@ import com.theblood.authentication.repository.ShopRegistrationRequestRepository;
 import com.theblood.authentication.service.ShopRegistrationRequestService;
 import com.theblood.authentication.service.mapper.ShopRegistrationMapper;
 import com.theblood.springfood.client.api.ShopClient;
-import com.theblood.springfood.client.service.LoggingService;
+
 import com.theblood.springfood.common.dto.request.CustomUserPrincipal;
 import com.theblood.springfood.common.dto.request.UserContextHolder;
 import jakarta.transaction.Transactional;
@@ -26,13 +26,12 @@ import java.util.UUID;
 public class ShopRegistrationRequestServiceImpl implements ShopRegistrationRequestService {
 
     ShopRegistrationRequestRepository shopRegistrationRequestRepository;
-    LoggingService loggingService;
     ShopRegistrationMapper shopRegistrationMapper;
 
     @Override
     public Page<ShopClient.ShopApproveResponse> getListShopRegistrationRequest(Pageable pageable, String adminId) {
 
-        Page<ShopRegistrationRequest> requests = shopRegistrationRequestRepository.findAll();
+        Page<ShopRegistrationRequest> requests = shopRegistrationRequestRepository.findAll(pageable);
         Page<ShopClient.ShopApproveResponse> res = requests.map(shopRegistrationMapper::toShopApproveResponse);
         return res;
     }

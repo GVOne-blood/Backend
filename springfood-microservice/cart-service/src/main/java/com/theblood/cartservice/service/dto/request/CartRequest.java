@@ -14,7 +14,10 @@ import java.math.BigDecimal;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CartRequest {
     String userId;
+    String sku;
     String productId;
+    String productName;
+    String productImage;
     Integer quantity;
     BigDecimal price;
     BigDecimal totalPrice;

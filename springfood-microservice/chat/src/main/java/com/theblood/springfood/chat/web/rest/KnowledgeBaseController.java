@@ -1,5 +1,6 @@
 package com.theblood.springfood.chat.web.rest;
 
+import com.theblood.springfood.chat.service.ai.RagImportService;
 import com.theblood.springfood.chat.service.dto.*;
 import com.theblood.springfood.chat.service.rag.DocumentIngestionService;
 import com.theblood.springfood.chat.service.rag.RAGService;
@@ -13,6 +14,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -31,13 +33,83 @@ public class KnowledgeBaseController {
 
     private final DocumentIngestionService ingestionService;
     private final RAGService ragService;
+    private final RagImportService ragImportService;
 
     public KnowledgeBaseController(
         DocumentIngestionService ingestionService,
-        RAGService ragService
+        RAGService ragService,
+        RagImportService ragImportService
     ) {
         this.ingestionService = ingestionService;
         this.ragService = ragService;
+        this.ragImportService = ragImportService;
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/sync/products")
+    @Operation(summary = "Sync products to knowledge base", description = "Import all products from product-service into vector store for AI RAG")
+    public ResponseEntity<DocumentUploadResponse> syncProducts() {
+        log.info("Manually triggered product sync to knowledge base...");
+        try {
+            int totalChunks = ragImportService.importAllProducts();
+            return ResponseEntity.ok(DocumentUploadResponse.builder()
+                .success(true)
+                .message("Products synced successfully")
+                .chunkCount(totalChunks)
+                .build());
+        } catch (Exception e) {
+            log.error("Failed to sync products", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(DocumentUploadResponse.builder()
+                    .success(false)
+                    .message("Failed to sync products: " + e.getMessage())
+                    .build());
+        }
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/sync/shops")
+    @Operation(summary = "Sync shops to knowledge base", description = "Import all shops from shop-service into vector store for AI RAG")
+    public ResponseEntity<DocumentUploadResponse> syncShops() {
+        log.info("Manually triggered shop sync to knowledge base...");
+        try {
+            int totalChunks = ragImportService.importAllShops();
+            return ResponseEntity.ok(DocumentUploadResponse.builder()
+                .success(true)
+                .message("Shops synced successfully")
+                .chunkCount(totalChunks)
+                .build());
+        } catch (Exception e) {
+            log.error("Failed to sync shops", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(DocumentUploadResponse.builder()
+                    .success(false)
+                    .message("Failed to sync shops: " + e.getMessage())
+                    .build());
+        }
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/sync/all")
+    @Operation(summary = "Sync all data to knowledge base", description = "Import all products and shops into vector store")
+    public ResponseEntity<DocumentUploadResponse> syncAll() {
+        log.info("Full sync triggered...");
+        try {
+            int productChunks = ragImportService.importAllProducts();
+            int shopChunks = ragImportService.importAllShops();
+            return ResponseEntity.ok(DocumentUploadResponse.builder()
+                .success(true)
+                .message("Full sync completed")
+                .chunkCount(productChunks + shopChunks)
+                .build());
+        } catch (Exception e) {
+            log.error("Full sync failed", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(DocumentUploadResponse.builder()
+                    .success(false)
+                    .message("Full sync failed: " + e.getMessage())
+                    .build());
+        }
     }
 
     /**

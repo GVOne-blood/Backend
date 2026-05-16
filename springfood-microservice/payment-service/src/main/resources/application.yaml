@@ -1,8 +1,12 @@
 server:
   port: 8086
 spring:
+  # Load .env: module-level trước, root global sau (root override).
+  # Hoạt động bất kể working dir là module hay root.
+  config:
+    import: optional:file:.env[.properties],optional:file:../.env[.properties]
   application:
-    name: product-service
+    name: payment-service
   datasource:
     driver-class-name: org.postgresql.Driver
     url: ${DEFAULT_DATABASE_URL}
@@ -17,7 +21,14 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         default_schema: springfood_payment
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    properties:
+      security.protocol: ${KAFKA_SECURITY_PROTOCOL:PLAINTEXT}
+      ssl.truststore.location: ${KAFKA_SSL_TRUSTSTORE_LOCATION:}
+      ssl.truststore.password: ${KAFKA_SSL_TRUSTSTORE_PASSWORD:}
+      ssl.keystore.location: ${KAFKA_SSL_KEYSTORE_LOCATION:}
+      ssl.keystore.password: ${KAFKA_SSL_KEYSTORE_PASSWORD:}
+      ssl.key.password: ${KAFKA_SSL_KEY_PASSWORD:}
     consumer:
       group-id: payment_group
       auto-offset-reset: earliest
@@ -26,6 +37,9 @@ spring:
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
+springfood:
+  kafka:
+    enabled: false
 eureka:
   client:
     service-url:
@@ -39,17 +53,18 @@ vnpay:
 
   # URL để VNPay gọi lại sau khi người dùng thanh toán xong (phải khớp với endpoint trong resources)
   # Lưu ý: Phần domain sẽ được lấy tự động từ request, ở đây chỉ cần path
-  return-url: /api/payment/vnpay-payment-return/
+  return-url: /api/v1/payment/vnpay-payment-return/
 
-  # Mã website (Terminal ID) do VNPay cung cấp
-  #tmn-code: T2NFMFM4
-  #tmn-code: EEIFB4OW
-  tmn-code: HXTJXVB0
+  # URL frontend để redirect user về sau khi BE xử lý xong VNPay return.
+  # Nếu set → BE sẽ 302 redirect về URL này kèm query params nguyên gốc của VNPay
+  # và thêm `paymentStatus`. Nếu để trống → BE trả JSON như cũ.
+  frontend-return-url: ${VNPAY_FRONTEND_RETURN_URL:http://localhost:4200/payment/vnpay-return}
 
-  # Chuỗi bí mật (Hash Secret) do VNPay cung cấp
-  #hash-secret: W27ZTGD9MHB8GNEOLFZPLUI2NNWD1UUX
-  #hash-secret: IJCIOEJ17JGYD7VCCC63NCHA2ID5TV2E
-  hash-secret: ICSSV3402R1F5XMADPMRKDXZM8ZW27EO
+  # Mã website (Terminal ID) do VNPay cung cấp - cấp ngày 16/05/2026
+  tmn-code: ${VNPAY_TMN_CODE:QZRXMW9L}
+
+  # Chuỗi bí mật (Hash Secret) do VNPay cung cấp - cấp ngày 16/05/2026
+  hash-secret: ${VNPAY_HASH_SECRET:YZ0RZKIZY27VFSE3QF2GAGE4QBC1RN4C}
   # API URL để thực hiện các thao tác khác như truy vấn, hoàn tiền (nếu cần)
   api-url: https://sandbox.vnpayment.vn/merchant_webapi/api/transaction
 
@@ -70,6 +85,9 @@ grpc:
   server:
     port: 9096
   client:
+    order-service:
+      address: 'static://localhost:9092'
+      negotiationType: PLAINTEXT
     product-service:
       address: 'static://localhost:9095'
       negotiationType: PLAINTEXT

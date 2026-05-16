@@ -121,6 +121,13 @@ public class ClientConfiguration {
         return clientFactory.getClient(NotificationClient.class);
     }
 
+    @Bean
+    @Lazy
+    @ConditionalOnMissingBean
+    public PaymentClient paymentClient(ClientFactory clientFactory) {
+        return clientFactory.getClient(PaymentClient.class);
+    }
+
     /**
      * Protocol selector interface
      */

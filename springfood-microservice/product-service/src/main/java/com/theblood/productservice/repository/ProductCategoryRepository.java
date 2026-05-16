@@ -21,9 +21,9 @@ public interface ProductCategoryRepository extends JpaRepository<ProductCategory
     Page<ProductProjection> findAllProductsByCategoryName(UUID productId, Pageable pageable);
 
     @Query(value = "SELECT p.product_id " +
-            "FROM products p " +
-            "JOIN product_categories pc1 ON p.product_id = pc1.product_id " +
-            "JOIN categories c ON c.category_name = pc1.category_name " +
+            "FROM springfood_product.products p " +
+            "JOIN springfood_product.product_categories pc1 ON p.product_id = pc1.product_id " +
+            "JOIN springfood_product.categories c ON c.category_name = pc1.category_name " +
             "WHERE c.category_name IN :categoryNames " +
             "AND p.product_id != :productId " +
             "GROUP BY p.product_id, p.updated_at " +

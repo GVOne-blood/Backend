@@ -1,0 +1,128 @@
+{
+  "generatedAt": "2026-05-16T02:51:02.073Z",
+  "bucket": "springfood-media",
+  "publicBase": "https://pub-db7036086154479380d282adb29af0a4.r2.dev",
+  "count": 24,
+  "avatars": [
+    {
+      "style": "avataaars",
+      "seed": "Felix",
+      "url": "https://pub-db7036086154479380d282adb29af0a4.r2.dev/avatars/preset/avataaars/felix.svg"
+    },
+    {
+      "style": "avataaars",
+      "seed": "Aneka",
+      "url": "https://pub-db7036086154479380d282adb29af0a4.r2.dev/avatars/preset/avataaars/aneka.svg"
+    },
+    {
+      "style": "avataaars",
+      "seed": "Luna",
+      "url": "https://pub-db7036086154479380d282adb29af0a4.r2.dev/avatars/preset/avataaars/luna.svg"
+    },
+    {
+      "style": "avataaars",
+      "seed": "Max",
+      "url": "https://pub-db7036086154479380d282adb29af0a4.r2.dev/avatars/preset/avataaars/max.svg"
+    },
+    {
+      "style": "avataaars",
+      "seed": "Bella",
+      "url": "https://pub-db7036086154479380d282adb29af0a4.r2.dev/avatars/preset/avataaars/bella.svg"
+    },
+    {
+      "style": "avataaars",
+      "seed": "Charlie",
+      "url": "https://pub-db7036086154479380d282adb29af0a4.r2.dev/avatars/preset/avataaars/charlie.svg"
+    },
+    {
+      "style": "avataaars",
+      "seed": "Lucy",
+      "url": "https://pub-db7036086154479380d282adb29af0a4.r2.dev/avatars/preset/avataaars/lucy.svg"
+    },
+    {
+      "style": "avataaars",
+      "seed": "Oliver",
+      "url": "https://pub-db7036086154479380d282adb29af0a4.r2.dev/avatars/preset/avataaars/oliver.svg"
+    },
+    {
+      "style": "avataaars",
+      "seed": "Milo",
+      "url": "https://pub-db7036086154479380d282adb29af0a4.r2.dev/avatars/preset/avataaars/milo.svg"
+    },
+    {
+      "style": "avataaars",
+      "seed": "Daisy",
+      "url": "https://pub-db7036086154479380d282adb29af0a4.r2.dev/avatars/preset/avataaars/daisy.svg"
+    },
+    {
+      "style": "avataaars",
+      "seed": "Leo",
+      "url": "https://pub-db7036086154479380d282adb29af0a4.r2.dev/avatars/preset/avataaars/leo.svg"
+    },
+    {
+      "style": "avataaars",
+      "seed": "Sophie",
+      "url": "https://pub-db7036086154479380d282adb29af0a4.r2.dev/avatars/preset/avataaars/sophie.svg"
+    },
+    {
+      "style": "lorelei",
+      "seed": "Mira",
+      "url": "https://pub-db7036086154479380d282adb29af0a4.r2.dev/avatars/preset/lorelei/mira.svg"
+    },
+    {
+      "style": "lorelei",
+      "seed": "Kai",
+      "url": "https://pub-db7036086154479380d282adb29af0a4.r2.dev/avatars/preset/lorelei/kai.svg"
+    },
+    {
+      "style": "lorelei",
+      "seed": "Rose",
+      "url": "https://pub-db7036086154479380d282adb29af0a4.r2.dev/avatars/preset/lorelei/rose.svg"
+    },
+    {
+      "style": "lorelei",
+      "seed": "Linh",
+      "url": "https://pub-db7036086154479380d282adb29af0a4.r2.dev/avatars/preset/lorelei/linh.svg"
+    },
+    {
+      "style": "lorelei",
+      "seed": "Tuan",
+      "url": "https://pub-db7036086154479380d282adb29af0a4.r2.dev/avatars/preset/lorelei/tuan.svg"
+    },
+    {
+      "style": "lorelei",
+      "seed": "Mai",
+      "url": "https://pub-db7036086154479380d282adb29af0a4.r2.dev/avatars/preset/lorelei/mai.svg"
+    },
+    {
+      "style": "lorelei",
+      "seed": "An",
+      "url": "https://pub-db7036086154479380d282adb29af0a4.r2.dev/avatars/preset/lorelei/an.svg"
+    },
+    {
+      "style": "lorelei",
+      "seed": "Hoa",
+      "url": "https://pub-db7036086154479380d282adb29af0a4.r2.dev/avatars/preset/lorelei/hoa.svg"
+    },
+    {
+      "style": "lorelei",
+      "seed": "Nam",
+      "url": "https://pub-db7036086154479380d282adb29af0a4.r2.dev/avatars/preset/lorelei/nam.svg"
+    },
+    {
+      "style": "lorelei",
+      "seed": "Hieu",
+      "url": "https://pub-db7036086154479380d282adb29af0a4.r2.dev/avatars/preset/lorelei/hieu.svg"
+    },
+    {
+      "style": "lorelei",
+      "seed": "Trang",
+      "url": "https://pub-db7036086154479380d282adb29af0a4.r2.dev/avatars/preset/lorelei/trang.svg"
+    },
+    {
+      "style": "lorelei",
+      "seed": "Phuc",
+      "url": "https://pub-db7036086154479380d282adb29af0a4.r2.dev/avatars/preset/lorelei/phuc.svg"
+    }
+  ]
+}

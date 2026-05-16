@@ -100,6 +100,10 @@ management:
       application: ${spring.application.name}
 
 spring:
+  # Load .env: module-level trước, root global sau (root override).
+  # Hoạt động bất kể working dir là module hay root.
+  config:
+    import: optional:file:.env[.properties],optional:file:../.env[.properties]
   application:
     name: chat
   cloud:
@@ -260,21 +264,30 @@ jhipster:
 
 spring:
   ai:
+    # Disable Vertex AI (we're using direct Google AI API instead)
+    vertex:
+      ai:
+        gemini:
+          enabled: false
+          project-id: dummy-project
+          location: us-central1
+    
     # Google AI Gemini Configuration (Direct API - simpler than Vertex AI)
     # Requires GEMINI_API_KEY in .env file
     google:
       ai:
         gemini:
           api-key: ${GEMINI_API_KEY}
-          model: ${GEMINI_MODEL:gemini-1.5-flash}
+          model: ${GEMINI_MODEL:gemini-2.5-flash-lite}
           # Optional: temperature, top-p, top-k, max-output-tokens
     
     # Vector Store Configuration
     vectorstore:
       pgvector:
-        schema-name: chat
+        schema-name: springfood_chat
         index-type: HNSW
         distance-type: COSINE_DISTANCE
         dimensions: 768
-        # Khởi tạo bảng vector trong db tự động vào trong schema-name đã khai báo
-        initialize-schema: true
+        # Table + index đã tạo manually trong DB → tắt auto-init
+        # (Spring AI 1.x bug: CREATE INDEX trước CREATE TABLE khi schema khác public)
+        initialize-schema: false

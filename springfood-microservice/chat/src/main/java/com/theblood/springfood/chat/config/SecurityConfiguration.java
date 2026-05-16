@@ -35,6 +35,8 @@ public class SecurityConfiguration {
                 authz
                     .requestMatchers(mvc.pattern(HttpMethod.POST, "/api/authenticate")).permitAll()
                     .requestMatchers(mvc.pattern(HttpMethod.GET, "/api/authenticate")).permitAll()
+                    // Internal realtime push: cho các microservice khác gọi tới (không cần JWT)
+                    .requestMatchers(new AntPathRequestMatcher("/api/realtime/**")).permitAll()
                     // WebSocket endpoints: Use AntPathRequestMatcher because WebSocket handshake
                     // requests bypass DispatcherServlet, so MvcRequestMatcher cannot match them
                     .requestMatchers(new AntPathRequestMatcher("/websocket-test.html")).permitAll()

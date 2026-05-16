@@ -1,0 +1,44 @@
+# IDE / OS
+.idea/
+.vscode/
+*.iml
+.DS_Store
+Thumbs.db
+
+# Build outputs
+**/target/
+**/build/
+**/out/
+**/.gradle/
+**/.mvn/wrapper/maven-wrapper.jar
+
+# Logs / crash dumps
+*.log
+hs_err_pid*.log
+
+# Local data / generated
+**/node_modules/
+.serena/
+.gitnexus/
+.kiro/
+.claude/
+.agent/
+.agents/
+
+# Frontend
+client-app/
+
+# Docs/markdown noise (keep small for context, but exclude bulk)
+**/*.md.bak
+
+# Secrets & local env
+.env.local
+.env.*.local
+
+# Test resources we don't need at runtime
+**/src/test/
+
+# Misc artifacts at repo root
+hs_err_pid*.log
+response.json
+*.bat

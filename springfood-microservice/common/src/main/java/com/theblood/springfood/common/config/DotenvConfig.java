@@ -24,11 +24,19 @@ public class DotenvConfig implements ApplicationContextInitializer<ConfigurableA
         System.out.println("DotenvConfig from COMMON module is being loaded!");
         System.out.println("=================================================");
 
+        // Try to find .env file in current directory or parent directories
         File envFile = new File(".env");
         if (!envFile.exists()) {
-            System.out.println("Warning: .env file not found in current directory");
+            // Try parent directory (for IntelliJ running from module directory)
+            envFile = new File("../.env");
+        }
+        if (!envFile.exists()) {
+            System.out.println("Warning: .env file not found in current directory or parent directory");
+            System.out.println("Current working directory: " + System.getProperty("user.dir"));
             return;
         }
+        
+        System.out.println("✓ Found .env file at: " + envFile.getAbsolutePath());
 
         Map<String, Object> envMap = new HashMap<>();
 
@@ -50,6 +58,8 @@ public class DotenvConfig implements ApplicationContextInitializer<ConfigurableA
             }
 
             environment.getPropertySources().addFirst(new MapPropertySource("dotenvProperties", envMap));
+            // Also set as system properties for reliable resolution across all contexts
+            envMap.forEach((key, value) -> System.setProperty(key, (String) value));
             System.out.println("✓ Successfully loaded " + envMap.size() + " properties from .env file");
             System.out.println("=================================================");
 

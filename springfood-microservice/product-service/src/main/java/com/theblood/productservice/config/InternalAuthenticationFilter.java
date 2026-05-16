@@ -1,6 +1,7 @@
 package com.theblood.productservice.config;
 
 import com.theblood.springfood.common.dto.request.CustomUserPrincipal;
+import com.theblood.springfood.common.dto.request.UserContextHolder;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -33,6 +34,9 @@ public class InternalAuthenticationFilter extends OncePerRequestFilter {
     @Value("X-User-ID")
     private String userIdHeader;
 
+    @Value("${security.internal.auth.header.shopId:X-Shop-ID}")
+    private String shopIdHeader;
+
     @Value("${security.internal.auth.header.authorities:X-User-Authorities}")
     private String authoritiesHeader;
 
@@ -49,6 +53,7 @@ public class InternalAuthenticationFilter extends OncePerRequestFilter {
         // Extract headers
         String userId = request.getHeader(userIdHeader);
         String username = request.getHeader(usernameHeader);
+        String shopId = request.getHeader(shopIdHeader);
         String rolesString = request.getHeader(rolesHeader);
         String authoritiesString = request.getHeader(authoritiesHeader);
 
@@ -58,7 +63,15 @@ public class InternalAuthenticationFilter extends OncePerRequestFilter {
             CustomUserPrincipal principal = new CustomUserPrincipal();
             principal.setUserId(UUID.fromString(userId));
             principal.setUsername(username);
+            principal.setShopId(shopId);
             setAuthentication(principal, rolesString, authoritiesString);
+
+            // Also expose the principal via the per-request thread-local
+            // {@link UserContextHolder}. Components like FeedbackResources
+            // resolve the current user from there (instead of going through
+            // {@code SecurityContextHolder}) so without this line they get a
+            // null userId and write feedback rows with no owner.
+            UserContextHolder.setContext(principal);
         } else {
             log.debug("⚠️ No authentication headers - request will be anonymous");
             // KHÔNG set gì cả - để Spring Security tự handle
@@ -66,8 +79,14 @@ public class InternalAuthenticationFilter extends OncePerRequestFilter {
             // - Secured endpoints: authenticated → reject với 401
         }
 
-        // LUÔN continue chain - để SecurityConfig quyết định cho qua hay không
-        filterChain.doFilter(request, response);
+        try {
+            // LUÔN continue chain - để SecurityConfig quyết định cho qua hay không
+            filterChain.doFilter(request, response);
+        } finally {
+            // Clear the thread-local so worker threads picked up by other
+            // requests (Tomcat reuses them) don't inherit a stale user.
+            UserContextHolder.setContext(null);
+        }
     }
 
     /**

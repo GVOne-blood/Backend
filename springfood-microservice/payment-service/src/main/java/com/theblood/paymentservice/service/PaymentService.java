@@ -1,7 +1,9 @@
 package com.theblood.paymentservice.service;
 
-import com.theblood.paymentservice.common.enums.TransactionStatus;
+import com.theblood.springfood.common.enums.TransactionStatus;
+import com.theblood.paymentservice.dto.request.BankAccountCreateRequest;
 import com.theblood.paymentservice.dto.request.PaymentInfoRequest;
+import com.theblood.paymentservice.dto.response.BankAccountResponse;
 import com.theblood.paymentservice.model.PaymentTransactions;
 
 import java.time.LocalDateTime;
@@ -20,4 +22,6 @@ public interface PaymentService {
     void handlePaymentReturnSuccess(Map<String, String> response);
 
     void handlePaymentReturnFail(Map<String, String> response);
+
+    BankAccountResponse createBankAccount(BankAccountCreateRequest request);
 }

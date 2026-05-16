@@ -2,6 +2,10 @@ server:
   port: 8083
 
 spring:
+  # Load .env: module-level trước, root global sau (root override).
+  # Hoạt động bất kể working dir là module hay root.
+  config:
+    import: optional:file:.env[.properties],optional:file:../.env[.properties]
   application:
     name: order-service
   datasource:
@@ -12,11 +16,12 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
-    show-sql: true
+    show-sql: false
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         default_schema: springfood_order
+        format_sql: false
   redis:
     # Redis Cluster 2 - Shared cho các read-heavy services
     shared:
@@ -31,7 +36,14 @@ spring:
           min-idle: 5
           max-wait: 2000ms
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    properties:
+      security.protocol: ${KAFKA_SECURITY_PROTOCOL:PLAINTEXT}
+      ssl.truststore.location: ${KAFKA_SSL_TRUSTSTORE_LOCATION:}
+      ssl.truststore.password: ${KAFKA_SSL_TRUSTSTORE_PASSWORD:}
+      ssl.keystore.location: ${KAFKA_SSL_KEYSTORE_LOCATION:}
+      ssl.keystore.password: ${KAFKA_SSL_KEYSTORE_PASSWORD:}
+      ssl.key.password: ${KAFKA_SSL_KEY_PASSWORD:}
     consumer:
       group-id: my-group
       auto-offset-reset: earliest
@@ -40,6 +52,13 @@ spring:
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
+
+# Tắt common KafkaConsumerAutoConfiguration để dùng Spring Boot default
+# (nó override container factory mà không set group.id, gây "No group.id found").
+# Spring Boot sẽ pick group-id từ spring.kafka.consumer.group-id ở trên.
+springfood:
+  kafka:
+    enabled: false
 
 eureka:
   client:
@@ -65,3 +84,32 @@ grpc:
     payment-service:
       address: 'static://localhost:9096'
       negotiation-type: plaintext
+
+logging:
+  level:
+    # === Kafka: tắt log spam ===
+    kafka: WARN
+    state.change.logger: WARN
+    org.apache.kafka: ERROR              # tất cả kafka client (consumer/producer/admin/network)
+    org.springframework.kafka: WARN
+    org.springframework.kafka.config: WARN
+    org.springframework.kafka.listener: WARN
+    org.springframework.kafka.core: WARN
+
+    # === Hibernate: tắt SQL/binder/transaction spam ===
+    org.hibernate: WARN                  # cha cho mọi hibernate logger
+    org.hibernate.SQL: WARN
+    org.hibernate.orm: WARN
+    org.hibernate.type: WARN
+    org.hibernate.stat: WARN
+    org.hibernate.engine: WARN
+    org.hibernate.cache: WARN
+
+    # Spring Data/JPA
+    org.springframework.data.jpa: WARN
+    org.springframework.orm.jpa: WARN
+    org.springframework.transaction: WARN
+
+    # Connection pool noise
+    com.zaxxer.hikari: WARN
+    org.apache.tomcat.jdbc: WARN

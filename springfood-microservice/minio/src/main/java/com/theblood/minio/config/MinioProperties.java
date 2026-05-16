@@ -1,8 +1,10 @@
 package com.theblood.minio.config;
 
 import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
@@ -20,10 +22,19 @@ import org.springframework.validation.annotation.Validated;
  * minio.connect-timeout=10000
  * minio.write-timeout=60000
  * minio.read-timeout=10000
+ *
+ * <p>NOTE: {@link NoArgsConstructor} + {@link Setter} are mandatory so Spring
+ * Boot's JavaBean-style {@code @ConfigurationProperties} binding can
+ * instantiate the class and inject values. Without {@code @NoArgsConstructor}
+ * Lombok's {@code @Builder} only generates an all-args constructor, leaving
+ * Spring with nothing to call → "bean of type 'MinioProperties' that could
+ * not be found" startup failure in services like {@code product-service}.
  */
 @Builder
 @Setter
 @Getter
+@NoArgsConstructor
+@AllArgsConstructor
 @ConfigurationProperties(prefix = "minio")
 @Validated
 public class MinioProperties {

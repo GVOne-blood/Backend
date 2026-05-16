@@ -1,6 +1,7 @@
 package com.theblood.springfood.common.config.kafka;
 
 import org.apache.kafka.clients.producer.ProducerConfig;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -35,6 +36,7 @@ public class KafkaProducerAutoConfiguration {
     }
     
     @Bean
+    @ConditionalOnMissingBean(name = "producerFactory")
     public ProducerFactory<String, Object> producerFactory() {
         Map<String, Object> configProps = new HashMap<>();
         configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaProperties.getBootstrapServers());
@@ -52,6 +54,7 @@ public class KafkaProducerAutoConfiguration {
     }
     
     @Bean
+    @ConditionalOnMissingBean(name = "kafkaTemplate")
     public KafkaTemplate<String, Object> kafkaTemplate() {
         return new KafkaTemplate<>(producerFactory());
     }

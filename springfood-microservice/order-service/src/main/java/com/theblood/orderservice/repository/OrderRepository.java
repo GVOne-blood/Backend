@@ -6,7 +6,10 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -14,11 +17,17 @@ public interface OrderRepository extends JpaRepository<Order, String> {
 
     @Query("SELECT o FROM Order o WHERE o.referenceId = :referenceId")
     List<Order> findByReferenceId(@Param("referenceId") UUID referenceId);
-//
-//    @Query("SELECT new com.theblood.orderservice.dto.response.OrderDetailResponse(od.id, od.user.id, od.shop.id, od.createdAt, od.subtotalAmount, od.discount, od.finalPrice, od.paymentMethod.id, od.paymentStatus, od.orderStatus, od.bookingItems, od.address.id, od.deliveredAt) FROM Order od")
-//    Page<OrderDetailResponse> getAllOrder(Pageable pageable);
-//
-//    @Query("SELECT o FROM Order o WHERE o.id = :orderId AND o.user.id = :userId")
-//    Optional<Order> findByUserIdAndOrderId(String orderId, String userId);
+
+    @Query("SELECT o FROM Order o WHERE o.shopId = :shopId ORDER BY o.createdAt DESC")
+    Page<Order> findByShopId(@Param("shopId") UUID shopId, Pageable pageable);
+
+    @Query("SELECT o FROM Order o WHERE o.id = :orderId AND o.shopId = :shopId")
+    Optional<Order> findByShopIdAndOrderId(@Param("shopId") UUID shopId, @Param("orderId") UUID orderId);
+
+    @Query("SELECT o FROM Order o WHERE o.userId = :userId ORDER BY o.createdAt DESC")
+    Page<Order> findByUserId(@Param("userId") UUID userId, Pageable pageable);
+
+    @Query("SELECT o FROM Order o WHERE o.id = :orderId AND o.userId = :userId")
+    Optional<Order> findByUserIdAndOrderId(@Param("userId") UUID userId, @Param("orderId") UUID orderId);
 
 }

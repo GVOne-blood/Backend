@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.Set;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -14,7 +15,6 @@ import java.util.Set;
 @AllArgsConstructor
 @Entity
 @Table(name = "categories")
-
 public class Categories {
 
     @OneToMany(mappedBy = "parentCategories", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -33,9 +33,25 @@ public class Categories {
     @Column(name = "is_active")
     private boolean isActive;
 
+    /**
+     * Owning shop. {@code NULL} means the category is a system-wide category
+     * shared by every shop. Hibernate's {@code ddl-auto=update} will add the
+     * column on first boot.
+     */
+    @Column(name = "shop_id")
+    private UUID shopId;
+
+    /** Optional grouping code, mirrors {@code categories.category_group_code}. */
+    @Column(name = "category_group_code")
+    private String categoryGroupCode;
+
+    @Column(name = "is_lock")
+    private Integer isLock;
+
     @ManyToOne
     @JoinColumn(name = "parent_id")
     private Categories parentCategories;
+
     @OneToMany(mappedBy = "categories", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<ProductCategory> productCategories;
 

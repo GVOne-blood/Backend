@@ -65,11 +65,9 @@ public class AIAssistantController {
 
         log.debug("REST AI chat - user: {}, conversation: {}", userId, conversationId);
 
-        String response = aiAssistantService.chat(conversationId, userId, request.getMessage());
+        AIMessageResponse response = aiAssistantService.chat(conversationId, userId, request.getMessage());
         
-        return ResponseEntity.ok(
-            AIMessageResponse.of(conversationId, request.getMessage(), response)
-        );
+        return ResponseEntity.ok(response);
     }
 
     /**
@@ -125,6 +123,22 @@ public class AIAssistantController {
                     );
                 })
                 .doOnComplete(() -> {
+                    // Sau khi stream text xong: search RAG → fetch product/shop cards
+                    // và push qua kênh riêng để UI render thẻ trực tiếp trong tin nhắn.
+                    try {
+                        AIAssistantService.CardSearchResult cards =
+                            aiAssistantService.searchCards(request.getMessage());
+                        if (cards != null && !cards.isEmpty()) {
+                            messagingTemplate.convertAndSendToUser(
+                                userId,
+                                "/queue/ai-assistant/cards",
+                                cards
+                            );
+                        }
+                    } catch (Exception ex) {
+                        log.warn("Failed to push cards to user {}: {}", userId, ex.getMessage());
+                    }
+
                     // Send completion signal
                     messagingTemplate.convertAndSendToUser(
                         userId,

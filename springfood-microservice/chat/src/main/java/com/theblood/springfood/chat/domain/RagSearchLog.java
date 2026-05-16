@@ -7,6 +7,7 @@ import lombok.*;
 import org.hibernate.annotations.Type;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -47,10 +48,11 @@ public class RagSearchLog {
     /**
      * Query embedding vector (768 dimensions)
      * Optional: Can be null to save storage if not needed for analytics
+     * Note: Using double[] instead of float[] because Hypersistence Utils ListArrayType doesn't support Float
      */
     @Type(ListArrayType.class)
-    @Column(name = "query_embedding", columnDefinition = "vector(768)")
-    private float[] queryEmbedding;
+    @Column(name = "query_embedding", columnDefinition = "real[]")
+    private List<Double> queryEmbedding;
 
     /**
      * IDs of documents retrieved for this query

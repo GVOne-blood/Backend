@@ -1,9 +1,8 @@
 package com.theblood.orderservice.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.theblood.springfood.common.dto.response.ProductDetail;
 import com.theblood.springfood.common.enums.OrderStatus;
-import com.theblood.orderservice.common.enums.TransactionStatus;
+import com.theblood.springfood.common.enums.TransactionStatus;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -31,9 +30,19 @@ public class OrderDetailResponse implements Serializable {
     String paymentMethod;
     TransactionStatus paymentStatus;
     OrderStatus orderStatus;
-    List<ProductDetail> items;
+
+    /**
+     * Order line items.
+     *
+     * <p>Switched from {@code List<ProductDetail>} (whose {@code quantity}
+     * means stock) to {@link OrderItemView} so the FE finally sees the
+     * customer-ordered quantity.</p>
+     */
+    List<OrderItemView> items;
+
     String shippingAddress;
     BigDecimal shippingFee;
     LocalDateTime deliveredAt;
 
 }
+

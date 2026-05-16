@@ -40,9 +40,9 @@ spring:
       indent-output: true
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
-    url: ${DEFAULT_DATABASE_URL:jdbc:postgresql://localhost:5432/springfood}
-    username: ${DEFAULT_DATABASE_USERNAME:postgres}
-    password: ${DEFAULT_DATABASE_PASSWORD:123456}
+    url: ${DEFAULT_DATABASE_URL}
+    username: ${DEFAULT_DATABASE_USERNAME}
+    password: ${DEFAULT_DATABASE_PASSWORD}
     hikari:
       poolName: Hikari
       auto-commit: false
@@ -62,7 +62,14 @@ spring:
   # KAFKA CONFIGURATION (STANDALONE)
   # ===================================================================
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    properties:
+      security.protocol: ${KAFKA_SECURITY_PROTOCOL:PLAINTEXT}
+      ssl.truststore.location: ${KAFKA_SSL_TRUSTSTORE_LOCATION:}
+      ssl.truststore.password: ${KAFKA_SSL_TRUSTSTORE_PASSWORD:}
+      ssl.keystore.location: ${KAFKA_SSL_KEYSTORE_LOCATION:}
+      ssl.keystore.password: ${KAFKA_SSL_KEYSTORE_PASSWORD:}
+      ssl.key.password: ${KAFKA_SSL_KEY_PASSWORD:}
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
@@ -96,7 +103,8 @@ jhipster:
   cache: # Cache configuration
     redis: # Redis configuration
       expiration: 3600 # By default objects stay 1 hour (in seconds) in the cache
-      server: redis://localhost:6379
+      # Upstash Redis (rediss:// = TLS). Có thể override bằng REDIS_URL trong .env
+      server: ${REDIS_URL:redis://localhost:6379}
       cluster: false
       # server: redis://localhost:6379,redis://localhost:16379,redis://localhost:26379
       # cluster: true
@@ -137,3 +145,18 @@ minio:
   bucket: ${MINIO_BUCKET:springfood-media}
   secure: false
   auto-create-bucket: true
+
+# ===================================================================
+# SpringFood Client Configuration (REST/Feign clients to other services)
+# Cần config cho LoggingService -> LogActionsClient
+# ===================================================================
+springfood:
+  client:
+    enabled: true
+    default-protocol: rest
+    services:
+      log-actions:
+        name: log-actions
+        protocol: rest
+        url: http://localhost:8094
+        enabled: true

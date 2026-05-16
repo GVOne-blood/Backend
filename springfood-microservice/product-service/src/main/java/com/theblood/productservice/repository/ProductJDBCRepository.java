@@ -29,7 +29,7 @@ public class ProductJDBCRepository {
     // private final BeanPropertyRowMapper beanPropertyRowMapper;
     public Optional<Product> findById(UUID productId) {
 
-        String sql = "SELECT p.* FROM products p WHERE product_id = ?";
+        String sql = "SELECT p.* FROM springfood_product.products p WHERE product_id = ?";
         try {
             Product product = jdbcTemplate.queryForObject(sql, new BeanPropertyRowMapper<>(Product.class), productId); // query, mapper, field variable
             return Optional.ofNullable(product);
@@ -40,10 +40,10 @@ public class ProductJDBCRepository {
 
     //named
     public Page<Product> findByPrice(BigDecimal from, BigDecimal to, Pageable pageable) {
-        String sql = " SELECT * FROM products WHERE price > :from and price < :to " +
+        String sql = " SELECT * FROM springfood_product.products WHERE price > :from and price < :to " +
                 "ORDER BY product_id " +
                 "LIMIT :limit OFFSET :offset ";
-        String sqlCount = " SELECT COUNT(*) FROM products WHERE price > :from and price < :to ";
+        String sqlCount = " SELECT COUNT(*) FROM springfood_product.products WHERE price > :from and price < :to ";
 
         SqlParameterSource params = new MapSqlParameterSource()
                 .addValue("from", null)

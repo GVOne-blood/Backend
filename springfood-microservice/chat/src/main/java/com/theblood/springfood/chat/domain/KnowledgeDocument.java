@@ -105,6 +105,7 @@ public class KnowledgeDocument {
      */
     public enum DocumentSourceType {
         PRODUCT,
+        SHOP,
         ORDER,
         POLICY,
         FAQ,

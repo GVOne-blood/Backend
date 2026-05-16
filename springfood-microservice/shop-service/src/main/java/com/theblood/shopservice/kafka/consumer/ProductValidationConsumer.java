@@ -34,6 +34,9 @@ public class ProductValidationConsumer {
     @KafkaListener(topics = "product-validation-request", groupId = "shop-service-validation-group")
     @Transactional
     public void validateProductCreation(ProductValidationRequest message) {
+        if (message.getShopId() == null) {
+            throw new InvalidDataException("Shop ID is required");
+        }
         Optional<Shop> shop = shopRepository.findById(message.getShopId());
         if (shop.isEmpty()) throw new InvalidDataException("Shop not found, create product failed");
         if (shop.get().getShopStatus() != ShopStatus.ACTIVE)

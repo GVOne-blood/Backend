@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.theblood.springfood.common.enums.PaymentMethod;
 import com.theblood.springfood.common.exception.custom.InvalidDataException;
-import com.theblood.paymentservice.common.enums.TransactionStatus;
+import com.theblood.springfood.common.enums.TransactionStatus;
 import com.theblood.paymentservice.common.enums.TransactionType;
 import com.theblood.paymentservice.common.util.VNPayUtil;
 import com.theblood.paymentservice.config.VNPayConfig;
@@ -102,6 +102,22 @@ public class VNPayServiceImpl implements VNPayService {
     @Transactional
     @Override
     public String createPaymentUrl(HttpServletRequest request, VNPayPaymentRequest paymentRequest) throws UnsupportedEncodingException {
+        if (paymentRequest == null) {
+            throw new InvalidDataException("Payment request is required");
+        }
+
+        if (paymentRequest.getPaymentMethod() == null || !PaymentMethod.VNPAY.equals(paymentRequest.getPaymentMethod())) {
+            throw new InvalidDataException("Payment method must be VNPAY");
+        }
+
+        if (paymentRequest.getAmount() == null || paymentRequest.getAmount() <= 0) {
+            throw new InvalidDataException("Amount must be greater than zero");
+        }
+
+        if (paymentRequest.getOrderInfo() == null || paymentRequest.getOrderInfo().trim().isEmpty()) {
+            throw new InvalidDataException("Order info is required");
+        }
+
         String vnp_TxnRef = paymentRequest.getTxnRef();
         if (vnp_TxnRef == null || vnp_TxnRef.trim().isEmpty()) {
             log.error(" (vnp_TxnRef) is null or empty. Cannot create payment URL.");
@@ -130,6 +146,9 @@ public class VNPayServiceImpl implements VNPayService {
         String cleanOrderInfo = paymentRequest.getOrderInfo()
                 .replaceAll("[^a-zA-Z0-9\\s]", " ") // Chỉ giữ lại ký tự an toàn
                 .replaceAll("\\s+", " ").trim();
+        if (cleanOrderInfo.isEmpty()) {
+            throw new InvalidDataException("Order info is invalid after sanitization");
+        }
         vnp_Params.put("vnp_OrderInfo", cleanOrderInfo.substring(0, Math.min(cleanOrderInfo.length(), 255)));
 
         SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");

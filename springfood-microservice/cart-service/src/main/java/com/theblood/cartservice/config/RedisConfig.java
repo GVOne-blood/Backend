@@ -33,19 +33,28 @@ public class RedisConfig {
     @Value("${spring.redis.shared.password}")
     private String redisPassword;
 
+    @Value("${spring.redis.shared.ssl.enabled:false}")
+    private boolean sslEnabled;
+
     @Bean
     public LettuceConnectionFactory redisConnectionFactory() {
         RedisStandaloneConfiguration config = new RedisStandaloneConfiguration();
         config.setHostName(redisHost);
         config.setPort(redisPort);
-        config.setPassword(redisPassword);
+        if (redisPassword != null && !redisPassword.isEmpty()) {
+            config.setPassword(redisPassword);
+        }
 
-        LettuceClientConfiguration clientConfig = LettuceClientConfiguration.builder()
-                .commandTimeout(Duration.ofSeconds(3))
-                .shutdownTimeout(Duration.ofMillis(100))
-                .build();
+        LettuceClientConfiguration.LettuceClientConfigurationBuilder clientConfig =
+                LettuceClientConfiguration.builder()
+                        .commandTimeout(Duration.ofSeconds(3))
+                        .shutdownTimeout(Duration.ofMillis(100));
 
-        return new LettuceConnectionFactory(config, clientConfig);
+        if (sslEnabled) {
+            clientConfig.useSsl();
+        }
+
+        return new LettuceConnectionFactory(config, clientConfig.build());
     }
 
     @Bean
@@ -69,7 +78,7 @@ public class RedisConfig {
     @Bean
     public RedisCacheManager cacheManager() {
         RedisCacheConfiguration cacheConfig = RedisCacheConfiguration.defaultCacheConfig()
-                .prefixCacheNameWith("product-service:")  // Service-specific prefix
+                .prefixCacheNameWith("cart-service:")
                 .entryTtl(Duration.ofMinutes(10))
                 .serializeKeysWith(
                         RedisSerializationContext.SerializationPair.fromSerializer(
@@ -79,16 +88,8 @@ public class RedisConfig {
                                 new GenericJackson2JsonRedisSerializer(redisObjectMapper())))
                 .disableCachingNullValues();
 
-        // Cấu hình TTL riêng cho từng cache region
         Map<String, RedisCacheConfiguration> cacheConfigurations = new HashMap<>();
-
-        // Products cache - TTL 60 phút (dữ liệu ít thay đổi)
-        cacheConfigurations.put("products",
-                cacheConfig.entryTtl(Duration.ofMinutes(60)));
-
-        // Categories cache - TTL 120 phút (dữ liệu rất ít thay đổi)
-        cacheConfigurations.put("categories",
-                cacheConfig.entryTtl(Duration.ofMinutes(120)));
+        cacheConfigurations.put("cart", cacheConfig.entryTtl(Duration.ofDays(7)));
 
         return RedisCacheManager.builder(redisConnectionFactory())
                 .cacheDefaults(cacheConfig)

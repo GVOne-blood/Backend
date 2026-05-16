@@ -1,0 +1,160 @@
+# ============================================================================
+# DEV override — hot reload cho 12 service Spring Boot.
+#
+# Cách chạy:
+#   docker compose -f docker-compose.apps.yml -f docker-compose.dev.yml up
+#
+# Mỗi service chạy `dev-run <module>` (xem scripts/dev-run.sh):
+#   1. mvn install -pl <module> -am -DskipTests   (build các module phụ thuộc)
+#   2. mvn -pl <module> spring-boot:run            (chạy CHỈ module đích)
+# Cách 2 bước này tránh lỗi "Unable to find a suitable main class" khi Maven
+# vô tình chạy spring-boot:run trên parent POM (packaging=pom).
+#
+# Hot reload: nguồn được mount qua bind volume, sửa code + compile lại trong
+# IDE → Spring Boot DevTools tự restart classpath.
+# ============================================================================
+
+x-dev-build: &dev-build
+  context: .
+  dockerfile: Dockerfile.dev
+
+x-dev-volumes: &dev-volumes
+  - ./:/workspace                        # toàn bộ source (read-write)
+  - maven-cache:/root/.m2                # cache .m2 dùng chung giữa các service
+
+services:
+  eureka-server:
+    build:
+      <<: *dev-build
+      args:
+        SERVICE_MODULE: eureka-server
+    image: springfood/eureka-server:dev
+    volumes: *dev-volumes
+    working_dir: /workspace
+    command: ["dev-run", "eureka-server"]
+
+  api-gateway:
+    build:
+      <<: *dev-build
+      args:
+        SERVICE_MODULE: api-gateway
+    image: springfood/api-gateway:dev
+    volumes: *dev-volumes
+    working_dir: /workspace
+    command: ["dev-run", "api-gateway"]
+
+  authentication:
+    build:
+      <<: *dev-build
+      args:
+        SERVICE_MODULE: authentication
+    image: springfood/authentication:dev
+    volumes: *dev-volumes
+    working_dir: /workspace
+    command: ["dev-run", "authentication"]
+
+  cart-service:
+    build:
+      <<: *dev-build
+      args:
+        SERVICE_MODULE: cart-service
+    image: springfood/cart-service:dev
+    volumes: *dev-volumes
+    working_dir: /workspace
+    command: ["dev-run", "cart-service"]
+
+  order-service:
+    build:
+      <<: *dev-build
+      args:
+        SERVICE_MODULE: order-service
+    image: springfood/order-service:dev
+    volumes: *dev-volumes
+    working_dir: /workspace
+    command: ["dev-run", "order-service"]
+
+  shop-service:
+    build:
+      <<: *dev-build
+      args:
+        SERVICE_MODULE: shop-service
+    image: springfood/shop-service:dev
+    volumes: *dev-volumes
+    working_dir: /workspace
+    command: ["dev-run", "shop-service"]
+
+  product-service:
+    build:
+      <<: *dev-build
+      args:
+        SERVICE_MODULE: product-service
+    image: springfood/product-service:dev
+    volumes: *dev-volumes
+    working_dir: /workspace
+    environment:
+      # YAML hardcode 127.0.0.1; bind on all interfaces for container networking
+      SERVER_ADDRESS: "0.0.0.0"
+    command: ["dev-run", "product-service"]
+
+  payment-service:
+    build:
+      <<: *dev-build
+      args:
+        SERVICE_MODULE: payment-service
+    image: springfood/payment-service:dev
+    volumes: *dev-volumes
+    working_dir: /workspace
+    command: ["dev-run", "payment-service"]
+
+  notification:
+    build:
+      <<: *dev-build
+      args:
+        SERVICE_MODULE: notification
+    image: springfood/notification:dev
+    volumes: *dev-volumes
+    working_dir: /workspace
+    command: ["dev-run", "notification"]
+
+  media:
+    build:
+      <<: *dev-build
+      args:
+        SERVICE_MODULE: media
+    image: springfood/media:dev
+    volumes: *dev-volumes
+    working_dir: /workspace
+    command: ["dev-run", "media"]
+
+  statistical-report:
+    build:
+      <<: *dev-build
+      args:
+        SERVICE_MODULE: statistical-report
+    image: springfood/statistical-report:dev
+    volumes: *dev-volumes
+    working_dir: /workspace
+    command: ["dev-run", "statistical-report"]
+
+  action-log:
+    build:
+      <<: *dev-build
+      args:
+        SERVICE_MODULE: action-log
+    image: springfood/action-log:dev
+    volumes: *dev-volumes
+    working_dir: /workspace
+    command: ["dev-run", "action-log"]
+
+  chat:
+    build:
+      <<: *dev-build
+      args:
+        SERVICE_MODULE: chat
+    image: springfood/chat:dev
+    volumes: *dev-volumes
+    working_dir: /workspace
+    command: ["dev-run", "chat"]
+
+volumes:
+  maven-cache:

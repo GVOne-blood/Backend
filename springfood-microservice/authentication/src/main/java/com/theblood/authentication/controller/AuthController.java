@@ -7,7 +7,6 @@ import com.theblood.authentication.dto.response.TokenResponse;
 import com.theblood.authentication.service.AuthService;
 import com.theblood.authentication.service.JwtService;
 import com.theblood.authentication.service.UserService;
-import com.theblood.springfood.common.dto.request.TokenRefreshRequest;
 import com.theblood.springfood.common.dto.response.LoginRequest;
 import com.theblood.springfood.common.dto.response.ResponseData;
 import jakarta.servlet.http.HttpServletRequest;
@@ -44,6 +43,36 @@ public class AuthController {
         );
     }
 
+    /**
+     * PUBLIC API - DEV ONLY (đồ án sinh viên)
+     * Register user với role chỉ định.
+     * 
+     * Body example:
+     * {
+     *   "firstName": "Admin",
+     *   "lastName": "User",
+     *   "username": "admin",
+     *   "password": "Admin@123",
+     *   "email": "admin@springfood.vn",
+     *   "gender": "MALE",
+     *   "phone": "0912345678"
+     * }
+     * 
+     * Query param: ?role=ADMIN (CUSTOMER|SHOP_OWNER|ADMIN|STAFF|DELIVER)
+     */
+    @PostMapping("/register-with-role")
+    public ResponseEntity<ResponseData<RegisterResponse>> registerWithRole(
+            @Valid @RequestBody UserRequest userRequest,
+            @RequestParam(name = "role", defaultValue = "CUSTOMER") String role,
+            HttpServletResponse response) {
+
+        RegisterResponse res = userService.registerUserWithRole(userRequest, role, response);
+        return new ResponseEntity<>(
+                new ResponseData<>(201, "User registered with role " + role.toUpperCase() + " successfully", res),
+                HttpStatus.OK
+        );
+    }
+
     @PatchMapping("/encode")
     public ResponseEntity<ResponseData<String>> encodeDumpPassword() {
         try {
@@ -62,11 +91,22 @@ public class AuthController {
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<TokenResponse> refreshToken(
-            @RequestBody TokenRefreshRequest request) {  // ✅ Nhận từ body
+    public ResponseEntity<ResponseData<TokenResponse>> refreshToken(
+            HttpServletRequest request,
+            HttpServletResponse response) {
+        // Đọc REFRESH_TOKEN từ HttpOnly cookie (FE không có quyền đọc/gửi qua body)
+        String refreshToken = com.theblood.springfood.common.util.CookieUtil
+                .getElementFromCookie(request, com.theblood.springfood.common.enums.CookieKey.REFRESH_TOKEN.name());
 
-        TokenResponse response = authService.refresh(request.getRefreshToken());
-        return ResponseEntity.ok(response);
+        TokenResponse tokenResponse = authService.refresh(refreshToken);
+
+        // Set-Cookie ACCESS_TOKEN mới (15 phút). REFRESH_TOKEN giữ nguyên cho tới khi logout/expire.
+        response.addCookie(com.theblood.springfood.common.util.CookieUtil.createCookie(
+                com.theblood.springfood.common.enums.CookieKey.ACCESS_TOKEN.name(),
+                tokenResponse.getAccessToken(),
+                15 * 60));
+
+        return ResponseEntity.ok(new ResponseData<>(200, "Token refreshed successfully", tokenResponse));
     }
 
     @PostMapping("/login")

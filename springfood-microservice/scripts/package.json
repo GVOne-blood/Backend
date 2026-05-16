@@ -1,0 +1,13 @@
+{
+  "name": "springfood-scripts",
+  "version": "1.0.0",
+  "description": "Utility scripts for SpringFood project",
+  "scripts": {
+    "upload-placeholders": "node upload-placeholder-images.js"
+  },
+  "dependencies": {
+    "aws-sdk": "^2.1691.0",
+    "dotenv": "^16.4.5",
+    "pg": "^8.20.0"
+  }
+}

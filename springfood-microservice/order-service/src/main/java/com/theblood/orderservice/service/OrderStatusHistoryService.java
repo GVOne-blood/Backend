@@ -153,27 +153,27 @@ public class OrderStatusHistoryService {
      * Record system status change (automated)
      */
     public OrderStatusHistory recordSystemStatusChange(UUID orderId, String toStatus, String note) {
-        return recordStatusChange(orderId, toStatus, "system", "SYSTEM", note);
+        return recordStatusChange(orderId, null, toStatus, "system", "SYSTEM", note);
     }
 
     /**
      * Record customer status change
      */
     public OrderStatusHistory recordCustomerStatusChange(UUID orderId, String toStatus, UUID customerId, String note) {
-        return recordStatusChange(orderId, toStatus, customerId.toString(), "CUSTOMER", note);
+        return recordStatusChange(orderId, null, toStatus, customerId.toString(), "CUSTOMER", note);
     }
 
     /**
      * Record shop status change
      */
     public OrderStatusHistory recordShopStatusChange(UUID orderId, String toStatus, UUID shopId, String note) {
-        return recordStatusChange(orderId, toStatus, shopId.toString(), "SHOP", note);
+        return recordStatusChange(orderId, null, toStatus, shopId.toString(), "SHOP", note);
     }
 
     /**
      * Record shipper status change
      */
     public OrderStatusHistory recordShipperStatusChange(UUID orderId, String toStatus, UUID shipperId, String note) {
-        return recordStatusChange(orderId, toStatus, shipperId.toString(), "SHIPPER", note);
+        return recordStatusChange(orderId, null, toStatus, shipperId.toString(), "SHIPPER", note);
     }
 }

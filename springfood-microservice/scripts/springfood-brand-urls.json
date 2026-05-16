@@ -1,0 +1,43 @@
+{
+  "bucket": "springfood-media",
+  "publicBase": "https://pub-db7036086154479380d282adb29af0a4.r2.dev",
+  "uploadedAt": "2026-05-15T17:34:15.760Z",
+  "assets": [
+    {
+      "src": "android-chrome-512x512.png",
+      "key": "brand/springfood-logo-512.png",
+      "url": "https://pub-db7036086154479380d282adb29af0a4.r2.dev/brand/springfood-logo-512.png",
+      "size": 194609
+    },
+    {
+      "src": "android-chrome-192x192.png",
+      "key": "brand/springfood-logo-192.png",
+      "url": "https://pub-db7036086154479380d282adb29af0a4.r2.dev/brand/springfood-logo-192.png",
+      "size": 31968
+    },
+    {
+      "src": "apple-touch-icon.png",
+      "key": "brand/springfood-apple-touch.png",
+      "url": "https://pub-db7036086154479380d282adb29af0a4.r2.dev/brand/springfood-apple-touch.png",
+      "size": 28476
+    },
+    {
+      "src": "favicon-32x32.png",
+      "key": "brand/springfood-favicon-32.png",
+      "url": "https://pub-db7036086154479380d282adb29af0a4.r2.dev/brand/springfood-favicon-32.png",
+      "size": 1680
+    },
+    {
+      "src": "favicon-16x16.png",
+      "key": "brand/springfood-favicon-16.png",
+      "url": "https://pub-db7036086154479380d282adb29af0a4.r2.dev/brand/springfood-favicon-16.png",
+      "size": 622
+    },
+    {
+      "src": "favicon.ico",
+      "key": "brand/springfood-favicon.ico",
+      "url": "https://pub-db7036086154479380d282adb29af0a4.r2.dev/brand/springfood-favicon.ico",
+      "size": 15406
+    }
+  ]
+}

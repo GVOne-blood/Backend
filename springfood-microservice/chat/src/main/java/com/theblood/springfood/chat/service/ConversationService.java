@@ -10,6 +10,7 @@ import com.theblood.springfood.chat.service.dto.ConversationDTO;
 import com.theblood.springfood.chat.service.dto.CreateConversationRequest;
 import com.theblood.springfood.chat.service.mapper.ConversationMapper;
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.slf4j.Logger;
@@ -120,6 +121,30 @@ public class ConversationService {
 
         LOG.debug("Created conversation with ID: {}", conversation.getConversationId());
         return conversationMapper.toDto(conversation);
+    }
+
+    /**
+     * Find an existing DIRECT conversation between two users, or create one if none exists.
+     * Uses the optimized participant1Id/participant2Id fields for efficient lookup.
+     *
+     * @param currentUserId the current authenticated user
+     * @param targetUserId  the other user to chat with
+     * @return the existing or newly created conversation DTO
+     */
+    @Transactional
+    public ConversationDTO findOrCreateDirectConversation(String currentUserId, String targetUserId) {
+        LOG.debug("Finding or creating DIRECT conversation between {} and {}", currentUserId, targetUserId);
+
+        Optional<Conversation> existing = conversationRepository.findDirectConversation(currentUserId, targetUserId);
+        if (existing.isPresent()) {
+            return conversationMapper.toDto(existing.get());
+        }
+
+        CreateConversationRequest request = new CreateConversationRequest();
+        request.setConversationType(CONVERSATION_TYPE_DIRECT);
+        request.setParticipantIds(List.of(currentUserId, targetUserId));
+
+        return createConversation(request, currentUserId);
     }
 
     /**

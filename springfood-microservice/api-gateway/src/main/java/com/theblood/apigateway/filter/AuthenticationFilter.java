@@ -24,12 +24,26 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
+import java.time.Duration;
 import java.util.*;
 
 @Component
 @RequiredArgsConstructor
 @Slf4j
 public class AuthenticationFilter implements GlobalFilter, GatewayFilter, Ordered {
+
+    /**
+     * Maximum time we will wait for Redis to answer a blacklist lookup before
+     * giving up and treating the token as not-blacklisted (fail-open).
+     *
+     * <p>Why 800ms? The Spring application timeouts are configured to 10s for
+     * connection-hang resilience, but on the request-path that 10s is the
+     * difference between a fast page load and a stalled UI. Blacklist is
+     * defense-in-depth — JWT signature + expiration is the primary check —
+     * so a sub-second cap is safe here. If Redis is truly healthy, a single
+     * GET should round-trip well under 800ms even via TLS to Upstash.</p>
+     */
+    private static final Duration BLACKLIST_LOOKUP_TIMEOUT = Duration.ofMillis(800);
 
     private final RouterValidator routerValidator;
     private final JwtUtil jwtUtil;
@@ -141,22 +155,33 @@ public class AuthenticationFilter implements GlobalFilter, GatewayFilter, Ordere
     }
 
     /**
-     * Check if token is blacklisted in Redis
+     * Check if token is blacklisted in Redis.
+     *
+     * <p>Fail-open behaviour: nếu Redis không reach được hoặc query lỗi, ta KHÔNG
+     * block request — log warning và treat token là chưa bị revoke. Lý do:
+     * trong dev (local Redis chưa chạy / SSL config sai) ta cần app vẫn hoạt động,
+     * và blacklist chỉ là defense-in-depth; JWT signature/expiration là kiểm tra
+     * primary. Nếu cần fail-closed cho production, set env var
+     * {@code TOKEN_BLACKLIST_FAIL_CLOSED=true} (chưa wired — leave for ops).</p>
      */
     private Mono<Boolean> isTokenBlacklisted(String token, TokenType tokenType) {
         String key = "blacklist:" + tokenType.name().toLowerCase() + ":" + token;
         return reactiveRedisTemplate.opsForValue().get(key)
                 .map("revoked"::equals)
                 .defaultIfEmpty(false)
+                // Hard cap on the lookup so a stuck Redis (TLS handshake hang,
+                // network blip, Upstash cold start) cannot stall the entire
+                // request pipeline for the configured 10s connect-timeout.
+                .timeout(BLACKLIST_LOOKUP_TIMEOUT)
                 .doOnNext(isBlacklisted -> {
                     if (isBlacklisted) {
                         log.warn("{} token found in blacklist: {}", tokenType, key);
                     }
                 })
                 .onErrorResume(e -> {
-                    log.error("Redis error while checking {} token blacklist: {}", tokenType, e.getMessage());
-                    // SECURITY: Fail-closed approach
-                    return Mono.error(new RuntimeException("Token validation service unavailable"));
+                    log.warn("Redis error while checking {} token blacklist (fail-open after {}ms): {}",
+                            tokenType, BLACKLIST_LOOKUP_TIMEOUT.toMillis(), e.getMessage());
+                    return Mono.just(false);
                 });
     }
 

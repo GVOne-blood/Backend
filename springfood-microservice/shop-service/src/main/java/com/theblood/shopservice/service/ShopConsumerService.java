@@ -1,24 +1,23 @@
 package com.theblood.shopservice.service;
 
 import com.theblood.shopservice.repository.ShopRepository;
-import com.theblood.springfood.common.dto.kafka.AvatarEvent;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Service;
 
-import java.util.UUID;
+// import com.theblood.springfood.common.dto.kafka.AvatarEvent;
 
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class ShopConsumerService {
-    KafkaTemplate<String, String> kafkaTemplate;
+    KafkaTemplate<String, Object> kafkaTemplate;
     ShopRepository shopRepository;
 
+    // TODO: Uncomment when AvatarEvent is implemented
+    /*
     @KafkaListener(topics = "media-shop-avatar", groupId = "shop-service")
     public void getShopAvatarFromMedia(@Payload AvatarEvent avatarEvent) {
 
@@ -28,4 +27,5 @@ public class ShopConsumerService {
         });
 
     }
+    */
 }

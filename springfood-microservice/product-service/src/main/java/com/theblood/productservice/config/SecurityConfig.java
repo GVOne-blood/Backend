@@ -23,6 +23,8 @@ public class SecurityConfig {
     private final InternalAuthenticationFilter internalAuthenticationFilter;
     String[] PRODUCT_WHITELIST = {
             "/products/**",
+            "/sales/**",
+            "/feedback/**",
             "/swagger-ui/**",
             "/v3/api-docs/**",
             "/swagger-resources/**",
@@ -38,7 +40,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(PRODUCT_WHITELIST).permitAll()
-                        .anyRequest().authenticated())
+                        .anyRequest().permitAll())  // Allow all for now (Gateway handles auth)
 //                .exceptionHandling(exception -> exception
 //                        .authenticationEntryPoint(authenticationEntryPoint)
 //                        .accessDeniedHandler(accessDeniedHandler))

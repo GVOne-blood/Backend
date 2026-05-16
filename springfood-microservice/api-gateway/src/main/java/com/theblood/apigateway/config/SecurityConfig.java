@@ -21,17 +21,11 @@ public class SecurityConfig {
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeExchange(exchange -> exchange
-                        // Public endpoints
-                        .pathMatchers("/api/v1/auth/login",
-                                "/error",
-                                "/api/v1/auth/register",
-                                "/api/v1/products/**",
-                                "/api/v1/auth/refresh-token").permitAll()
-                        .pathMatchers("/actuator/**", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                        // Tất cả request khác đều cho qua (vì đã có AuthenticationFilter)
+                        // Allow all requests (AuthenticationFilter will handle auth)
                         .anyExchange().permitAll()
                 )
-                .httpBasic(ServerHttpSecurity.HttpBasicSpec::disable);
+                .httpBasic(ServerHttpSecurity.HttpBasicSpec::disable)
+                .formLogin(ServerHttpSecurity.FormLoginSpec::disable);
 
         return http.build();
     }
@@ -39,7 +33,13 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:8081", "http://localhost:3000"));
+        configuration.setAllowedOriginPatterns(List.of(
+            "http://localhost:*",
+            "https://*.vercel.app",
+            "https://*.ngrok.io",
+            "https://*.ngrok-free.app",
+            "https://*.trycloudflare.com"  // Cloudflare Tunnel
+        ));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);

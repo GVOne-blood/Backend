@@ -4,9 +4,13 @@ import com.theblood.springfood.chat.domain.UserPresence;
 import org.springframework.data.jpa.repository.*;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 /**
  * Spring Data JPA repository for the UserPresence entity.
  */
 @SuppressWarnings("unused")
 @Repository
-public interface UserPresenceRepository extends JpaRepository<UserPresence, String> {}
+public interface UserPresenceRepository extends JpaRepository<UserPresence, String> {
+    Optional<UserPresence> findByUserId(String userId);
+}

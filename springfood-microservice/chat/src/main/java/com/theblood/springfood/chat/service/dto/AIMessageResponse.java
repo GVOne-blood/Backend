@@ -5,10 +5,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.Instant;
+import java.util.List;
 
-/**
- * DTO for AI chat message response
- */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -18,8 +16,15 @@ public class AIMessageResponse {
     private String message;
     private String response;
     private Instant timestamp;
+    private List<ProductCard> products;
+    private List<ShopCard> shops;
 
     public static AIMessageResponse of(String conversationId, String message, String response) {
-        return new AIMessageResponse(conversationId, message, response, Instant.now());
+        return new AIMessageResponse(conversationId, message, response, Instant.now(), null, null);
+    }
+
+    public static AIMessageResponse of(String conversationId, String message, String response,
+                                        List<ProductCard> products, List<ShopCard> shops) {
+        return new AIMessageResponse(conversationId, message, response, Instant.now(), products, shops);
     }
 }

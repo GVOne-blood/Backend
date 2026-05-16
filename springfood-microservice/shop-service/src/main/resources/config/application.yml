@@ -100,7 +100,7 @@ management:
 
 spring:
   application:
-    name: shopService
+    name: shop-service
   kafka:
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
     consumer:

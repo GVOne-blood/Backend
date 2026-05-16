@@ -2,6 +2,7 @@ package com.theblood.orderservice.grpc.client_role;
 
 
 import com.theblood.springfood.common.enums.OrderStatus;
+import com.theblood.springfood.common.enums.TransactionStatus;
 import com.theblood.springfood.common.grpc.PaymentRequest;
 import com.theblood.springfood.common.grpc.PaymentResponse;
 import com.theblood.springfood.common.grpc.PaymentServiceGrpc;
@@ -23,7 +24,7 @@ public class OrderTranfer {
     OrderService orderService;
     OrderRepository orderRepository;
 
-    @GrpcClient("shop-service")
+    @GrpcClient("payment-service")
     private PaymentServiceGrpc.PaymentServiceBlockingStub paymentServiceStub;
 
     /**
@@ -38,7 +39,7 @@ public class OrderTranfer {
         PaymentRequest req = PaymentRequest.newBuilder()
                 .setAmount(amount.toString())
                 .setPaymentMethod(paymentMethod)
-                .setTransactionStatus(orderStatus.toString())
+                .setTransactionStatus(TransactionStatus.PENDING.name())
                 .setUserId(userId.toString())
                 .build();
 
@@ -55,3 +56,4 @@ public class OrderTranfer {
 
 
 }
+

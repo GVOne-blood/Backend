@@ -3,7 +3,7 @@ package com.theblood.paymentservice.dto.request;
 
 import com.theblood.springfood.common.enums.PaymentMethod;
 import com.theblood.springfood.common.util.EnumPattern;
-import com.theblood.paymentservice.common.enums.TransactionStatus;
+import com.theblood.springfood.common.enums.TransactionStatus;
 import com.theblood.paymentservice.common.enums.TransactionType;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;

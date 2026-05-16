@@ -18,6 +18,12 @@ public interface UserService {
 
     RegisterResponse registerUser(UserRequest userRequest, HttpServletResponse response);
 
+    /**
+     * Register user với role được chỉ định (CUSTOMER, SHOP_OWNER, ADMIN, STAFF, DELIVER).
+     * PUBLIC API - chỉ dùng cho dev/đồ án.
+     */
+    RegisterResponse registerUserWithRole(UserRequest userRequest, String roleName, HttpServletResponse response);
+
     User findByUsername(String username);
 
     boolean existsById(UUID id);

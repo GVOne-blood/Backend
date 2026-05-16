@@ -53,9 +53,9 @@ spring:
         api-key: ${GEMINI_API_KEY:your-gemini-api-key-here}
         chat:
           options:
-            # Switch to gemini-3-flash (available quota: 5 RPM, 250K TPM, 20 RPD)
-            # Alternative: gemini-2.5-flash-lite (10 RPM, 250K TPM, 20 RPD)
-            model: gemini-3-flash
+            # Switch to gemini-2.5-flash-lite (available quota: 10 RPM, 250K TPM, 20 RPD)
+            # Currently 19/20 RPD on gemini-2.5-flash, switching to lite
+            model: gemini-2.5-flash-lite
             temperature: 0.7
             max-output-tokens: 1000
     # Spring AI Chat Memory Repository Configuration
@@ -65,8 +65,19 @@ spring:
           jdbc:
             # Always initialize schema (create SPRING_AI_CHAT_MEMORY table)
             initialize-schema: always
+    vectorstore:
+      pgvector:
+        # Table + index đã được tạo manually trong DB → tắt auto-init
+        # để tránh Spring AI chạy CREATE INDEX với syntax không match
+        initialize-schema: false
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:vector-store-schema.sql
+      continue-on-error: true
   websocket:
-    allowed-origins: "*"
+    # CORS configuration for WebSocket
+    allowed-origins: "http://localhost:4200,http://localhost:8080,http://127.0.0.1:4200"
   cache:
     type: simple  # Use in-memory cache instead of Redis
   devtools:
@@ -80,19 +91,26 @@ spring:
       indent-output: true
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
-    url: jdbc:postgresql://localhost:5432/springfood?currentSchema=springfood_chat
-    username: postgres
-    password: 123456
+    url: ${DEFAULT_DATABASE_URL}
+    username: ${DEFAULT_DATABASE_USERNAME}
+    password: ${DEFAULT_DATABASE_PASSWORD}
     hikari:
       poolName: Hikari
       auto-commit: false
       schema: springfood_chat
+      maximum-pool-size: 10
+      minimum-idle: 2
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
   jpa:
     properties:
       hibernate:
         default_schema: springfood_chat
   liquibase:
-    # Schema cho Liquibase
+    # DISABLE Liquibase - schema already exists
+    enabled: false
+    # Schema cho Liquibase (nếu cần enable lại)
     default-schema: springfood_chat
     liquibase-schema: springfood_chat
     # Remove 'faker' if you do not want the sample data to be loaded automatically
@@ -106,7 +124,7 @@ spring:
   # KAFKA CONFIGURATION FOR MESSAGE DISTRIBUTION
   # ===================================================================
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
@@ -114,14 +132,28 @@ spring:
       properties:
         enable.idempotence: true  # Prevent duplicate messages
         max.in.flight.requests.per.connection: 5  # Maintain ordering with idempotence
+        security.protocol: ${KAFKA_SECURITY_PROTOCOL}
+        ssl.truststore.location: ${KAFKA_SSL_TRUSTSTORE_LOCATION}
+        ssl.truststore.password: ${KAFKA_SSL_TRUSTSTORE_PASSWORD}
+        ssl.keystore.location: ${KAFKA_SSL_KEYSTORE_LOCATION}
+        ssl.keystore.password: ${KAFKA_SSL_KEYSTORE_PASSWORD}
+        ssl.key.password: ${KAFKA_SSL_KEY_PASSWORD}
+        ssl.endpoint.identification.algorithm: https
     consumer:
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       auto-offset-reset: earliest
       enable-auto-commit: false  # Manual commit for at-least-once delivery
       max-poll-records: 100  # Batch size for persistence consumer
+      auto-startup: true  # Enable Kafka consumer listeners
       properties:
         spring.json.trusted.packages: "*"  # Trust all packages for JSON deserialization
+        security.protocol: ${KAFKA_SECURITY_PROTOCOL}
+        ssl.truststore.location: ${KAFKA_SSL_TRUSTSTORE_LOCATION}
+        ssl.truststore.password: ${KAFKA_SSL_TRUSTSTORE_PASSWORD}
+        ssl.keystore.location: ${KAFKA_SSL_KEYSTORE_LOCATION}
+        ssl.keystore.password: ${KAFKA_SSL_KEYSTORE_PASSWORD}
+        ssl.key.password: ${KAFKA_SSL_KEY_PASSWORD}
     listener:
       ack-mode: manual  # Manual acknowledgment for better control
 
@@ -130,10 +162,12 @@ spring:
   # ===================================================================
   data:
     redis:
-      host: localhost
-      port: 6379
-      password: 123456
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+      password: ${REDIS_PASSWORD}
       timeout: 2000ms
+      ssl:
+        enabled: ${REDIS_SSL_ENABLED}
       lettuce:
         pool:
           max-active: 8
@@ -145,13 +179,6 @@ server:
   port: 9098
   # make sure requests the proxy uri instead of the server one
   forward-headers-strategy: native
-
-# ===================================================================
-# gRPC SERVER CONFIGURATION
-# ===================================================================
-grpc:
-  server:
-    port: 9100  # gRPC port for chat service
 
 # ===================================================================
 # JHipster specific properties
@@ -242,8 +269,15 @@ springfood:
         enabled: true
         protocol: grpc
 
-# gRPC Client Config
+# ===================================================================
+# gRPC Configuration (Server + Client)
+# ===================================================================
 grpc:
+  # gRPC Server Configuration
+  server:
+    port: 9100  # gRPC port for chat service
+  
+  # gRPC Client Configuration
   client:
     product-service:
       address: dns:///localhost:9090

@@ -1,6 +1,7 @@
 package com.theblood.orderservice.grpc.server_role;
 
 import com.theblood.springfood.common.enums.OrderStatus;
+import com.theblood.springfood.common.grpc.OrderServiceGrpc;
 import com.theblood.springfood.common.grpc.OrderUpdateRequest;
 import com.theblood.springfood.common.grpc.OrderUpdateResponse;
 import com.theblood.orderservice.common.enums.TransactionType;
@@ -14,24 +15,23 @@ import io.grpc.stub.StreamObserver;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import net.devh.boot.grpc.client.inject.GrpcClient;
-import org.springframework.stereotype.Service;
+import net.devh.boot.grpc.server.service.GrpcService;
 
 import java.util.List;
 import java.util.UUID;
 
-@Service
+@GrpcService
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class OrderUpdateService {
+public class OrderUpdateService extends OrderServiceGrpc.OrderServiceImplBase {
 
     OrderRepository orderRepository;
     OrderService orderService;
     OrderMapper orderMapper;
     OrderItemRepository orderItemRepository;
 
-    @GrpcClient("payment-service")
-    public void updateOrder(OrderUpdateRequest orderUpdateRequest, StreamObserver<OrderUpdateResponse> responseObserver) {
+    @Override
+    public void orderUpdate(OrderUpdateRequest orderUpdateRequest, StreamObserver<OrderUpdateResponse> responseObserver) {
         List<Order> orders = orderRepository.findByReferenceId(UUID.fromString(orderUpdateRequest.getReferenceId()));
 
         if (orders.isEmpty()) {
@@ -39,6 +39,8 @@ public class OrderUpdateService {
                     .setSuccess(false)
                     .setMessage("No order found")
                     .build());
+            responseObserver.onCompleted();
+            return;
         }
 
         OrdersUpdateRequest ordersUpdateRequest = new OrdersUpdateRequest();
@@ -48,13 +50,14 @@ public class OrderUpdateService {
         ordersUpdateRequest.setTransactionType(TransactionType.PAYMENT);
 
         try {
-            responseObserver.onNext(OrderUpdateResponse.newBuilder().setMessage("Update order successfully ").setSuccess(true).build());
+            orderService.updatePaymentPendingOrders(ordersUpdateRequest);
+            responseObserver.onNext(OrderUpdateResponse.newBuilder()
+                    .setMessage("Update order successfully ")
+                    .setSuccess(true)
+                    .build());
             responseObserver.onCompleted();
         } catch (Exception e) {
             responseObserver.onError(e);
         }
-
-        orderService.updatePaymentPendingOrders(ordersUpdateRequest);
-        // return ordersUpdateRequest;
     }
 }

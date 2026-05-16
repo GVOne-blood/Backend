@@ -42,12 +42,13 @@ spring:
       indent-output: true
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
-    url: jdbc:postgresql://localhost:5432/shopService
-    username: shopService
-    password:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://ep-green-dream-a1nsq7ax-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require}
+    username: ${SPRING_DATASOURCE_USERNAME:neondb_owner}
+    password: ${SPRING_DATASOURCE_PASSWORD:npg_gpK2ckWJPG4v}
     hikari:
       poolName: Hikari
       auto-commit: false
+      schema: springfood_shop
   liquibase:
     enabled: false
   messages:
@@ -60,6 +61,15 @@ server:
   # make sure requests the proxy uri instead of the server one
   forward-headers-strategy: native
 
+# Eureka Client Configuration
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    prefer-ip-address: false
+    hostname: localhost
+
 # ===================================================================
 # JHipster specific properties
 #
@@ -67,13 +77,10 @@ server:
 # ===================================================================
 
 jhipster:
+  # Temporarily disable Redis cache to avoid SslVerifyMode error
   cache: # Cache configuration
     redis: # Redis configuration
-      expiration: 3600 # By default objects stay 1 hour (in seconds) in the cache
-      server: redis://localhost:6379
-      cluster: false
-      # server: redis://localhost:6379,redis://localhost:16379,redis://localhost:26379
-      # cluster: true
+      server: ${REDIS_URL}
   # CORS is disabled by default on microservices, as you should access them through a gateway.
   # If you want to enable it, please uncomment the configuration below.
   # cors:
@@ -108,3 +115,19 @@ jhipster:
 # ===================================================================
 
 # application:
+
+springfood:
+  client:
+    enabled: true
+    default-protocol: rest
+    services:
+      log-actions:
+        name: log-actions
+        protocol: rest
+        url: http://localhost:8094
+        enabled: true
+      payment-service:
+        name: payment-service
+        protocol: rest
+        url: http://localhost:8086
+        enabled: true

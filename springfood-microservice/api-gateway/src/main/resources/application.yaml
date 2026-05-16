@@ -18,9 +18,19 @@ spring:
   # Redis configuration cho Gateway
   data:
     redis:
-      port: 6379
-      host: localhost
-      connect-timeout: 10000ms
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      # SSL chỉ bật khi Redis là remote (vd: Upstash). Local Redis không có SSL.
+      # Mặc định false; override bằng env REDIS_SSL_ENABLED=true khi cần.
+      ssl:
+        enabled: ${REDIS_SSL_ENABLED:false}
+      # 2s là đủ rộng cho Upstash round-trip khoẻ mạnh và đủ ngắn để không
+      # block request pipeline khi Redis cold-start hoặc nghẽn TLS. Application-level
+      # blacklist lookup còn có hard timeout 800ms ở AuthenticationFilter để
+      # chắc chắn không stall UI.
+      timeout: 2000ms
+      connect-timeout: 2000ms
 
 # Buộc Gateway ưu tiên hostname (không dùng IP) khi lấy instance từ Eureka
 eureka:
@@ -41,4 +51,4 @@ app:
     secretKey: 4dVgNvOxWTz2PKJZqCYFoh+AXX0l2OVHoCTfN9ZdXGs=
     resetKey: 4dVgNvOxWTz2PKJZqCYFoh+AXX0l2OVHoCTfN9ZdXGs=
     refreshKey: RKyKtM34VufukHK6sSPlQdDA8wBOHCYUygwIp6Fekco=
-    open-api-endpoints: /api/v1/auth/login,/api/v1/auth/register,/api/v1/auth/refresh-token,/eureka
+    open-api-endpoints: /api/v1/auth/login,/api/v1/auth/register,/api/v1/auth/register-with-role,/api/v1/auth/refresh,/api/v1/auth/logout,/eureka

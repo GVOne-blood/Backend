@@ -3,11 +3,15 @@ package com.theblood.paymentservice.service.impl;
 
 import com.theblood.springfood.common.exception.custom.InvalidDataException;
 import com.theblood.springfood.common.grpc.OrderUpdateRequest;
-import com.theblood.paymentservice.common.enums.TransactionStatus;
+import com.theblood.springfood.common.enums.TransactionStatus;
 import com.theblood.paymentservice.common.enums.TransactionType;
+import com.theblood.paymentservice.dto.request.BankAccountCreateRequest;
 import com.theblood.paymentservice.dto.request.PaymentInfoRequest;
+import com.theblood.paymentservice.dto.response.BankAccountResponse;
+import com.theblood.paymentservice.model.BankAccount;
 import com.theblood.paymentservice.grpc.client_role.OrderUpdateService;
 import com.theblood.paymentservice.model.PaymentTransactions;
+import com.theblood.paymentservice.repository.BankAccountRepository;
 import com.theblood.paymentservice.repository.PaymentRepository;
 import com.theblood.paymentservice.repository.PaymentTransactionsRepository;
 import com.theblood.paymentservice.service.PaymentService;
@@ -33,6 +37,7 @@ public class PaymentServiceImpl implements PaymentService {
 //    UserRepository userRepository;
     PaymentRepository paymentRepository;
     PaymentTransactionsRepository paymentTransactionsRepository;
+    BankAccountRepository bankAccountRepository;
     OrderUpdateService orderUpdateService;
 //    private final OrderMapper orderMapper;
 
@@ -57,6 +62,7 @@ public class PaymentServiceImpl implements PaymentService {
         paymentTransactions.setPaymentMethodName(paymentInfoRequest.getPaymentMethod().name());
         paymentTransactions.setStatus(TransactionStatus.PENDING);
         paymentTransactionsRepository.save(paymentTransactions);
+        paymentTransactions.setReferenceId(paymentTransactions.getId());
         return paymentTransactions;
     }
 
@@ -131,6 +137,33 @@ public class PaymentServiceImpl implements PaymentService {
         String newTransactionNo = response.get("vnp_TransactionNo");
 //        orderService.updatePaymentPendingOrders(updateRequest);
         updatePaymentTransaction(UUID.fromString(paymentTransactionsId), newTransactionNo, TransactionStatus.FAILED, transferFailAt);
+    }
+
+    @Override
+    public BankAccountResponse createBankAccount(BankAccountCreateRequest request) {
+        if (request == null) {
+            throw new InvalidDataException("Bank account request is required");
+        }
+
+        BankAccount bankAccount = new BankAccount();
+        bankAccount.setShopId(request.getShopId());
+        bankAccount.setBankName(request.getBankName());
+        bankAccount.setAccountNumber(request.getAccountNumber());
+        bankAccount.setAccountHolderName(request.getAccountHolderName());
+        bankAccount.setIsDefault(Boolean.TRUE);
+        bankAccount.setIsVerified(Boolean.FALSE);
+
+        BankAccount saved = bankAccountRepository.save(bankAccount);
+
+        return BankAccountResponse.builder()
+            .accountId(saved.getId())
+            .shopId(saved.getShopId())
+            .bankName(saved.getBankName())
+            .accountNumber(saved.getAccountNumber())
+            .accountHolderName(saved.getAccountHolderName())
+            .isDefault(saved.getIsDefault())
+            .isVerified(saved.getIsVerified())
+            .build();
     }
 }
 

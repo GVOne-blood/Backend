@@ -1,0 +1,74 @@
+{
+  "user": {
+    "id": "38859152",
+    "username": "telecoms-architect-74213291",
+    "fullName": "TuanAnh"
+  },
+  "workspace": {
+    "id": "3cd3313a-0c67-4cf8-8a94-b27d599bd942",
+    "name": "My Workspace",
+    "type": "personal"
+  },
+  "collection": {
+    "id": "08e40352-1fac-494d-bcd5-4d9d550c3405",
+    "uid": "38859152-08e40352-1fac-494d-bcd5-4d9d550c3405",
+    "name": "springfood-micro"
+  },
+  "environments": {
+    "default": {
+      "id": "b3d52488-4b51-403c-b498-907e55e58e55",
+      "uid": "38859152-b3d52488-4b51-403c-b498-907e55e58e55",
+      "name": "springfood-micro"
+    }
+  },
+  "services": {
+    "api-gateway": {
+      "port": 8080,
+      "envVar": "base_url"
+    },
+    "authentication": {
+      "port": 8081,
+      "envVar": "identity_base_url"
+    },
+    "cart-service": {
+      "port": 8082,
+      "envVar": "cart_base_url"
+    },
+    "order-service": {
+      "port": 8083,
+      "envVar": "order_base_url"
+    },
+    "shop-service": {
+      "port": 8084,
+      "envVar": "shop_base_url"
+    },
+    "product-service": {
+      "port": 8085,
+      "envVar": "product_base_url"
+    },
+    "payment-service": {
+      "port": 8086,
+      "envVar": "payment_base_url"
+    },
+    "statistical-report": {
+      "port": 8090,
+      "envVar": "statistical_report_base_url"
+    },
+    "notification": {
+      "port": 8095,
+      "envVar": "notification_base_url"
+    },
+    "chat": {
+      "port": 8098,
+      "envVar": "chat_base_url"
+    },
+    "media": {
+      "port": 8099,
+      "envVar": "media_base_url"
+    },
+    "eureka-server": {
+      "port": 8761,
+      "envVar": "eureka_base_url"
+    }
+  }
+}

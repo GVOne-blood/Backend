@@ -1,0 +1,24 @@
+# syntax=docker/dockerfile:1.7
+# ============================================================================
+# Dev image: Maven + JDK + curl, source được mount từ host.
+# Không build jar trong image — service sẽ chạy `mvn spring-boot:run` thông qua
+# `command:` của docker-compose.dev.yml.
+#
+# Lưu ý: KHÔNG đặt ENTRYPOINT ở đây. Nếu set ENTRYPOINT=["mvn"], compose
+# `command:` (cũng bắt đầu bằng "mvn") sẽ ghép thành `mvn mvn ...` và Maven
+# sẽ coi "mvn" là lifecycle phase → BUILD FAILURE.
+# ============================================================================
+FROM maven:3.9.9-eclipse-temurin-21
+WORKDIR /workspace
+
+RUN apt-get update && apt-get install -y --no-install-recommends curl \
+    && rm -rf /var/lib/apt/lists/*
+
+ENV MAVEN_OPTS="-XX:+UseContainerSupport -XX:MaxRAMPercentage=70.0"
+
+# Helper: install deps + spring-boot:run trên đúng module.
+COPY scripts/dev-run.sh /usr/local/bin/dev-run
+RUN chmod +x /usr/local/bin/dev-run
+
+# Source code mount tại /workspace lúc runtime.
+CMD ["mvn", "-version"]

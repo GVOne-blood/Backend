@@ -23,6 +23,7 @@ import com.theblood.productservice.service.dto.response.ProductImageResponse;
 import com.theblood.productservice.service.mapper.ProductMapper;
 import com.theblood.productservice.util.ProductExcelUtil;
 import com.theblood.springfood.client.service.LoggingService;
+import com.theblood.springfood.common.dto.request.CustomUserPrincipal;
 import com.theblood.springfood.common.dto.response.ProductDetail;
 import com.theblood.springfood.common.enums.FileStatus;
 import com.theblood.springfood.common.enums.MimeType;
@@ -82,6 +83,7 @@ public class ProductServiceImpl implements ProductService {
     private final ProductGrpcClient productGrpcClient;
     private final ProductVariantsService productVariantsService;
     private final LoggingService loggingService;
+    private final com.theblood.productservice.service.SaleApplier saleApplier;
 
     @Qualifier("redisObjectMapper")
     private final ObjectMapper objectMapper;
@@ -98,24 +100,186 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public Page<ProductDetail> getAllProductDetails(Pageable pageable) {
         Page<ProductProjection> projections = productRepository.findListProduct(pageable);
-        return projections.map(productMapper::toProductDetail);
+        Page<ProductDetail> page = projections.map(productMapper::toProductDetail);
+        saleApplier.applyActiveSales(page.getContent());
+        return page;
+    }
+
+    @Override
+    public Page<ProductDetail> getRecommendedProducts(Pageable pageable) {
+        Page<ProductProjection> projections = productRepository.findRecommendedProducts(pageable);
+        Page<ProductDetail> page = projections.map(productMapper::toProductDetail);
+        saleApplier.applyActiveSales(page.getContent());
+        return page;
+    }
+
+    @Override
+    public Page<ProductDetail> searchProductsByKeyword(String keyword, Pageable pageable) {
+        if (keyword == null || keyword.isBlank()) {
+            return getAllProductDetails(pageable);
+        }
+        Page<ProductProjection> projections = productRepository.searchByKeyword(keyword.trim(), pageable);
+        Page<ProductDetail> page = projections.map(productMapper::toProductDetail);
+        saleApplier.applyActiveSales(page.getContent());
+        return page;
+    }
+
+    @Override
+    public java.util.List<java.util.Map<String, Object>> listCategoryOptions() {
+        return categoryRepository.findAll().stream()
+                .map(c -> {
+                    java.util.Map<String, Object> row = new java.util.LinkedHashMap<>();
+                    row.put("name", c.getName());
+                    row.put("slug", c.getSlug());
+                    row.put("description", c.getDescription());
+                    row.put("isActive", c.isActive());
+                    return row;
+                })
+                .collect(Collectors.toList());
     }
 
     @Override
     public List<ProductDetail> getAllProductDetails() {
         // return productMapper.toProductDetail(productRepository.findAll());
-        return productMapper.toProductDetail(productRepository.findTop300ByOrderByUpdatedAtDesc());
-
+        List<ProductDetail> details = productMapper.toProductDetail(productRepository.findTop300ByOrderByUpdatedAtDesc());
+        saleApplier.applyActiveSales(details);
+        return details;
     }
 
     @Override
     public List<ProductDetail> getAllLastUpdatedProducts(LocalDateTime lastModifiedAt) {
-        return productMapper.toProductDetail(productRepository.findAllByUpdatedAtGreaterThan(lastModifiedAt));
+        List<ProductDetail> details = productMapper.toProductDetail(productRepository.findAllByUpdatedAtGreaterThan(lastModifiedAt));
+        saleApplier.applyActiveSales(details);
+        return details;
+    }
+
+    @Override
+    public Page<ProductDetail> getProductsByShopId(UUID shopId, Pageable pageable) {
+        if (shopId == null) throw new InvalidDataException("Shop not found");
+        Page<ProductProjection> projections = productRepository.findProductsByShopId(shopId, pageable);
+        Page<ProductDetail> page = projections.map(productMapper::toProductDetail);
+        saleApplier.applyActiveSales(page.getContent());
+        return page;
+    }
+
+    /**
+     * Builds the storefront menu for a shop: pulls every product, then groups
+     * them by category using the {@code product_categories} link table.
+     *
+     * <p>Implementation notes:</p>
+     * <ul>
+     *   <li>We fetch products via the existing projection query so sale info
+     *   stays consistent with the rest of the catalog (one
+     *   {@link com.theblood.productservice.service.SaleApplier} pass instead
+     *   of N).</li>
+     *   <li>Category links are loaded in a single round-trip and joined on
+     *   the FE — the BE projection avoids fetching the JSON {@code images}
+     *   blob twice.</li>
+     *   <li>Products belonging to multiple categories appear in every bucket
+     *   so the FE chip count matches reality.</li>
+     *   <li>Products with no category fall into a synthetic
+     *   {@code OTHER} bucket; categories whose entire product set is empty
+     *   are skipped to avoid empty chips on the menu.</li>
+     * </ul>
+     */
+    @Override
+    public java.util.List<com.theblood.productservice.service.dto.response.ShopMenuCategoryResponse> getShopMenu(UUID shopId) {
+        if (shopId == null) throw new InvalidDataException("Shop not found");
+
+        // 1. Pull every product (capped to a sane upper bound for a single shop).
+        org.springframework.data.domain.Pageable pageable =
+                org.springframework.data.domain.PageRequest.of(0, 500);
+        java.util.List<ProductDetail> allProducts = productRepository
+                .findProductsByShopId(shopId, pageable)
+                .map(productMapper::toProductDetail)
+                .getContent();
+        saleApplier.applyActiveSales(allProducts);
+
+        java.util.Map<UUID, ProductDetail> productById = new java.util.HashMap<>();
+        for (ProductDetail pd : allProducts) {
+            productById.put(pd.getId(), pd);
+        }
+
+        // 2. Pull (categoryName, productId) pairs and bucket them.
+        java.util.List<Object[]> rows = productRepository.findShopProductCategoryLinks(shopId);
+        java.util.Map<String, java.util.List<ProductDetail>> grouped = new java.util.LinkedHashMap<>();
+        java.util.Set<UUID> classifiedIds = new java.util.HashSet<>();
+
+        for (Object[] row : rows) {
+            String categoryName = (String) row[0];
+            UUID productId = (UUID) row[1];
+            ProductDetail product = productById.get(productId);
+            if (product == null || categoryName == null) continue;
+
+            grouped.computeIfAbsent(categoryName, k -> new java.util.ArrayList<>()).add(product);
+            classifiedIds.add(productId);
+        }
+
+        // 3. Anything not bucketed goes to OTHER.
+        java.util.List<ProductDetail> others = new java.util.ArrayList<>();
+        for (ProductDetail pd : allProducts) {
+            if (!classifiedIds.contains(pd.getId())) {
+                others.add(pd);
+            }
+        }
+
+        // 4. Resolve display metadata (slug, ordering) from the canonical
+        // categories table — keeps menu order stable & gives FE the slug.
+        java.util.Map<String, com.theblood.productservice.domain.Categories> meta = new java.util.HashMap<>();
+        if (!grouped.isEmpty()) {
+            categoryRepository.findAllById(grouped.keySet())
+                    .forEach(c -> meta.put(c.getName(), c));
+        }
+
+        // 5. Sort categories: by name asc to keep menu deterministic for the FE.
+        java.util.List<String> sortedNames = new java.util.ArrayList<>(grouped.keySet());
+        sortedNames.sort(String.CASE_INSENSITIVE_ORDER);
+
+        java.util.List<com.theblood.productservice.service.dto.response.ShopMenuCategoryResponse> result =
+                new java.util.ArrayList<>();
+        for (String name : sortedNames) {
+            java.util.List<ProductDetail> products = grouped.get(name);
+            if (products == null || products.isEmpty()) continue;
+            com.theblood.productservice.domain.Categories cat = meta.get(name);
+            result.add(com.theblood.productservice.service.dto.response.ShopMenuCategoryResponse.builder()
+                    .id(stableCategoryId(name))
+                    .name(name)
+                    .slug(cat != null ? cat.getSlug() : null)
+                    .count(products.size())
+                    .products(products)
+                    .build());
+        }
+
+        if (!others.isEmpty()) {
+            String otherLabel = "KHÁC";
+            result.add(com.theblood.productservice.service.dto.response.ShopMenuCategoryResponse.builder()
+                    .id(stableCategoryId(otherLabel))
+                    .name(otherLabel)
+                    .slug(null)
+                    .count(others.size())
+                    .products(others)
+                    .build());
+        }
+
+        return result;
+    }
+
+    /**
+     * Hash a category name into a positive int so the FE can use it as a
+     * stable scroll-anchor id ({@code #category-{id}}). {@link String#hashCode()}
+     * may collide for different names, but for a single shop's small number
+     * of categories the chance is negligible — and the same input always
+     * yields the same id, which is what the FE relies on across renders.
+     */
+    private static int stableCategoryId(String name) {
+        return Math.abs(name == null ? 0 : name.hashCode());
     }
 
     public Page<ProductDetail> getProductsByIds(List<UUID> productIds, Pageable pageable) {
         Page<ProductProjection> projections = productRepository.findByIds(productIds, pageable);
-        return projections.map(productMapper::toProductDetail);
+        Page<ProductDetail> page = projections.map(productMapper::toProductDetail);
+        saleApplier.applyActiveSales(page.getContent());
+        return page;
     }
 
     @Override
@@ -152,6 +316,7 @@ public class ProductServiceImpl implements ProductService {
             // Fallback to direct DB query
             Page<ProductProjection> projections = productCategoryRepository.findAllProductsByCategoryName(productId, pageable);
             Page<ProductDetail> productRelated = projections.map(productMapper::toProductDetail);
+            saleApplier.applyActiveSales(productRelated.getContent());
             List<UUID> productRelatedIds = productRelated.stream()
                     .map(ProductDetail::getId)
                     .collect(Collectors.toList());
@@ -170,12 +335,13 @@ public class ProductServiceImpl implements ProductService {
                 .getProductCategories().stream()
                 .map(pc -> pc.getCategories().getName())
                 .collect(Collectors.toList());
-        return productRepository.findRandomRelatedProducts(
+        List<ProductDetail> details = productRepository.findRandomRelatedProducts(
                 categoryNames,
                 productId,
                 limit
         ).stream().map(productMapper::toProductDetail).collect(Collectors.toList());
-
+        saleApplier.applyActiveSales(details);
+        return details;
     }
 
     @Override
@@ -196,6 +362,7 @@ public class ProductServiceImpl implements ProductService {
                 // Deserialize from LinkedHashMap or other serialized form
                 cachedProduct = objectMapper.convertValue(rawValue, ProductDetail.class);
             }
+            saleApplier.applyActiveSale(cachedProduct);
             return cachedProduct;
         }
 
@@ -217,11 +384,14 @@ public class ProductServiceImpl implements ProductService {
             // Read from cache after task completion
             rawValue = redisServiceWrapper.getValue(productRedisKey);
             if (rawValue != null) {
+                ProductDetail detail;
                 if (rawValue instanceof ProductDetail) {
-                    return (ProductDetail) rawValue;
+                    detail = (ProductDetail) rawValue;
                 } else {
-                    return objectMapper.convertValue(rawValue, ProductDetail.class);
+                    detail = objectMapper.convertValue(rawValue, ProductDetail.class);
                 }
+                saleApplier.applyActiveSale(detail);
+                return detail;
             } else {
                 throw new RuntimeException("Failed to cache product detail");
             }
@@ -245,6 +415,15 @@ public class ProductServiceImpl implements ProductService {
     public Product addProduct(ProductRequest productRequest) throws JsonProcessingException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String currentUser = authentication.getName(); // Lấy tên người dùng hiện tại
+        CustomUserPrincipal principal = authentication != null && authentication.getPrincipal() instanceof CustomUserPrincipal
+                ? (CustomUserPrincipal) authentication.getPrincipal()
+                : null;
+        if (principal == null || principal.getShopId() == null) {
+            throw new InvalidDataException("Shop context is required");
+        }
+        if (productRequest.getShopId() == null || !principal.getShopId().equals(productRequest.getShopId().toString())) {
+            throw new InvalidDataException("Shop mismatch");
+        }
 
         // validate using gRPC
         ValidateProductCreationResponse validationResponse = productGrpcClient.validateProduct(
@@ -384,14 +563,22 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    @PreAuthorize("hasRole('SHOP_OWNER') and hasAuthority('product:upadte')")
+    @PreAuthorize("hasRole('SHOP_OWNER') and hasAuthority('product:update_own')")
     @Transactional
     public Product updateProduct(UUID productId, ProductRequest productRequest) {
         Product productToUpdate = productRepository.findById(productId)
                 .orElseThrow(() -> new InvalidDataException("Product not found with ID: " + productId));
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentUsername = authentication.getName();
+        CustomUserPrincipal principal = authentication != null && authentication.getPrincipal() instanceof CustomUserPrincipal
+                ? (CustomUserPrincipal) authentication.getPrincipal()
+                : null;
+        if (principal == null || principal.getShopId() == null) {
+            throw new InvalidDataException("Shop context is required");
+        }
+        if (!principal.getShopId().equals(productToUpdate.getShopId().toString())) {
+            throw new InvalidDataException("User is not authorized to update this product");
+        }
 
 
         kafkaTemplate.send("product-update-request", productToUpdate.getShopId());
@@ -445,10 +632,22 @@ public class ProductServiceImpl implements ProductService {
         return updatedProduct;
     }
 
-    @PreAuthorize("hasRole('SHOP_OWNER') and hasAuthority('product:delete')")
+    @PreAuthorize("hasRole('SHOP_OWNER') and hasAuthority('product:delete_own')")
     @Override
     @Transactional
     public void deleteProduct(UUID productId) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new InvalidDataException("Product not found"));
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        CustomUserPrincipal principal = authentication != null && authentication.getPrincipal() instanceof CustomUserPrincipal
+                ? (CustomUserPrincipal) authentication.getPrincipal()
+                : null;
+        if (principal == null || principal.getShopId() == null) {
+            throw new InvalidDataException("Shop context is required");
+        }
+        if (!principal.getShopId().equals(product.getShopId().toString())) {
+            throw new InvalidDataException("User is not authorized to delete this product");
+        }
         if (productRepository.findProductDetailById(productId).isPresent()) {
             productRepository.deleteProductById(productId);
 

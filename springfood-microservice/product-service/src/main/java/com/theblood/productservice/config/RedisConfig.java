@@ -32,20 +32,29 @@ public class RedisConfig {
 
     @Value("${spring.redis.shared.password}")
     private String redisPassword;
+    
+    @Value("${spring.redis.shared.ssl.enabled:false}")
+    private boolean sslEnabled;
 
     @Bean
     public LettuceConnectionFactory redisConnectionFactory() {
         RedisStandaloneConfiguration config = new RedisStandaloneConfiguration();
         config.setHostName(redisHost);
         config.setPort(redisPort);
-        config.setPassword(redisPassword);
+        if (redisPassword != null && !redisPassword.isEmpty()) {
+            config.setPassword(redisPassword);
+        }
 
-        LettuceClientConfiguration clientConfig = LettuceClientConfiguration.builder()
+        LettuceClientConfiguration.LettuceClientConfigurationBuilder clientConfig = 
+            LettuceClientConfiguration.builder()
                 .commandTimeout(Duration.ofSeconds(3))
-                .shutdownTimeout(Duration.ofMillis(100))
-                .build();
+                .shutdownTimeout(Duration.ofMillis(100));
+        
+        if (sslEnabled) {
+            clientConfig.useSsl();
+        }
 
-        return new LettuceConnectionFactory(config, clientConfig);
+        return new LettuceConnectionFactory(config, clientConfig.build());
     }
 
     @Bean

@@ -5,9 +5,11 @@ import org.springframework.ai.chat.memory.ChatMemoryRepository;
 import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 import org.springframework.ai.chat.memory.repository.jdbc.JdbcChatMemoryRepository;
 import org.springframework.ai.chat.memory.repository.jdbc.PostgresChatMemoryRepositoryDialect;
+import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.web.client.RestTemplate;
 
 
 @Configuration
@@ -27,5 +29,11 @@ public class AIConfiguration {
             .chatMemoryRepository(chatMemoryRepository)
             .maxMessages(30)
             .build();
+    }
+
+    @Bean
+    @LoadBalanced
+    public RestTemplate loadBalancedRestTemplate() {
+        return new RestTemplate();
     }
 }

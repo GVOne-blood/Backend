@@ -50,7 +50,14 @@ public class UserController {
                         users), HttpStatus.OK);
     }
 
-    @PreAuthorize("hasRole('CUSTOMER')")
+    /**
+     * Lấy thông tin cá nhân của user đang đăng nhập. Endpoint này dùng
+     * {@code @AuthenticationPrincipal} để xác định "ai đang login", không
+     * phụ thuộc role — admin / shop owner / staff / customer đều phải xem
+     * được profile của chính mình. {@code isAuthenticated()} là điều kiện
+     * cần và đủ ở đây.
+     */
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/profile")
     public ResponseEntity<ResponseData<UserDetail>> getUserById(@AuthenticationPrincipal CustomUserPrincipal user) {
 
@@ -62,7 +69,12 @@ public class UserController {
                         resUser), HttpStatus.OK);
     }
 
-    @PreAuthorize("hasRole('CUSTOMER')")
+    /**
+     * Cập nhật thông tin cá nhân của user đang đăng nhập. Cùng lý do như
+     * {@link #getUserById(CustomUserPrincipal)} — bất cứ vai trò nào cũng
+     * có quyền sửa profile của chính mình.
+     */
+    @PreAuthorize("isAuthenticated()")
     @PutMapping("/profile")
     public ResponseEntity<ResponseData<UserDetail>> updateUser(@AuthenticationPrincipal CustomUserPrincipal user, @RequestBody UserRequest userRequest) {
         UserDetail resUser = userService.updateUser(user.getUserId(), userRequest);

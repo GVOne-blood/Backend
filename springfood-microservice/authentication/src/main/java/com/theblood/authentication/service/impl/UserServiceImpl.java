@@ -118,6 +118,63 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
+    public RegisterResponse registerUserWithRole(UserRequest userRequest, String roleName, HttpServletResponse response) {
+        // Validate role name
+        if (roleName == null || roleName.isBlank()) {
+            throw new InvalidDataException("Role name is required");
+        }
+        String roleUpper = roleName.toUpperCase();
+
+        // Check if username already exists
+        if (existsByUsername(userRequest.getUsername())) {
+            throw new InvalidDataException("Username is already taken!");
+        }
+
+        // Check if email already exists
+        if (existsByEmail(userRequest.getEmail())) {
+            throw new InvalidDataException("Email is already in use!");
+        }
+
+        // Find role
+        Role role = roleRepository.findByName(roleUpper)
+                .orElseThrow(() -> new InvalidDataException("Role not found: " + roleUpper
+                        + ". Available: CUSTOMER, SHOP_OWNER, ADMIN, STAFF, DELIVER"));
+
+        // Create new user
+        User user = userMapper.toUser(userRequest);
+        user.setPassword(passwordEncoder.encode(userRequest.getPassword()));
+        user.setStatus(UserStatus.ACTIVE);
+
+        // Assign role
+        UserHasRole userHasRole = new UserHasRole();
+        userHasRole.setUser(user);
+        userHasRole.setRole(role);
+        user.getUserRoles().add(userHasRole);
+
+        // Save
+        User savedUser = userRepository.save(user);
+
+        // Generate JWT tokens
+        String accessToken = jwtService.generateToken(TokenType.ACCESS, savedUser);
+        String refreshToken = jwtService.generateToken(TokenType.REFRESH, savedUser);
+
+        // Set cookies
+        response.addCookie(CookieUtil.createCookie(CookieKey.ACCESS_TOKEN.name(), accessToken, 15 * 60));
+        response.addCookie(CookieUtil.createCookie(CookieKey.REFRESH_TOKEN.name(), refreshToken, 7 * 24 * 60 * 60));
+
+        return RegisterResponse.builder()
+                .userId(savedUser.getId().toString())
+                .username(savedUser.getUsername())
+                .email(savedUser.getEmail())
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .tokenType("Bearer")
+                .expiresIn(jwtService.getTokenExpiration(TokenType.ACCESS))
+                .build();
+    }
+
+    @Override
     public User findByUsername(String username) {
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));

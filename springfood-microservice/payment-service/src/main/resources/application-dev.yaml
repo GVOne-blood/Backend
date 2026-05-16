@@ -1,0 +1,17 @@
+spring:
+  # Load .env global từ project root khi chạy profile dev
+  config:
+    import: optional:file:../.env[.properties],optional:file:.env[.properties]
+  datasource:
+    url: ${DEFAULT_DATABASE_URL}
+    username: ${DEFAULT_DATABASE_USERNAME}
+    password: ${DEFAULT_DATABASE_PASSWORD}
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    properties:
+      security.protocol: ${KAFKA_SECURITY_PROTOCOL:PLAINTEXT}
+      ssl.truststore.location: ${KAFKA_SSL_TRUSTSTORE_LOCATION:}
+      ssl.truststore.password: ${KAFKA_SSL_TRUSTSTORE_PASSWORD:}
+      ssl.keystore.location: ${KAFKA_SSL_KEYSTORE_LOCATION:}
+      ssl.keystore.password: ${KAFKA_SSL_KEYSTORE_PASSWORD:}
+      ssl.key.password: ${KAFKA_SSL_KEY_PASSWORD:}

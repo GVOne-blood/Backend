@@ -101,6 +101,10 @@ management:
 spring:
   application:
     name: media
+  # Load .env: module-level trước, root global sau (root override).
+  # Hoạt động bất kể working dir là module hay root.
+  config:
+    import: optional:file:.env[.properties],optional:file:../.env[.properties]
   liquibase:
     enabled: false
   cloud:

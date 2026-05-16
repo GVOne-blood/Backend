@@ -1,12 +1,7 @@
 spring:
   application:
     name: cart-service
-  data:
-    mongodb:
-      uri: mongodb://localhost:27017/cart-service
-      auto-index-creation: true # Tự động tạo index dựa trên annotation @Indexed
 
-  # TẮT JPA/PostgreSQL auto-configuration
   autoconfigure:
     exclude:
       - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
@@ -14,6 +9,8 @@ spring:
       - org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration
 
   redis:
+    host: localhost
+    port: 6379
     # Redis Cluster 1 - Shared cho các read-heavy services
     shared:
       host: localhost

@@ -4,11 +4,14 @@ server:
 spring:
   application:
     name: shop-service
+  # Load .env file
+  config:
+    import: optional:file:.env[.properties]
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: ${DEFAULT_DATABASE_URL}
-    username: ${DEFAULT_DATABASE_USERNAME}
-    password: ${DEFAULT_DATABASE_PASSWORD}
+    url: jdbc:postgresql://ep-green-dream-a1nsq7ax-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require
+    username: neondb_owner
+    password: npg_gpK2ckWJPG4v
     hikari:
       maximum-pool-size: 10
   jpa:
@@ -20,7 +23,14 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         default_schema: springfood_shop
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    properties:
+      security.protocol: ${KAFKA_SECURITY_PROTOCOL:PLAINTEXT}
+      ssl.truststore.location: ${KAFKA_SSL_TRUSTSTORE_LOCATION:}
+      ssl.truststore.password: ${KAFKA_SSL_TRUSTSTORE_PASSWORD:}
+      ssl.keystore.location: ${KAFKA_SSL_KEYSTORE_LOCATION:}
+      ssl.keystore.password: ${KAFKA_SSL_KEYSTORE_PASSWORD:}
+      ssl.key.password: ${KAFKA_SSL_KEY_PASSWORD:}
     consumer:
       group-id: shop-service-group
       auto-offset-reset: earliest
@@ -33,6 +43,19 @@ eureka:
       defaultZone: http://localhost:8761/eureka/
   instance:
     prefer-ip-address: true
+
+# Logging configuration
+logging:
+  level:
+    # Disable JMX/RMI spam logs
+    javax.management.remote.rmi: ERROR
+    # Disable Kafka connection warnings (when Kafka is not available)
+    org.apache.kafka.clients.NetworkClient: ERROR
+    org.apache.kafka.clients.consumer: ERROR
+    org.springframework.kafka: ERROR
+    # Keep application logs at INFO level
+    com.theblood.shopservice: INFO
+    root: INFO
 
 grpc:
   server:

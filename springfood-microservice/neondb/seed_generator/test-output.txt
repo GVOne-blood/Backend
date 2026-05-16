@@ -1,0 +1,972 @@
+=== Testing Dependency Analyzer ===
+
+Parsing DDL files from: F:\Document\TASC\Backend\springfood-microservice\neondb\
+
+Step 1: Parsing DDL files...
+Parser failed for F:\Document\TASC\Backend\springfood-microservice\neondb\springfood_authentication\address.sql, using fallback regex parser: s [SyntaxError]: Expected "(", "--", ".", "/*", or [ \t\n\r] but "," found.
+    at peg$buildStructuredError (\home\runner\work\node-sql-parser\node-sql-parser\pegjs\postgresql.pegjs:6086:12)
+    at Object.typeCase [as postgresql] (\home\runner\work\node-sql-parser\node-sql-parser\pegjs\postgresql.pegjs:46743:11)
+    at r.parse (\home\runner\work\node-sql-parser\node-sql-parser\src\parser.js:34:43)
+    at r.value (\home\runner\work\node-sql-parser\node-sql-parser\src\parser.js:9:26)
+    at parseDDLFile (F:\Document\TASC\Backend\springfood-microservice\neondb\seed_generator\src\parsers\ddl-parser.ts:61:29)
+    at parseAllDDLFiles (F:\Document\TASC\Backend\springfood-microservice\neondb\seed_generator\src\parsers\ddl-parser.ts:445:31)
+    at main (F:\Document\TASC\Backend\springfood-microservice\neondb\seed_generator\src\analyzers\test-dependency-analyzer.ts:30:36)
+    at Object.<anonymous> (F:\Document\TASC\Backend\springfood-microservice\neondb\seed_generator\src\analyzers\test-dependency-analyzer.ts:115:1)
+    at Module._compile (node:internal/modules/cjs/loader:1759:14)
+    at Module.m._compile (F:\Document\TASC\Backend\springfood-microservice\neondb\seed_generator\node_modules\ts-node\src\index.ts:1618:23) {
+  expected: [
+    {
+      type: 'class',
+      parts: [Array],
+      inverted: false,
+      ignoreCase: false
+    },
+    { type: 'literal', text: '/*', ignoreCase: false },
+    { type: 'literal', text: '--', ignoreCase: false },
+    { type: 'literal', text: '.', ignoreCase: false },
+    {
+      type: 'class',
+      parts: [Array],
+      inverted: false,
+      ignoreCase: false
+    },
+    { type: 'literal', text: '/*', ignoreCase: false },
+    { type: 'literal', text: '--', ignoreCase: false },
+    { type: 'literal', text: '.', ignoreCase: false },
+    {
+      type: 'class',
+      parts: [Array],
+      inverted: false,
+      ignoreCase: false
+    },
+    { type: 'literal', text: '/*', ignoreCase: false },
+    { type: 'literal', text: '--', ignoreCase: false },
+    { type: 'literal', text: '(', ignoreCase: false }
+  ],
+  found: ',',
+  location: {
+    start: { offset: 169, line: 7, column: 30 },
+    end: { offset: 170, line: 7, column: 31 }
+  }
+}
+Parser failed for F:\Document\TASC\Backend\springfood-microservice\neondb\springfood_authentication\role_has_permission.sql, using fallback regex parser: s [SyntaxError]: Expected "(", "--", ".", "/*", [ \t\n\r], or [A-Za-z0-9_\-$一-龥À-ſ] but "," found.
+    at peg$buildStructuredError (\home\runner\work\node-sql-parser\node-sql-parser\pegjs\postgresql.pegjs:6086:12)
+    at Object.typeCase [as postgresql] (\home\runner\work\node-sql-parser\node-sql-parser\pegjs\postgresql.pegjs:46743:11)
+    at r.parse (\home\runner\work\node-sql-parser\node-sql-parser\src\parser.js:34:43)
+    at r.value (\home\runner\work\node-sql-parser\node-sql-parser\src\parser.js:9:26)
+    at parseDDLFile (F:\Document\TASC\Backend\springfood-microservice\neondb\seed_generator\src\parsers\ddl-parser.ts:61:29)
+    at parseAllDDLFiles (F:\Document\TASC\Backend\springfood-microservice\neondb\seed_generator\src\parsers\ddl-parser.ts:445:31)
+    at main (F:\Document\TASC\Backend\springfood-microservice\neondb\seed_generator\src\analyzers\test-dependency-analyzer.ts:30:36)
+    at Object.<anonymous> (F:\Document\TASC\Backend\springfood-microservice\neondb\seed_generator\src\analyzers\test-dependency-analyzer.ts:115:1)
+    at Module._compile (node:internal/modules/cjs/loader:1759:14)
+    at Module.m._compile (F:\Document\TASC\Backend\springfood-microservice\neondb\seed_generator\node_modules\ts-node\src\index.ts:1618:23) {
+  expected: [
+    {
+      type: 'class',
+      parts: [Array],
+      inverted: false,
+      ignoreCase: false
+    },
+    {
+      type: 'class',
+      parts: [Array],
+      inverted: false,
+      ignoreCase: false
+    },
+    { type: 'literal', text: '/*', ignoreCase: false },
+    { type: 'literal', text: '--', ignoreCase: false },
+    { type: 'literal', text: '.', ignoreCase: false },
+    {
+      type: 'class',
+      parts: [Array],
+      inverted: false,
+      ignoreCase: false
+    },
+    { type: 'literal', text: '/*', ignoreCase: false },
+    { type: 'literal', text: '--', ignoreCase: false },
+    { type: 'literal', text: '.', ignoreCase: false },
+    {
+      type: 'class',
+      parts: [Array],
+      inverted: false,
+      ignoreCase: false
+    },
+    { type: 'literal', text: '/*', ignoreCase: false },
+    { type: 'literal', text: '--', ignoreCase: false },
+    { type: 'literal', text: '(', ignoreCase: false }
+  ],
+  found: ',',
+  location: {
+    start: { offset: 142, line: 5, column: 28 },
+    end: { offset: 143, line: 5, column: 29 }
+  }
+}
+Parser failed for F:\Document\TASC\Backend\springfood-microservice\neondb\springfood_authentication\token.sql, using fallback regex parser: s [SyntaxError]: Expected "(", "--", ".", "/*", or [ \t\n\r] but "," found.
+    at peg$buildStructuredError (\home\runner\work\node-sql-parser\node-sql-parser\pegjs\postgresql.pegjs:6086:12)
+    at Object.typeCase [as postgresql] (\home\runner\work\node-sql-parser\node-sql-parser\pegjs\postgresql.pegjs:46743:11)
+    at r.parse (\home\runner\work\node-sql-parser\node-sql-parser\src\parser.js:34:43)
+    at r.value (\home\runner\work\node-sql-parser\node-sql-parser\src\parser.js:9:26)
+    at parseDDLFile (F:\Document\TASC\Backend\springfood-microservice\neondb\seed_generator\src\parsers\ddl-parser.ts:61:29)
+    at parseAllDDLFiles (F:\Document\TASC\Backend\springfood-microservice\neondb\seed_generator\src\parsers\ddl-parser.ts:445:31)
+    at main (F:\Document\TASC\Backend\springfood-microservice\neondb\seed_generator\src\analyzers\test-dependency-analyzer.ts:30:36)
+    at Object.<anonymous> (F:\Document\TASC\Backend\springfood-microservice\neondb\seed_generator\src\analyzers\test-dependency-analyzer.ts:115:1)
+    at Module._compile (node:internal/modules/cjs/loader:1759:14)
+    at Module.m._compile (F:\Document\TASC\Backend\springfood-microservice\neondb\seed_generator\node_modules\ts-node\src\index.ts:1618:23) {
+  expected: [
+    {
+      type: 'class',
+      parts: [Array],
+      inverted: false,
+      ignoreCase: false
+    },
+    { type: 'literal', text: '/*', ignoreCase: false },
+    { type: 'literal', text: '--', ignoreCase: false },
+    { type: 'literal', text: '.', ignoreCase: false },
+    {
+      type: 'class',
+      parts: [Array],
+      inverted: false,
+      ignoreCase: false
+    },
+    { type: 'literal', text: '/*', ignoreCase: false },
+    { type: 'literal', text: '--', ignoreCase: false },
+    { type: 'literal', text: '.', ignoreCase: false },
+    {
+      type: 'class',
+      parts: [Array],
+      inverted: false,
+      ignoreCase: false
+    },
+    { type: 'literal', text: '/*', ignoreCase: false },
+    { type: 'literal', text: '--', ignoreCase: false },
+    { type: 'literal', text: '(', ignoreCase: false }
+  ],
+  found: ',',
+  location: {
+    start: { offset: 169, line: 7, column: 30 },
+    end: { offset: 170, line: 7, column: 31 }
+  }
+}
+Parser failed for F:\Document\TASC\Backend\springfood-microservice\neondb\springfood_authentication\user_has_role.sql, using fallback regex parser: s [SyntaxError]: Expected "(", "--", ".", "/*", or [ \t\n\r] but "," found.
+    at peg$buildStructuredError (\home\runner\work\node-sql-parser\node-sql-parser\pegjs\postgresql.pegjs:6086:12)
+    at Object.typeCase [as postgresql] (\home\runner\work\node-sql-parser\node-sql-parser\pegjs\postgresql.pegjs:46743:11)
+    at r.parse (\home\runner\work\node-sql-parser\node-sql-parser\src\parser.js:34:43)
+    at r.value (\home\runner\work\node-sql-parser\node-sql-parser\src\parser.js:9:26)
+    at parseDDLFile (F:\Document\TASC\Backend\springfood-microservice\neondb\seed_generator\src\parsers\ddl-parser.ts:61:29)
+    at parseAllDDLFiles (F:\Document\TASC\Backend\springfood-microservice\neondb\seed_generator\src\parsers\ddl-parser.ts:445:31)
+    at main (F:\Document\TASC\Backend\springfood-microservice\neondb\seed_generator\src\analyzers\test-dependency-analyzer.ts:30:36)
+    at Object.<anonymous> (F:\Document\TASC\Backend\springfood-microservice\neondb\seed_generator\src\analyzers\test-dependency-analyzer.ts:115:1)
+    at Module._compile (node:internal/modules/cjs/loader:1759:14)
+    at Module.m._compile (F:\Document\TASC\Backend\springfood-microservice\neondb\seed_generator\node_modules\ts-node\src\index.ts:1618:23) {
+  expected: [
+    {
+      type: 'class',
+      parts: [Array],
+      inverted: false,
+      ignoreCase: false
+    },
+    { type: 'literal', text: '/*', ignoreCase: false },
+    { type: 'literal', text: '--', ignoreCase: false },
+    { type: 'literal', text: '.', ignoreCase: false },
+    {
+      type: 'class',
+      parts: [Array],
+      inverted: false,
+      ignoreCase: false
+    },
+    { type: 'literal', text: '/*', ignoreCase: false },
+    { type: 'literal', text: '--', ignoreCase: false },
+    { type: 'literal', text: '.', ignoreCase: false },
+    {
+      type: 'class',
+      parts: [Array],
+      inverted: false,
+      ignoreCase: false
+    },
+    { type: 'literal', text: '/*', ignoreCase: false },
+    { type: 'literal', text: '--', ignoreCase: false },
+    { type: 'literal', text: '(', ignoreCase: false }
+  ],
+  found: ',',
+  location: {
+    start: { offset: 125, line: 5, column: 30 },
+    end: { offset: 126, line: 5, column: 31 }
+  }
+}
+Parser failed for F:\Document\TASC\Backend\springfood-microservice\neondb\springfood_chat\conversation.sql, using fallback regex parser: s [SyntaxError]: Expected "(", "--", ".", "/*", [ \t\n\r], or [A-Za-z0-9_\-$一-龥À-ſ] but "," found.
+    at peg$buildStructuredError (\home\runner\work\node-sql-parser\node-sql-parser\pegjs\postgresql.pegjs:6086:12)
+    at Object.typeCase [as postgresql] (\home\runner\work\node-sql-parser\node-sql-parser\pegjs\postgresql.pegjs:46743:11)
+    at r.parse (\home\runner\work\node-sql-parser\node-sql-parser\src\parser.js:34:43)
+    at r.value (\home\runner\work\node-sql-parser\node-sql-parser\src\parser.js:9:26)
+    at parseDDLFile (F:\Document\TASC\Backend\springfood-microservice\neondb\seed_generator\src\parsers\ddl-parser.ts:61:29)
+    at parseAllDDLFiles (F:\Document\TASC\Backend\springfood-microservice\neondb\seed_generator\src\parsers\ddl-parser.ts:445:31)
+    at main (F:\Document\TASC\Backend\springfood-microservice\neondb\seed_generator\src\analyzers\test-dependency-analyzer.ts:30:36)
+    at Object.<anonymous> (F:\Document\TASC\Backend\springfood-microservice\neondb\seed_generator\src\analyzers\test-dependency-analyzer.ts:115:1)
+    at Module._compile (node:internal/modules/cjs/loader:1759:14)
+    at Module.m._compile (F:\Document\TASC\Backend\springfood-microservice\neondb\seed_generator\node_modules\ts-node\src\index.ts:1618:23) {
+  expected: [
+    {
+      type: 'class',
+      parts: [Array],
+      inverted: false,
+      ignoreCase: false
+    },
+    {
+      type: 'class',
+      parts: [Array],
+      inverted: false,
+      ignoreCase: false
+    },
+    { type: 'literal', text: '/*', ignoreCase: false },
+    { type: 'literal', text: '--', ignoreCase: false },
+    { type: 'literal', text: '.', ignoreCase: false },
+    {
+      type: 'class',
+      parts: [Array],
+      inverted: false,
+      ignoreCase: false
+    },
+    { type: 'literal', text: '/*', ignoreCase: false },
+    { type: 'literal', text: '--', ignoreCase: false },
+    { type: 'literal', text: '.', ignoreCase: false },
+    {
+      type: 'class',
+      parts: [Array],
+      inverted: false,
+      ignoreCase: false
+    },
+    { type: 'literal', text: '/*', ignoreCase: false },
+    { type: 'literal', text: '--', ignoreCase: false },
+    { type: 'literal', text: '(', ignoreCase: false }
+  ],
+  found: ',',
+  location: {
+    start: { offset: 784, line: 21, column: 45 },
+    end: { offset: 785, line: 21, column: 46 }
+  }
+}
+Parser failed for F:\Document\TASC\Backend\springfood-microservice\neondb\springfood_chat\conversation_participant.sql, using fallback regex parser: s [SyntaxError]: Expected "(", "--", ".", "/*", [ \t\n\r], or [A-Za-z0-9_\-$一-龥À-ſ] but "," found.
+    at peg$buildStructuredError (\home\runner\work\node-sql-parser\node-sql-parser\pegjs\postgresql.pegjs:6086:12)
+    at Object.typeCase [as postgresql] (\home\runner\work\node-sql-parser\node-sql-parser\pegjs\postgresql.pegjs:46743:11)
+    at r.parse (\home\runner\work\node-sql-parser\node-sql-parser\src\parser.js:34:43)
+    at r.value (\home\runner\work\node-sql-parser\node-sql-parser\src\parser.js:9:26)
+    at parseDDLFile (F:\Document\TASC\Backend\springfood-microservice\neondb\seed_generator\src\parsers\ddl-parser.ts:61:29)
+    at parseAllDDLFiles (F:\Document\TASC\Backend\springfood-microservice\neondb\seed_generator\src\parsers\ddl-parser.ts:445:31)
+    at main (F:\Document\TASC\Backend\springfood-microservice\neondb\seed_generator\src\analyzers\test-dependency-analyzer.ts:30:36)
+    at Object.<anonymous> (F:\Document\TASC\Backend\springfood-microservice\neondb\seed_generator\src\analyzers\test-dependency-analyzer.ts:115:1)
+    at Module._compile (node:internal/modules/cjs/loader:1759:14)
+    at Module.m._compile (F:\Document\TASC\Backend\springfood-microservice\neondb\seed_generator\node_modules\ts-node\src\index.ts:1618:23) {
+  expected: [
+    {
+      type: 'class',
+      parts: [Array],
+      inverted: false,
+      ignoreCase: false
+    },
+    {
+      type: 'class',
+      parts: [Array],
+      inverted: false,
+      ignoreCase: false
+    },
+    { type: 'literal', text: '/*', ignoreCase: false },
+    { type: 'literal', text: '--', ignoreCase: false },
+    { type: 'literal', text: '.', ignoreCase: false },
+    {
+      type: 'class',
+      parts: [Array],
+      inverted: false,
+      ignoreCase: false
+    },
+    { type: 'literal', text: '/*', ignoreCase: false },
+    { type: 'literal', text: '--', ignoreCase: false },
+    { type: 'literal', text: '.', ignoreCase: false },
+    {
+      type: 'class',
+      parts: [Array],
+      inverted: false,
+      ignoreCase: false
+    },
+    { type: 'literal', text: '/*', ignoreCase: false },
+    { type: 'literal', text: '--', ignoreCase: false },
+    { type: 'literal', text: '(', ignoreCase: false }
+  ],
+  found: ',',
+  location: {
+    start: { offset: 1030, line: 23, column: 36 },
+    end: { offset: 1031, line: 23, column: 37 }
+  }
+}
+Parser failed for F:\Document\TASC\Backend\springfood-microservice\neondb\springfood_chat\message.sql, using fallback regex parser: s [SyntaxError]: Expected "(", "--", ".", "/*", [ \t\n\r], or [A-Za-z0-9_\-$一-龥À-ſ] but "," found.
+    at peg$buildStructuredError (\home\runner\work\node-sql-parser\node-sql-parser\pegjs\postgresql.pegjs:6086:12)
+    at Object.typeCase [as postgresql] (\home\runner\work\node-sql-parser\node-sql-parser\pegjs\postgresql.pegjs:46743:11)
+    at r.parse (\home\runner\work\node-sql-parser\node-sql-parser\src\parser.js:34:43)
+    at r.value (\home\runner\work\node-sql-parser\node-sql-parser\src\parser.js:9:26)
+    at parseDDLFile (F:\Document\TASC\Backend\springfood-microservice\neondb\seed_generator\src\parsers\ddl-parser.ts:61:29)
+    at parseAllDDLFiles (F:\Document\TASC\Backend\springfood-microservice\neondb\seed_generator\src\parsers\ddl-parser.ts:445:31)
+    at main (F:\Document\TASC\Backend\springfood-microservice\neondb\seed_generator\src\analyzers\test-dependency-analyzer.ts:30:36)
+    at Object.<anonymous> (F:\Document\TASC\Backend\springfood-microservice\neondb\seed_generator\src\analyzers\test-dependency-analyzer.ts:115:1)
+    at Module._compile (node:internal/modules/cjs/loader:1759:14)
+    at Module.m._compile (F:\Document\TASC\Backend\springfood-microservice\neondb\seed_generator\node_modules\ts-node\src\index.ts:1618:23) {
+  expected: [
+    {
+      type: 'class',
+      parts: [Array],
+      inverted: false,
+      ignoreCase: false
+    },
+    {
+      type: 'class',
+      parts: [Array],
+      inverted: false,
+      ignoreCase: false
+    },
+    { type: 'literal', text: '/*', ignoreCase: false },
+    { type: 'literal', text: '--', ignoreCase: false },
+    { type: 'literal', text: '.', ignoreCase: false },
+    {
+      type: 'class',
+      parts: [Array],
+      inverted: false,
+      ignoreCase: false
+    },
+    { type: 'literal', text: '/*', ignoreCase: false },
+    { type: 'literal', text: '--', ignoreCase: false },
+    { type: 'literal', text: '.', ignoreCase: false },
+    {
+      type: 'class',
+      parts: [Array],
+      inverted: false,
+      ignoreCase: false
+    },
+    { type: 'literal', text: '/*', ignoreCase: false },
+    { type: 'literal', text: '--', ignoreCase: false },
+    { type: 'literal', text: '(', ignoreCase: false }
+  ],
+  found: ',',
+  location: {
+    start: { offset: 1217, line: 27, column: 36 },
+    end: { offset: 1218, line: 27, column: 37 }
+  }
+}
+Parser failed for F:\Document\TASC\Backend\springfood-microservice\neondb\springfood_chat\message_attachment.sql, using fallback regex parser: s [SyntaxError]: Expected "(", "--", ".", "/*", [ \t\n\r], or [A-Za-z0-9_\-$一-龥À-ſ] but "," found.
+    at peg$buildStructuredError (\home\runner\work\node-sql-parser\node-sql-parser\pegjs\postgresql.pegjs:6086:12)
+    at Object.typeCase [as postgresql] (\home\runner\work\node-sql-parser\node-sql-parser\pegjs\postgresql.pegjs:46743:11)
+    at r.parse (\home\runner\work\node-sql-parser\node-sql-parser\src\parser.js:34:43)
+    at r.value (\home\runner\work\node-sql-parser\node-sql-parser\src\parser.js:9:26)
+    at parseDDLFile (F:\Document\TASC\Backend\springfood-microservice\neondb\seed_generator\src\parsers\ddl-parser.ts:61:29)
+    at parseAllDDLFiles (F:\Document\TASC\Backend\springfood-microservice\neondb\seed_generator\src\parsers\ddl-parser.ts:445:31)
+    at main (F:\Document\TASC\Backend\springfood-microservice\neondb\seed_generator\src\analyzers\test-dependency-analyzer.ts:30:36)
+    at Object.<anonymous> (F:\Document\TASC\Backend\springfood-microservice\neondb\seed_generator\src\analyzers\test-dependency-analyzer.ts:115:1)
+    at Module._compile (node:internal/modules/cjs/loader:1759:14)
+    at Module.m._compile (F:\Document\TASC\Backend\springfood-microservice\neondb\seed_generator\node_modules\ts-node\src\index.ts:1618:23) {
+  expected: [
+    {
+      type: 'class',
+      parts: [Array],
+      inverted: false,
+      ignoreCase: false
+    },
+    {
+      type: 'class',
+      parts: [Array],
+      inverted: false,
+      ignoreCase: false
+    },
+    { type: 'literal', text: '/*', ignoreCase: false },
+    { type: 'literal', text: '--', ignoreCase: false },
+    { type: 'literal', text: '.', ignoreCase: false },
+    {
+      type: 'class',
+      parts: [Array],
+      inverted: false,
+      ignoreCase: false
+    },
+    { type: 'literal', text: '/*', ignoreCase: false },
+    { type: 'literal', text: '--', ignoreCase: false },
+    { type: 'literal', text: '.', ignoreCase: false },
+    {
+      type: 'class',
+      parts: [Array],
+      inverted: false,
+      ignoreCase: false
+    },
+    { type: 'literal', text: '/*', ignoreCase: false },
+    { type: 'literal', text: '--', ignoreCase: false },
+    { type: 'literal', text: '(', ignoreCase: false }
+  ],
+  found: ',',
+  location: {
+    start: { offset: 629, line: 18, column: 31 },
+    end: { offset: 630, line: 18, column: 32 }
+  }
+}
+Parser failed for F:\Document\TASC\Backend\springfood-microservice\neondb\springfood_chat\message_reaction.sql, using fallback regex parser: s [SyntaxError]: Expected "(", "--", ".", "/*", [ \t\n\r], or [A-Za-z0-9_\-$一-龥À-ſ] but "," found.
+    at peg$buildStructuredError (\home\runner\work\node-sql-parser\node-sql-parser\pegjs\postgresql.pegjs:6086:12)
+    at Object.typeCase [as postgresql] (\home\runner\work\node-sql-parser\node-sql-parser\pegjs\postgresql.pegjs:46743:11)
+    at r.parse (\home\runner\work\node-sql-parser\node-sql-parser\src\parser.js:34:43)
+    at r.value (\home\runner\work\node-sql-parser\node-sql-parser\src\parser.js:9:26)
+    at parseDDLFile (F:\Document\TASC\Backend\springfood-microservice\neondb\seed_generator\src\parsers\ddl-parser.ts:61:29)
+    at parseAllDDLFiles (F:\Document\TASC\Backend\springfood-microservice\neondb\seed_generator\src\parsers\ddl-parser.ts:445:31)
+    at main (F:\Document\TASC\Backend\springfood-microservice\neondb\seed_generator\src\analyzers\test-dependency-analyzer.ts:30:36)
+    at Object.<anonymous> (F:\Document\TASC\Backend\springfood-microservice\neondb\seed_generator\src\analyzers\test-dependency-analyzer.ts:115:1)
+    at Module._compile (node:internal/modules/cjs/loader:1759:14)
+    at Module.m._compile (F:\Document\TASC\Backend\springfood-microservice\neondb\seed_generator\node_modules\ts-node\src\index.ts:1618:23) {
+  expected: [
+    {
+      type: 'class',
+      parts: [Array],
+      inverted: false,
+      ignoreCase: false
+    },
+    {
+      type: 'class',
+      parts: [Array],
+      inverted: false,
+      ignoreCase: false
+    },
+    { type: 'literal', text: '/*', ignoreCase: false },
+    { type: 'literal', text: '--', ignoreCase: false },
+    { type: 'literal', text: '.', ignoreCase: false },
+    {
+      type: 'class',
+      parts: [Array],
+      inverted: false,
+      ignoreCase: false
+    },
+    { type: 'literal', text: '/*', ignoreCase: false },
+    { type: 'literal', text: '--', ignoreCase: false },
+    { type: 'literal', text: '.', ignoreCase: false },
+    {
+      type: 'class',
+      parts: [Array],
+      inverted: false,
+      ignoreCase: false
+    },
+    { type: 'literal', text: '/*', ignoreCase: false },
+    { type: 'literal', text: '--', ignoreCase: false },
+    { type: 'literal', text: '(', ignoreCase: false }
+  ],
+  found: ',',
+  location: {
+    start: { offset: 352, line: 10, column: 31 },
+    end: { offset: 353, line: 10, column: 32 }
+  }
+}
+Parser failed for F:\Document\TASC\Backend\springfood-microservice\neondb\springfood_chat\message_read_receipt.sql, using fallback regex parser: s [SyntaxError]: Expected "(", "--", ".", "/*", [ \t\n\r], or [A-Za-z0-9_\-$一-龥À-ſ] but "," found.
+    at peg$buildStructuredError (\home\runner\work\node-sql-parser\node-sql-parser\pegjs\postgresql.pegjs:6086:12)
+    at Object.typeCase [as postgresql] (\home\runner\work\node-sql-parser\node-sql-parser\pegjs\postgresql.pegjs:46743:11)
+    at r.parse (\home\runner\work\node-sql-parser\node-sql-parser\src\parser.js:34:43)
+    at r.value (\home\runner\work\node-sql-parser\node-sql-parser\src\parser.js:9:26)
+    at parseDDLFile (F:\Document\TASC\Backend\springfood-microservice\neondb\seed_generator\src\parsers\ddl-parser.ts:61:29)
+    at parseAllDDLFiles (F:\Document\TASC\Backend\springfood-microservice\neondb\seed_generator\src\parsers\ddl-parser.ts:445:31)
+    at main (F:\Document\TASC\Backend\springfood-microservice\neondb\seed_generator\src\analyzers\test-dependency-analyzer.ts:30:36)
+    at Object.<anonymous> (F:\Document\TASC\Backend\springfood-microservice\neondb\seed_generator\src\analyzers\test-dependency-analyzer.ts:115:1)
+    at Module._compile (node:internal/modules/cjs/loader:1759:14)
+    at Module.m._compile (F:\Document\TASC\Backend\springfood-microservice\neondb\seed_generator\node_modules\ts-node\src\index.ts:1618:23) {
+  expected: [
+    {
+      type: 'class',
+      parts: [Array],
+      inverted: false,
+      ignoreCase: false
+    },
+    {
+      type: 'class',
+      parts: [Array],
+      inverted: false,
+      ignoreCase: false
+    },
+    { type: 'literal', text: '/*', ignoreCase: false },
+    { type: 'literal', text: '--', ignoreCase: false },
+    { type: 'literal', text: '.', ignoreCase: false },
+    {
+      type: 'class',
+      parts: [Array],
+      inverted: false,
+      ignoreCase: false
+    },
+    { type: 'literal', text: '/*', ignoreCase: false },
+    { type: 'literal', text: '--', ignoreCase: false },
+    { type: 'literal', text: '.', ignoreCase: false },
+    {
+      type: 'class',
+      parts: [Array],
+      inverted: false,
+      ignoreCase: false
+    },
+    { type: 'literal', text: '/*', ignoreCase: false },
+    { type: 'literal', text: '--', ignoreCase: false },
+    { type: 'literal', text: '(', ignoreCase: false }
+  ],
+  found: ',',
+  location: {
+    start: { offset: 360, line: 10, column: 31 },
+    end: { offset: 361, line: 10, column: 32 }
+  }
+}
+Parser failed for F:\Document\TASC\Backend\springfood-microservice\neondb\springfood_chat\sequence_generator.sql, using fallback regex parser: Error: No CREATE TABLE statement found in F:\Document\TASC\Backend\springfood-microservice\neondb\springfood_chat\sequence_generator.sql
+    at parseDDLFile (F:\Document\TASC\Backend\springfood-microservice\neondb\seed_generator\src\parsers\ddl-parser.ts:72:13)
+    at parseAllDDLFiles (F:\Document\TASC\Backend\springfood-microservice\neondb\seed_generator\src\parsers\ddl-parser.ts:445:31)
+    at main (F:\Document\TASC\Backend\springfood-microservice\neondb\seed_generator\src\analyzers\test-dependency-analyzer.ts:30:36)
+    at Object.<anonymous> (F:\Document\TASC\Backend\springfood-microservice\neondb\seed_generator\src\analyzers\test-dependency-analyzer.ts:115:1)
+    at Module._compile (node:internal/modules/cjs/loader:1759:14)
+    at Module.m._compile (F:\Document\TASC\Backend\springfood-microservice\neondb\seed_generator\node_modules\ts-node\src\index.ts:1618:23)
+    at node:internal/modules/cjs/loader:1892:10
+    at Object.require.extensions.<computed> [as .ts] (F:\Document\TASC\Backend\springfood-microservice\neondb\seed_generator\node_modules\ts-node\src\index.ts:1621:12)
+    at Module.load (node:internal/modules/cjs/loader:1479:32)
+    at Module._load (node:internal/modules/cjs/loader:1298:12)
+Error parsing F:\Document\TASC\Backend\springfood-microservice\neondb\springfood_chat\sequence_generator.sql: Error: Could not parse CREATE TABLE statement in F:\Document\TASC\Backend\springfood-microservice\neondb\springfood_chat\sequence_generator.sql
+    at parseDDLFileWithRegex (F:\Document\TASC\Backend\springfood-microservice\neondb\seed_generator\src\parsers\ddl-parser.ts:178:11)
+    at parseDDLFile (F:\Document\TASC\Backend\springfood-microservice\neondb\seed_generator\src\parsers\ddl-parser.ts:154:12)
+    at parseAllDDLFiles (F:\Document\TASC\Backend\springfood-microservice\neondb\seed_generator\src\parsers\ddl-parser.ts:445:31)
+    at main (F:\Document\TASC\Backend\springfood-microservice\neondb\seed_generator\src\analyzers\test-dependency-analyzer.ts:30:36)
+    at Object.<anonymous> (F:\Document\TASC\Backend\springfood-microservice\neondb\seed_generator\src\analyzers\test-dependency-analyzer.ts:115:1)
+    at Module._compile (node:internal/modules/cjs/loader:1759:14)
+    at Module.m._compile (F:\Document\TASC\Backend\springfood-microservice\neondb\seed_generator\node_modules\ts-node\src\index.ts:1618:23)
+    at node:internal/modules/cjs/loader:1892:10
+    at Object.require.extensions.<computed> [as .ts] (F:\Document\TASC\Backend\springfood-microservice\neondb\seed_generator\node_modules\ts-node\src\index.ts:1621:12)
+    at Module.load (node:internal/modules/cjs/loader:1479:32)
+Parser failed for F:\Document\TASC\Backend\springfood-microservice\neondb\springfood_product\categories.sql, using fallback regex parser: s [SyntaxError]: Expected "(", "--", ".", "/*", [ \t\n\r], or [A-Za-z0-9_\-$一-龥À-ſ] but "," found.
+    at peg$buildStructuredError (\home\runner\work\node-sql-parser\node-sql-parser\pegjs\postgresql.pegjs:6086:12)
+    at Object.typeCase [as postgresql] (\home\runner\work\node-sql-parser\node-sql-parser\pegjs\postgresql.pegjs:46743:11)
+    at r.parse (\home\runner\work\node-sql-parser\node-sql-parser\src\parser.js:34:43)
+    at r.value (\home\runner\work\node-sql-parser\node-sql-parser\src\parser.js:9:26)
+    at parseDDLFile (F:\Document\TASC\Backend\springfood-microservice\neondb\seed_generator\src\parsers\ddl-parser.ts:61:29)
+    at parseAllDDLFiles (F:\Document\TASC\Backend\springfood-microservice\neondb\seed_generator\src\parsers\ddl-parser.ts:445:31)
+    at main (F:\Document\TASC\Backend\springfood-microservice\neondb\seed_generator\src\analyzers\test-dependency-analyzer.ts:30:36)
+    at Object.<anonymous> (F:\Document\TASC\Backend\springfood-microservice\neondb\seed_generator\src\analyzers\test-dependency-analyzer.ts:115:1)
+    at Module._compile (node:internal/modules/cjs/loader:1759:14)
+    at Module.m._compile (F:\Document\TASC\Backend\springfood-microservice\neondb\seed_generator\node_modules\ts-node\src\index.ts:1618:23) {
+  expected: [
+    {
+      type: 'class',
+      parts: [Array],
+      inverted: false,
+      ignoreCase: false
+    },
+    {
+      type: 'class',
+      parts: [Array],
+      inverted: false,
+      ignoreCase: false
+    },
+    { type: 'literal', text: '/*', ignoreCase: false },
+    { type: 'literal', text: '--', ignoreCase: false },
+    { type: 'literal', text: '.', ignoreCase: false },
+    {
+      type: 'class',
+      parts: [Array],
+      inverted: false,
+      ignoreCase: false
+    },
+    { type: 'literal', text: '/*', ignoreCase: false },
+    { type: 'literal', text: '--', ignoreCase: false },
+    { type: 'literal', text: '.', ignoreCase: false },
+    {
+      type: 'class',
+      parts: [Array],
+      inverted: false,
+      ignoreCase: false
+    },
+    { type: 'literal', text: '/*', ignoreCase: false },
+    { type: 'literal', text: '--', ignoreCase: false },
+    { type: 'literal', text: '(', ignoreCase: false }
+  ],
+  found: ',',
+  location: {
+    start: { offset: 311, line: 10, column: 34 },
+    end: { offset: 312, line: 10, column: 35 }
+  }
+}
+Parser failed for F:\Document\TASC\Backend\springfood-microservice\neondb\springfood_product\feedbacks.sql, using fallback regex parser: s [SyntaxError]: Expected "(", "--", ".", "/*", [ \t\n\r], or [A-Za-z0-9_\-$一-龥À-ſ] but "," found.
+    at peg$buildStructuredError (\home\runner\work\node-sql-parser\node-sql-parser\pegjs\postgresql.pegjs:6086:12)
+    at Object.typeCase [as postgresql] (\home\runner\work\node-sql-parser\node-sql-parser\pegjs\postgresql.pegjs:46743:11)
+    at r.parse (\home\runner\work\node-sql-parser\node-sql-parser\src\parser.js:34:43)
+    at r.value (\home\runner\work\node-sql-parser\node-sql-parser\src\parser.js:9:26)
+    at parseDDLFile (F:\Document\TASC\Backend\springfood-microservice\neondb\seed_generator\src\parsers\ddl-parser.ts:61:29)
+    at parseAllDDLFiles (F:\Document\TASC\Backend\springfood-microservice\neondb\seed_generator\src\parsers\ddl-parser.ts:445:31)
+    at main (F:\Document\TASC\Backend\springfood-microservice\neondb\seed_generator\src\analyzers\test-dependency-analyzer.ts:30:36)
+    at Object.<anonymous> (F:\Document\TASC\Backend\springfood-microservice\neondb\seed_generator\src\analyzers\test-dependency-analyzer.ts:115:1)
+    at Module._compile (node:internal/modules/cjs/loader:1759:14)
+    at Module.m._compile (F:\Document\TASC\Backend\springfood-microservice\neondb\seed_generator\node_modules\ts-node\src\index.ts:1618:23) {
+  expected: [
+    {
+      type: 'class',
+      parts: [Array],
+      inverted: false,
+      ignoreCase: false
+    },
+    {
+      type: 'class',
+      parts: [Array],
+      inverted: false,
+      ignoreCase: false
+    },
+    { type: 'literal', text: '/*', ignoreCase: false },
+    { type: 'literal', text: '--', ignoreCase: false },
+    { type: 'literal', text: '.', ignoreCase: false },
+    {
+      type: 'class',
+      parts: [Array],
+      inverted: false,
+      ignoreCase: false
+    },
+    { type: 'literal', text: '/*', ignoreCase: false },
+    { type: 'literal', text: '--', ignoreCase: false },
+    { type: 'literal', text: '.', ignoreCase: false },
+    {
+      type: 'class',
+      parts: [Array],
+      inverted: false,
+      ignoreCase: false
+    },
+    { type: 'literal', text: '/*', ignoreCase: false },
+    { type: 'literal', text: '--', ignoreCase: false },
+    { type: 'literal', text: '(', ignoreCase: false }
+  ],
+  found: ',',
+  location: {
+    start: { offset: 376, line: 12, column: 32 },
+    end: { offset: 377, line: 12, column: 33 }
+  }
+}
+Parser failed for F:\Document\TASC\Backend\springfood-microservice\neondb\springfood_product\product_categories.sql, using fallback regex parser: s [SyntaxError]: Expected "(", "--", ".", "/*", [ \t\n\r], or [A-Za-z0-9_\-$一-龥À-ſ] but "," found.
+    at peg$buildStructuredError (\home\runner\work\node-sql-parser\node-sql-parser\pegjs\postgresql.pegjs:6086:12)
+    at Object.typeCase [as postgresql] (\home\runner\work\node-sql-parser\node-sql-parser\pegjs\postgresql.pegjs:46743:11)
+    at r.parse (\home\runner\work\node-sql-parser\node-sql-parser\src\parser.js:34:43)
+    at r.value (\home\runner\work\node-sql-parser\node-sql-parser\src\parser.js:9:26)
+    at parseDDLFile (F:\Document\TASC\Backend\springfood-microservice\neondb\seed_generator\src\parsers\ddl-parser.ts:61:29)
+    at parseAllDDLFiles (F:\Document\TASC\Backend\springfood-microservice\neondb\seed_generator\src\parsers\ddl-parser.ts:445:31)
+    at main (F:\Document\TASC\Backend\springfood-microservice\neondb\seed_generator\src\analyzers\test-dependency-analyzer.ts:30:36)
+    at Object.<anonymous> (F:\Document\TASC\Backend\springfood-microservice\neondb\seed_generator\src\analyzers\test-dependency-analyzer.ts:115:1)
+    at Module._compile (node:internal/modules/cjs/loader:1759:14)
+    at Module.m._compile (F:\Document\TASC\Backend\springfood-microservice\neondb\seed_generator\node_modules\ts-node\src\index.ts:1618:23) {
+  expected: [
+    {
+      type: 'class',
+      parts: [Array],
+      inverted: false,
+      ignoreCase: false
+    },
+    {
+      type: 'class',
+      parts: [Array],
+      inverted: false,
+      ignoreCase: false
+    },
+    { type: 'literal', text: '/*', ignoreCase: false },
+    { type: 'literal', text: '--', ignoreCase: false },
+    { type: 'literal', text: '.', ignoreCase: false },
+    {
+      type: 'class',
+      parts: [Array],
+      inverted: false,
+      ignoreCase: false
+    },
+    { type: 'literal', text: '/*', ignoreCase: false },
+    { type: 'literal', text: '--', ignoreCase: false },
+    { type: 'literal', text: '.', ignoreCase: false },
+    {
+      type: 'class',
+      parts: [Array],
+      inverted: false,
+      ignoreCase: false
+    },
+    { type: 'literal', text: '/*', ignoreCase: false },
+    { type: 'literal', text: '--', ignoreCase: false },
+    { type: 'literal', text: '(', ignoreCase: false }
+  ],
+  found: ',',
+  location: {
+    start: { offset: 145, line: 5, column: 34 },
+    end: { offset: 146, line: 5, column: 35 }
+  }
+}
+Parser failed for F:\Document\TASC\Backend\springfood-microservice\neondb\springfood_product\product_sales.sql, using fallback regex parser: s [SyntaxError]: Expected "(", "--", ".", "/*", [ \t\n\r], or [A-Za-z0-9_\-$一-龥À-ſ] but "," found.
+    at peg$buildStructuredError (\home\runner\work\node-sql-parser\node-sql-parser\pegjs\postgresql.pegjs:6086:12)
+    at Object.typeCase [as postgresql] (\home\runner\work\node-sql-parser\node-sql-parser\pegjs\postgresql.pegjs:46743:11)
+    at r.parse (\home\runner\work\node-sql-parser\node-sql-parser\src\parser.js:34:43)
+    at r.value (\home\runner\work\node-sql-parser\node-sql-parser\src\parser.js:9:26)
+    at parseDDLFile (F:\Document\TASC\Backend\springfood-microservice\neondb\seed_generator\src\parsers\ddl-parser.ts:61:29)
+    at parseAllDDLFiles (F:\Document\TASC\Backend\springfood-microservice\neondb\seed_generator\src\parsers\ddl-parser.ts:445:31)
+    at main (F:\Document\TASC\Backend\springfood-microservice\neondb\seed_generator\src\analyzers\test-dependency-analyzer.ts:30:36)
+    at Object.<anonymous> (F:\Document\TASC\Backend\springfood-microservice\neondb\seed_generator\src\analyzers\test-dependency-analyzer.ts:115:1)
+    at Module._compile (node:internal/modules/cjs/loader:1759:14)
+    at Module.m._compile (F:\Document\TASC\Backend\springfood-microservice\neondb\seed_generator\node_modules\ts-node\src\index.ts:1618:23) {
+  expected: [
+    {
+      type: 'class',
+      parts: [Array],
+      inverted: false,
+      ignoreCase: false
+    },
+    {
+      type: 'class',
+      parts: [Array],
+      inverted: false,
+      ignoreCase: false
+    },
+    { type: 'literal', text: '/*', ignoreCase: false },
+    { type: 'literal', text: '--', ignoreCase: false },
+    { type: 'literal', text: '.', ignoreCase: false },
+    {
+      type: 'class',
+      parts: [Array],
+      inverted: false,
+      ignoreCase: false
+    },
+    { type: 'literal', text: '/*', ignoreCase: false },
+    { type: 'literal', text: '--', ignoreCase: false },
+    { type: 'literal', text: '.', ignoreCase: false },
+    {
+      type: 'class',
+      parts: [Array],
+      inverted: false,
+      ignoreCase: false
+    },
+    { type: 'literal', text: '/*', ignoreCase: false },
+    { type: 'literal', text: '--', ignoreCase: false },
+    { type: 'literal', text: '(', ignoreCase: false }
+  ],
+  found: ',',
+  location: {
+    start: { offset: 127, line: 5, column: 32 },
+    end: { offset: 128, line: 5, column: 33 }
+  }
+}
+✅ Parsed 52 tables
+
+Tables found:
+  - springfood_authentication.acc_login_log (0 foreign keys)
+  - springfood_authentication.address (1 foreign keys)
+  - springfood_authentication.permission (0 foreign keys)
+  - springfood_authentication.role (0 foreign keys)
+  - springfood_authentication.role_has_permission (2 foreign keys)
+  - springfood_authentication.shop_registration_request (0 foreign keys)
+  - springfood_authentication.token (1 foreign keys)
+  - springfood_authentication.user (0 foreign keys)
+  - springfood_authentication.user_device (0 foreign keys)
+  - springfood_authentication.user_ekyc (0 foreign keys)
+  - springfood_authentication.user_has_role (2 foreign keys)
+  - springfood_chat.ai_message (0 foreign keys)
+  - springfood_chat.blocked_user (0 foreign keys)
+  - springfood_chat.conversation (1 foreign keys)
+  - springfood_chat.conversation_participant (1 foreign keys)
+  - springfood_chat.conversation_settings (0 foreign keys)
+  - springfood_chat.databasechangelog (0 foreign keys)
+  - springfood_chat.databasechangeloglock (0 foreign keys)
+  - springfood_chat.message (1 foreign keys)
+  - springfood_chat.message_attachment (1 foreign keys)
+  - springfood_chat.message_reaction (1 foreign keys)
+  - springfood_chat.message_read_receipt (1 foreign keys)
+  - springfood_chat.message_report (0 foreign keys)
+  - springfood_chat.spring_ai_chat_memory (0 foreign keys)
+  - springfood_chat.typing_indicator (0 foreign keys)
+  - springfood_chat.user_presence (0 foreign keys)
+  - springfood_media.media_file (0 foreign keys)
+  - springfood_notification.notifications (0 foreign keys)
+  - springfood_order.orders (0 foreign keys)
+  - springfood_order.orders_history (0 foreign keys)
+  - springfood_order.order_items (0 foreign keys)
+  - springfood_order.outbox_messages (0 foreign keys)
+  - springfood_payment.bank_accounts (0 foreign keys)
+  - springfood_payment.outbox_messages (0 foreign keys)
+  - springfood_payment.payment_methods (0 foreign keys)
+  - springfood_payment.payment_transactions (0 foreign keys)
+  - springfood_product.categories (1 foreign keys)
+  - springfood_product.category_group (0 foreign keys)
+  - springfood_product.feedbacks (1 foreign keys)
+  - springfood_product.outbox_messages (0 foreign keys)
+  - springfood_product.products (0 foreign keys)
+  - springfood_product.product_categories (2 foreign keys)
+  - springfood_product.product_images (0 foreign keys)
+  - springfood_product.product_sales (2 foreign keys)
+  - springfood_product.product_variants (0 foreign keys)
+  - springfood_product.product_view_history (0 foreign keys)
+  - springfood_product.sales (0 foreign keys)
+  - springfood_product.user_wishlist (0 foreign keys)
+  - springfood_shop.shops (0 foreign keys)
+  - springfood_shop.shop_business_document (0 foreign keys)
+  - springfood_shop.shop_members (0 foreign keys)
+  - springfood_shop.shop_wallets (0 foreign keys)
+
+Step 2: Analyzing dependencies...
+✅ Built dependency graph with 52 nodes
+
+Step 3: Checking for unresolved foreign keys...
+✅ All foreign keys resolved
+
+Step 4: Detecting cycles...
+✅ No cycles detected (good!)
+
+Step 5: Performing topological sort...
+✅ Sorted 52 tables in dependency order
+
+Insertion order:
+  1. springfood_authentication.acc_login_log
+  2. springfood_authentication.permission
+  3. springfood_authentication.role
+  4. springfood_authentication.role_has_permission
+  5. springfood_authentication.shop_registration_request
+  6. springfood_authentication.user
+  7. springfood_authentication.address
+  8. springfood_authentication.token
+  9. springfood_authentication.user_device
+  10. springfood_authentication.user_ekyc
+  11. springfood_authentication.user_has_role
+  12. springfood_chat.ai_message
+  13. springfood_chat.blocked_user
+  14. springfood_chat.conversation_settings
+  15. springfood_chat.conversation
+  16. springfood_chat.conversation_participant
+  17. springfood_chat.databasechangelog
+  18. springfood_chat.databasechangeloglock
+  19. springfood_chat.message
+  20. springfood_chat.message_attachment
+  21. springfood_chat.message_reaction
+  22. springfood_chat.message_read_receipt
+  23. springfood_chat.message_report
+  24. springfood_chat.spring_ai_chat_memory
+  25. springfood_chat.typing_indicator
+  26. springfood_chat.user_presence
+  27. springfood_media.media_file
+  28. springfood_notification.notifications
+  29. springfood_order.order_items
+  30. springfood_order.orders
+  31. springfood_order.orders_history
+  32. springfood_order.outbox_messages
+  33. springfood_payment.bank_accounts
+  34. springfood_payment.outbox_messages
+  35. springfood_payment.payment_methods
+  36. springfood_payment.payment_transactions
+  37. springfood_product.categories
+  38. springfood_product.category_group
+  39. springfood_product.outbox_messages
+  40. springfood_product.product_images
+  41. springfood_product.product_variants
+  42. springfood_product.product_view_history
+  43. springfood_product.products
+  44. springfood_product.feedbacks
+  45. springfood_product.product_categories
+  46. springfood_product.sales
+  47. springfood_product.product_sales
+  48. springfood_product.user_wishlist
+  49. springfood_shop.shop_business_document
+  50. springfood_shop.shop_members
+  51. springfood_shop.shop_wallets
+  52. springfood_shop.shops
+
+Step 6: Analyzing dependency levels...
+✅ Identified 4 dependency levels
+
+
+=== Dependency Hierarchy ===
+
+Level 1 (39 tables):
+  - springfood_authentication.acc_login_log (no dependencies)
+  - springfood_authentication.permission (no dependencies)
+  - springfood_authentication.role (no dependencies)
+  - springfood_authentication.shop_registration_request (no dependencies)
+  - springfood_authentication.user (no dependencies)
+  - springfood_authentication.user_device (no dependencies)
+  - springfood_authentication.user_ekyc (no dependencies)
+  - springfood_chat.ai_message (no dependencies)
+  - springfood_chat.blocked_user (no dependencies)
+  - springfood_chat.conversation_settings (no dependencies)
+  - springfood_chat.databasechangelog (no dependencies)
+  - springfood_chat.databasechangeloglock (no dependencies)
+  - springfood_chat.message_report (no dependencies)
+  - springfood_chat.spring_ai_chat_memory (no dependencies)
+  - springfood_chat.typing_indicator (no dependencies)
+  - springfood_chat.user_presence (no dependencies)
+  - springfood_media.media_file (no dependencies)
+  - springfood_notification.notifications (no dependencies)
+  - springfood_order.order_items (no dependencies)
+  - springfood_order.orders (no dependencies)
+  - springfood_order.orders_history (no dependencies)
+  - springfood_order.outbox_messages (no dependencies)
+  - springfood_payment.bank_accounts (no dependencies)
+  - springfood_payment.outbox_messages (no dependencies)
+  - springfood_payment.payment_methods (no dependencies)
+  - springfood_payment.payment_transactions (no dependencies)
+  - springfood_product.categories (no dependencies)
+  - springfood_product.category_group (no dependencies)
+  - springfood_product.outbox_messages (no dependencies)
+  - springfood_product.product_images (no dependencies)
+  - springfood_product.product_variants (no dependencies)
+  - springfood_product.product_view_history (no dependencies)
+  - springfood_product.products (no dependencies)
+  - springfood_product.sales (no dependencies)
+  - springfood_product.user_wishlist (no dependencies)
+  - springfood_shop.shop_business_document (no dependencies)
+  - springfood_shop.shop_members (no dependencies)
+  - springfood_shop.shop_wallets (no dependencies)
+  - springfood_shop.shops (no dependencies)
+
+Level 2 (8 tables):
+  - springfood_authentication.address → depends on: [springfood_authentication.user]
+  - springfood_authentication.role_has_permission → depends on: [springfood_authentication.role, springfood_authentication.permission]
+  - springfood_authentication.token → depends on: [springfood_authentication.user]
+  - springfood_authentication.user_has_role → depends on: [springfood_authentication.user, springfood_authentication.role]
+  - springfood_chat.conversation → depends on: [springfood_chat.conversation_settings]
+  - springfood_product.feedbacks → depends on: [springfood_product.products]
+  - springfood_product.product_categories → depends on: [springfood_product.categories, springfood_product.products]
+  - springfood_product.product_sales → depends on: [springfood_product.products, springfood_product.sales]
+
+Level 3 (2 tables):
+  - springfood_chat.conversation_participant → depends on: [springfood_chat.conversation]
+  - springfood_chat.message → depends on: [springfood_chat.conversation]
+
+Level 4 (3 tables):
+  - springfood_chat.message_attachment → depends on: [springfood_chat.message]
+  - springfood_chat.message_reaction → depends on: [springfood_chat.message]
+  - springfood_chat.message_read_receipt → depends on: [springfood_chat.message]
+
+Total levels: 4
+Total tables: 52
+
+=== Validating Expected Hierarchy ===
+
+Level 1:
+  Expected: 2 tables
+  Actual: 39 tables
+  ⚠️  Unexpected tables: springfood_authentication.acc_login_log, springfood_authentication.permission, springfood_authentication.shop_registration_request, springfood_authentication.user, springfood_authentication.user_device, springfood_authentication.user_ekyc, springfood_chat.ai_message, springfood_chat.blocked_user, springfood_chat.conversation_settings, springfood_chat.databasechangelog, springfood_chat.databasechangeloglock, springfood_chat.message_report, springfood_chat.spring_ai_chat_memory, springfood_chat.typing_indicator, springfood_chat.user_presence, springfood_media.media_file, springfood_notification.notifications, springfood_order.order_items, springfood_order.orders, springfood_order.orders_history, springfood_order.outbox_messages, springfood_payment.bank_accounts, springfood_payment.outbox_messages, springfood_payment.payment_methods, springfood_payment.payment_transactions, springfood_product.categories, springfood_product.outbox_messages, springfood_product.product_images, springfood_product.product_variants, springfood_product.product_view_history, springfood_product.products, springfood_product.sales, springfood_product.user_wishlist, springfood_shop.shop_business_document, springfood_shop.shop_members, springfood_shop.shop_wallets, springfood_shop.shops
+
+Level 2:
+  Expected: 2 tables
+  Actual: 8 tables
+  ❌ Missing tables: springfood_authentication.user, springfood_product.categories
+  ⚠️  Unexpected tables: springfood_authentication.address, springfood_authentication.role_has_permission, springfood_authentication.token, springfood_authentication.user_has_role, springfood_chat.conversation, springfood_product.feedbacks, springfood_product.product_categories, springfood_product.product_sales
+
+Level 3:
+  Expected: 3 tables
+  Actual: 2 tables
+  ❌ Missing tables: springfood_authentication.user_has_role, springfood_authentication.address, springfood_shop.shops
+  ⚠️  Unexpected tables: springfood_chat.conversation_participant, springfood_chat.message
+
+Level 4:
+  Expected: 3 tables
+  Actual: 3 tables
+  ❌ Missing tables: springfood_product.products, springfood_shop.shop_members, springfood_shop.shop_wallets
+  ⚠️  Unexpected tables: springfood_chat.message_attachment, springfood_chat.message_reaction, springfood_chat.message_read_receipt
+
+Level 5:
+  Expected: 5 tables
+  Actual: 0 tables
+  ❌ Missing tables: springfood_product.product_categories, springfood_product.product_images, springfood_product.feedbacks, springfood_product.sales, springfood_order.orders
+
+Level 6:
+  Expected: 5 tables
+  Actual: 0 tables
+  ❌ Missing tables: springfood_product.product_sales, springfood_order.order_items, springfood_payment.payment_transactions, springfood_chat.conversation, springfood_notification.notifications
+
+Level 7:
+  Expected: 3 tables
+  Actual: 0 tables
+  ❌ Missing tables: springfood_chat.conversation_participant, springfood_chat.message, springfood_media.media_file
+
+⚠️  Dependency hierarchy differs from expected structure.
+This may be due to schema changes or missing DDL files.
+
+=== Test Complete ===

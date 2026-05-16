@@ -1,0 +1,371 @@
+# ============================================================================
+# 12 Spring Boot microservices.
+#
+# Hạ tầng (Postgres / Redis / Kafka / Object storage / Mail / AI) đều là
+# CLOUD-HOSTED (Neon, Upstash, Aiven, Cloudflare R2, Brevo, Gemini). Compose
+# này KHÔNG depend trên `docker-compose.yml` infra cũ — chạy độc lập:
+#
+#   docker compose -f docker-compose.apps.yml up -d --build
+#
+# Nếu mày vẫn muốn dùng MongoDB / Carbone / MinIO local, hãy chạy thêm:
+#   docker compose -f docker-compose.yml -f docker-compose.apps.yml up -d --build
+# (cùng network `springfood-network`).
+# ============================================================================
+
+x-common-build: &common-build
+  context: .
+  dockerfile: Dockerfile.service
+
+x-common-env: &common-env
+  # Spring profile
+  SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-dev}
+
+  # Eureka — point ALL services to the eureka-server container
+  EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka/
+  EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
+
+  # Spring datasource (Neon)
+  SPRING_DATASOURCE_URL: ${DEFAULT_DATABASE_URL}
+  SPRING_DATASOURCE_USERNAME: ${DEFAULT_DATABASE_USERNAME}
+  SPRING_DATASOURCE_PASSWORD: ${DEFAULT_DATABASE_PASSWORD}
+
+  # Redis (Upstash)
+  REDIS_HOST: ${REDIS_HOST}
+  REDIS_PORT: ${REDIS_PORT}
+  REDIS_PASSWORD: ${REDIS_PASSWORD}
+  REDIS_SSL_ENABLED: ${REDIS_SSL_ENABLED:-true}
+
+  # Kafka (Aiven)
+  KAFKA_BOOTSTRAP_SERVERS: ${KAFKA_BOOTSTRAP_SERVERS}
+  KAFKA_ENABLED: ${KAFKA_ENABLED:-true}
+  KAFKA_SECURITY_PROTOCOL: ${KAFKA_SECURITY_PROTOCOL:-SSL}
+  KAFKA_SSL_TRUSTSTORE_LOCATION: /app/certs/kafka.truststore.jks
+  KAFKA_SSL_TRUSTSTORE_PASSWORD: ${KAFKA_SSL_TRUSTSTORE_PASSWORD}
+  KAFKA_SSL_KEYSTORE_LOCATION: /app/certs/kafka.keystore.jks
+  KAFKA_SSL_KEYSTORE_PASSWORD: ${KAFKA_SSL_KEYSTORE_PASSWORD}
+  KAFKA_SSL_KEY_PASSWORD: ${KAFKA_SSL_KEY_PASSWORD}
+
+  # JWT
+  JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+  JWT_REFRESH_KEY: ${JWT_REFRESH_KEY}
+  JWT_RESET_KEY: ${JWT_RESET_KEY}
+
+  # Mail / Brevo
+  MAIL_ENABLED: ${MAIL_ENABLED:-true}
+  BREVO_API_KEY: ${BREVO_API_KEY}
+  MAIL_FROM: ${MAIL_FROM}
+  MAIL_FROM_NAME: ${MAIL_FROM_NAME}
+  MAIL_REPLY_TO: ${MAIL_REPLY_TO}
+
+  # MinIO / Object storage (Cloudflare R2 trên cloud)
+  MINIO_HOST: ${MINIO_HOST}
+  MINIO_PORT: ${MINIO_PORT}
+  MINIO_ENDPOINT: ${MINIO_ENDPOINT}
+  MINIO_ACCESS: ${MINIO_ACCESS}
+  MINIO_SECRET: ${MINIO_SECRET}
+  MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
+  MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
+  MINIO_BUCKET: ${MINIO_BUCKET:-test}
+
+  # Carbone (cloud nếu có, fallback localhost)
+  CARBONE_BASE_URL: ${CARBONE_BASE_URL}
+  CARBONE_MINIO_BUCKET: ${CARBONE_MINIO_BUCKET}
+
+  # AI / external
+  GEMINI_API_KEY: ${GEMINI_API_KEY}
+  PEXELS_API_KEY: ${PEXELS_API_KEY}
+  R2_PUBLIC_BASE_URL: ${R2_PUBLIC_BASE_URL}
+  R2_BUCKET: ${R2_BUCKET}
+
+  # JVM
+  JAVA_OPTS: "-XX:+UseContainerSupport -XX:MaxRAMPercentage=70.0"
+
+x-kafka-certs-mount: &kafka-certs-mount
+  - ./deploy/messaging/certs:/app/certs:ro
+
+services:
+  # --------------------------- Service discovery ---------------------------
+  eureka-server:
+    build:
+      <<: *common-build
+      args:
+        SERVICE_MODULE: eureka-server
+    image: springfood/eureka-server:latest
+    container_name: springfood-eureka-server
+    environment:
+      <<: *common-env
+      SERVER_PORT: "8761"
+    ports:
+      - "8761:8761"
+    networks: [springfood-network]
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8761/actuator/health || curl -fsS http://localhost:8761/ || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 60s
+    restart: unless-stopped
+
+  # --------------------------- Edge / gateway ---------------------------
+  api-gateway:
+    build:
+      <<: *common-build
+      args:
+        SERVICE_MODULE: api-gateway
+    image: springfood/api-gateway:latest
+    container_name: springfood-api-gateway
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+    environment:
+      <<: *common-env
+      SERVER_PORT: "8080"
+    ports:
+      - "8080:8080"
+    networks: [springfood-network]
+    restart: unless-stopped
+
+  # --------------------------- Business services ---------------------------
+  authentication:
+    build:
+      <<: *common-build
+      args:
+        SERVICE_MODULE: authentication
+    image: springfood/authentication:latest
+    container_name: springfood-authentication
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+    environment:
+      <<: *common-env
+      SERVER_PORT: "8081"
+    ports:
+      - "8081:8081"
+    volumes: *kafka-certs-mount
+    networks: [springfood-network]
+    restart: unless-stopped
+
+  cart-service:
+    build:
+      <<: *common-build
+      args:
+        SERVICE_MODULE: cart-service
+    image: springfood/cart-service:latest
+    container_name: springfood-cart-service
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+    environment:
+      <<: *common-env
+      SERVER_PORT: "8082"
+    ports:
+      - "8082:8082"
+    volumes: *kafka-certs-mount
+    networks: [springfood-network]
+    restart: unless-stopped
+
+  order-service:
+    build:
+      <<: *common-build
+      args:
+        SERVICE_MODULE: order-service
+    image: springfood/order-service:latest
+    container_name: springfood-order-service
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+    environment:
+      <<: *common-env
+      SERVER_PORT: "8083"
+      # Override gRPC client targets to use container DNS instead of localhost
+      GRPC_CLIENT_SHOP-SERVICE_ADDRESS: "static://shop-service:9090"
+      GRPC_CLIENT_PAYMENT-SERVICE_ADDRESS: "static://payment-service:9096"
+    ports:
+      - "8083:8083"
+      - "9097:9097"
+    volumes: *kafka-certs-mount
+    networks: [springfood-network]
+    restart: unless-stopped
+
+  shop-service:
+    build:
+      <<: *common-build
+      args:
+        SERVICE_MODULE: shop-service
+    image: springfood/shop-service:latest
+    container_name: springfood-shop-service
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+    environment:
+      <<: *common-env
+      SERVER_PORT: "8084"
+      GRPC_CLIENT_PRODUCT-SERVICE_ADDRESS: "static://product-service:9095"
+    ports:
+      - "8084:8084"
+      - "9090:9090"
+    volumes: *kafka-certs-mount
+    networks: [springfood-network]
+    restart: unless-stopped
+
+  product-service:
+    build:
+      <<: *common-build
+      args:
+        SERVICE_MODULE: product-service
+    image: springfood/product-service:latest
+    container_name: springfood-product-service
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+    environment:
+      <<: *common-env
+      SERVER_PORT: "8085"
+      # The yaml hardcodes server.address=127.0.0.1; force bind on all interfaces inside the container
+      SERVER_ADDRESS: "0.0.0.0"
+      GRPC_CLIENT_SHOP-SERVICE_ADDRESS: "static://shop-service:9090"
+    ports:
+      - "8085:8085"
+      - "9095:9095"
+    volumes: *kafka-certs-mount
+    networks: [springfood-network]
+    restart: unless-stopped
+
+  payment-service:
+    build:
+      <<: *common-build
+      args:
+        SERVICE_MODULE: payment-service
+    image: springfood/payment-service:latest
+    container_name: springfood-payment-service
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+    environment:
+      <<: *common-env
+      SERVER_PORT: "8086"
+      GRPC_CLIENT_ORDER-SERVICE_ADDRESS: "static://order-service:9097"
+      GRPC_CLIENT_PRODUCT-SERVICE_ADDRESS: "static://product-service:9095"
+    ports:
+      - "8086:8086"
+      - "9096:9096"
+    volumes: *kafka-certs-mount
+    networks: [springfood-network]
+    restart: unless-stopped
+
+  notification:
+    build:
+      <<: *common-build
+      args:
+        SERVICE_MODULE: notification
+    image: springfood/notification:latest
+    container_name: springfood-notification
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+    environment:
+      <<: *common-env
+      SERVER_PORT: "8095"
+    ports:
+      - "8095:8095"
+    volumes: *kafka-certs-mount
+    networks: [springfood-network]
+    restart: unless-stopped
+
+  media:
+    build:
+      <<: *common-build
+      args:
+        SERVICE_MODULE: media
+    image: springfood/media:latest
+    container_name: springfood-media
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+    environment:
+      <<: *common-env
+      SERVER_PORT: "8099"
+    ports:
+      - "8099:8099"
+    volumes: *kafka-certs-mount
+    networks: [springfood-network]
+    restart: unless-stopped
+
+  statistical-report:
+    build:
+      <<: *common-build
+      args:
+        SERVICE_MODULE: statistical-report
+    image: springfood/statistical-report:latest
+    container_name: springfood-statistical-report
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+    environment:
+      <<: *common-env
+      SERVER_PORT: "8090"
+    ports:
+      - "8090:8090"
+    volumes: *kafka-certs-mount
+    networks: [springfood-network]
+    restart: unless-stopped
+
+  action-log:
+    build:
+      <<: *common-build
+      args:
+        SERVICE_MODULE: action-log
+    image: springfood/action-log:latest
+    container_name: springfood-action-log
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+    environment:
+      <<: *common-env
+      SERVER_PORT: "8094"
+    ports:
+      - "8094:8094"
+    volumes: *kafka-certs-mount
+    networks: [springfood-network]
+    restart: unless-stopped
+
+  chat:
+    build:
+      <<: *common-build
+      args:
+        SERVICE_MODULE: chat
+    image: springfood/chat:latest
+    container_name: springfood-chat
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+    environment:
+      <<: *common-env
+      SERVER_PORT: "9098"
+      # MongoDB cho chat — set MONGODB_HOST/MONGODB_URI trong .env
+      SPRING_DATA_MONGODB_URI: ${MONGODB_URI:-}
+      SPRING_DATA_MONGODB_HOST: ${MONGODB_HOST:-mongodb}
+      SPRING_DATA_MONGODB_PORT: ${MONGODB_PORT:-27017}
+      SPRING_DATA_MONGODB_USERNAME: ${MONGODB_USERNAME:-}
+      SPRING_DATA_MONGODB_PASSWORD: ${MONGODB_PASSWORD:-}
+      SPRING_DATA_MONGODB_DATABASE: ${MONGODB_DATABASE:-springfood}
+      SPRING_DATA_MONGODB_AUTHENTICATION_DATABASE: ${MONGODB_AUTH_DB:-admin}
+    ports:
+      - "9098:9098"
+    volumes: *kafka-certs-mount
+    networks: [springfood-network]
+    restart: unless-stopped
+
+
+# ----------------------------------------------------------------------------
+# Network
+# - `external: true` => sẽ DÙNG network `springfood-network` nếu mày đang chạy
+#   `docker-compose.yml` infra cũ (mongodb / carbone / minio local).
+# - Nếu chỉ chạy file này, Compose sẽ báo "network not found"; lúc đó chuyển
+#   sang block `external: false` ở dưới (hoặc chạy 1 lần `docker network create
+#   springfood-network`).
+# ----------------------------------------------------------------------------
+networks:
+  springfood-network:
+    name: springfood-network
+    driver: bridge

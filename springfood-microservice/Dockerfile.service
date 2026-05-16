@@ -1,0 +1,88 @@
+# syntax=docker/dockerfile:1.7
+# ============================================================================
+# Generic multi-stage Dockerfile for any Spring Boot module in this monorepo.
+# Pass SERVICE_MODULE as build arg, e.g. authentication, product-service, ...
+# ============================================================================
+
+# ---------- Stage 1: Build ---------------------------------------------------
+FROM maven:3.9.9-eclipse-temurin-21 AS build
+WORKDIR /workspace
+
+# 1) Copy only POMs first to leverage Docker layer cache for dependencies
+COPY pom.xml ./
+COPY .mvn .mvn
+COPY mvnw mvnw.cmd ./
+
+COPY action-log/pom.xml         action-log/pom.xml
+COPY api-gateway/pom.xml        api-gateway/pom.xml
+COPY authentication/pom.xml     authentication/pom.xml
+COPY cart-service/pom.xml       cart-service/pom.xml
+COPY chat/pom.xml               chat/pom.xml
+COPY client/pom.xml             client/pom.xml
+COPY common/pom.xml             common/pom.xml
+COPY common-security/pom.xml    common-security/pom.xml
+COPY eureka-server/pom.xml      eureka-server/pom.xml
+COPY grpc/pom.xml               grpc/pom.xml
+COPY media/pom.xml              media/pom.xml
+COPY minio/pom.xml              minio/pom.xml
+COPY notification/pom.xml       notification/pom.xml
+COPY order-service/pom.xml      order-service/pom.xml
+COPY payment-service/pom.xml    payment-service/pom.xml
+COPY product-service/pom.xml    product-service/pom.xml
+COPY shop-service/pom.xml       shop-service/pom.xml
+COPY statistical-report/pom.xml statistical-report/pom.xml
+
+# Best-effort go-offline (some modules may need source for plugin enforcement)
+RUN --mount=type=cache,target=/root/.m2 \
+    mvn -B -q -DskipTests dependency:go-offline -fae || true
+
+# 2) Copy full source
+COPY action-log         action-log
+COPY api-gateway        api-gateway
+COPY authentication     authentication
+COPY cart-service       cart-service
+COPY chat               chat
+COPY client             client
+COPY common             common
+COPY common-security    common-security
+COPY eureka-server      eureka-server
+COPY grpc               grpc
+COPY media              media
+COPY minio              minio
+COPY notification       notification
+COPY order-service      order-service
+COPY payment-service    payment-service
+COPY product-service    product-service
+COPY shop-service       shop-service
+COPY statistical-report statistical-report
+
+# 3) Build only the requested module (and its required local modules)
+ARG SERVICE_MODULE
+RUN --mount=type=cache,target=/root/.m2 \
+    mvn -B -q -DskipTests -pl ${SERVICE_MODULE} -am package
+
+# 4) Pick the executable Spring Boot jar (skip original-/sources/javadoc)
+RUN set -eux; \
+    mkdir -p /dist; \
+    JAR=$(find /workspace/${SERVICE_MODULE}/target -maxdepth 1 -name '*.jar' \
+            ! -name 'original-*' ! -name '*-sources.jar' ! -name '*-javadoc.jar' \
+            | head -n 1); \
+    test -n "$JAR"; \
+    cp "$JAR" /dist/app.jar
+
+# ---------- Stage 2: Runtime -------------------------------------------------
+FROM eclipse-temurin:21-jre AS runtime
+WORKDIR /app
+
+# Run as non-root for security
+RUN groupadd -r app && useradd -r -g app -d /app -s /sbin/nologin app
+RUN apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
+
+COPY --from=build /dist/app.jar /app/app.jar
+RUN chown -R app:app /app
+USER app
+
+ENV JAVA_OPTS="-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0"
+
+# Generic exec; per-service ports are exposed via docker-compose
+ENTRYPOINT ["sh","-c","exec java $JAVA_OPTS -jar /app/app.jar"]

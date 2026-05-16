@@ -33,6 +33,9 @@ public class KafkaConsumerConfig {
     @Value("${spring.kafka.bootstrap-servers:localhost:9092}")
     private String bootstrapServers;
 
+    @Value("${spring.kafka.consumer.auto-startup:true}")
+    private boolean autoStartup;
+
     /**
      * Common consumer configuration properties.
      * 
@@ -93,6 +96,8 @@ public class KafkaConsumerConfig {
             org.springframework.kafka.listener.ContainerProperties.AckMode.MANUAL
         );
         
+        factory.setAutoStartup(autoStartup);
+        
         return factory;
     }
 
@@ -137,6 +142,8 @@ public class KafkaConsumerConfig {
             org.springframework.kafka.listener.ContainerProperties.AckMode.MANUAL_IMMEDIATE
         );
         
+        factory.setAutoStartup(autoStartup);
+        
         return factory;
     }
 
@@ -176,6 +183,8 @@ public class KafkaConsumerConfig {
         factory.getContainerProperties().setAckMode(
             org.springframework.kafka.listener.ContainerProperties.AckMode.MANUAL
         );
+        
+        factory.setAutoStartup(autoStartup);
         
         return factory;
     }

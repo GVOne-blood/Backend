@@ -95,7 +95,19 @@ public class GlobalHandleException {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
     }
 
-    @ExceptionHandler({InvalidDataException.class, DataIntegrityViolationException.class})
+    @ExceptionHandler(InvalidDataException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseError handleInvalidDataException(InvalidDataException e, WebRequest request) {
+        return ResponseError.builder()
+                .status(HttpStatus.BAD_REQUEST.value())
+                .error(HttpStatus.BAD_REQUEST.getReasonPhrase())
+                .message(e.getMessage())
+                .timestamp(new Date())
+                .path(request.getDescription(false).replace("uri=", ""))
+                .build();
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     public ResponseError handleSqlException(Exception e, WebRequest request) {
         // Sanitize SQL error message to prevent information disclosure

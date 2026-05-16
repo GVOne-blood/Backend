@@ -16,6 +16,10 @@
 spring:
   application:
     name: shopService
+  main:
+    allow-bean-definition-overriding: true
+  autoconfigure:
+    exclude: com.theblood.springfood.client.autoconf.ClientConfiguration
   # Replace by 'prod, faker' to add the faker context and have sample data loaded in production
   liquibase:
     enabled: false
@@ -24,8 +28,6 @@ spring:
       write-durations-as-timestamps: false
   mail:
     host: localhost
-  main:
-    allow-bean-definition-overriding: true
   messages:
     basename: i18n/messages
   security:

@@ -9,6 +9,15 @@ spring:
     url: ${DEFAULT_DATABASE_URL:jdbc:postgresql://localhost:5432/springfood}
     username: ${DEFAULT_DATABASE_USERNAME:postgres}
     password: ${DEFAULT_DATABASE_PASSWORD:123456}
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      ssl:
+        enabled: true
+      timeout: 10000ms
+      connect-timeout: 10000ms
   jpa:
     hibernate:
       ddl-auto: update

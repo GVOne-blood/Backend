@@ -1,136 +1,15 @@
-# Example configuration for microservice client library
 springfood:
   client:
     enabled: true
     default-protocol: rest
-
-    # Default configurations for all clients
-    defaults:
-      connect-timeout: 10s
-      read-timeout: 120s
-      write-timeout: 120s
-      max-retries: 3
-      enable-metrics: true
-      enable-tracing: true
-
-    # Resilience configurations
-    resilience:
-      enabled: false
-      circuit-breaker:
-        enabled: true
-        failure-rate-threshold: 50
-      retry:
-        enabled: true
-        max-attempts: 3
-
-    # Service-specific configurations
     services:
-      # Authentication Service
-      authentication:
-        enabled: true
-        protocol: rest
-        url: http://localhost:8081
-        base-path: /api
-
-      # Action Log Service
       log-actions:
+        name: log-actions
+        protocol: rest
+        url: http://localhost:8094
         enabled: true
+      payment-service:
+        name: payment-service
         protocol: rest
         url: http://localhost:8086
-        base-path: /api/log-actions
-
-      # Notification Service
-      notification:
         enabled: true
-        protocol: rest
-        url: http://localhost:8095
-        base-path: /api/notifications
-
-      # Product Service
-      product:
-        enabled: true
-        protocol: rest
-        url: http://localhost:8082
-        base-path: /api/products
-
-      # Shop Service
-      shop:
-        enabled: true
-        protocol: rest
-        url: http://localhost:8083
-        base-path: /api/shops
-
-      # Cart Service
-      cart:
-        enabled: true
-        protocol: rest
-        url: http://localhost:8084
-        base-path: /api/carts
-
-      # Order Service
-      order:
-        enabled: true
-        protocol: rest
-        url: http://localhost:8085
-        base-path: /api/orders
-
-      # Payment Service
-      payment:
-        enabled: true
-        protocol: rest
-        url: http://localhost:8087
-        base-path: /api/payments
-
-      # Statistical Report Service
-      statistical-report:
-        enabled: true
-        protocol: rest
-        url: http://localhost:8090
-        base-path: /api/reports
-
-      # Chat Service
-      chat:
-        enabled: true
-        protocol: rest
-        url: http://localhost:8091
-        base-path: /api/messages
-
-      # Media/MinIO Service
-      media:
-        enabled: true
-        protocol: rest
-        url: http://localhost:9000
-        base-path: /
-
-      # API Gateway
-      api-gateway:
-        enabled: true
-        protocol: rest
-        url: http://localhost:8080
-        base-path: /
-
-      # Eureka Server
-      eureka:
-        enabled: true
-        protocol: rest
-        url: http://localhost:8761
-        base-path: /eureka
-
-# Legacy gRPC configuration (for backward compatibility)
-management:
-  health:
-    grpcChannel:
-      enabled: false
-
-grpc:
-  client:
-    PRODUCT:
-      address: dns:///localhost:9090
-      negotiation-type: plaintext
-    SHOP:
-      address: dns:///localhost:9091
-      negotiation-type: plaintext
-    ORDER:
-      address: dns:///localhost:9092
-      negotiation-type: plaintext
-

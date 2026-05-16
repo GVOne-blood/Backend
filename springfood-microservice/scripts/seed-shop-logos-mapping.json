@@ -1,0 +1,164 @@
+[
+  {
+    "shop_id": "9c66f0b2-e38a-455f-9e02-30301d0d0450",
+    "shop_name": "BBQ Garden",
+    "url": "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/shops/9c66f0b2-e38a-455f-9e02-30301d0d0450.jpg",
+    "kind": "pexels"
+  },
+  {
+    "shop_id": "675dd695-314a-438f-8205-c5afd4866fbd",
+    "shop_name": "Bánh Mì Hòa Mã",
+    "url": "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/shops/675dd695-314a-438f-8205-c5afd4866fbd.jpg",
+    "kind": "pexels"
+  },
+  {
+    "shop_id": "64e671c8-db3c-4592-bd27-327a05cb7cb0",
+    "shop_name": "Bánh Xèo Miền Tây",
+    "url": "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/shops/64e671c8-db3c-4592-bd27-327a05cb7cb0.jpg",
+    "kind": "pexels"
+  },
+  {
+    "shop_id": "bede932b-358f-4b1e-a0ce-8c2a85e4e6b0",
+    "shop_name": "Bún Bò Huế Mẹ Liên",
+    "url": "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/shops/bede932b-358f-4b1e-a0ce-8c2a85e4e6b0.jpg",
+    "kind": "pexels"
+  },
+  {
+    "shop_id": "2e1c1517-693c-48af-bb27-3d223ac46a18",
+    "shop_name": "Bún Chả Hà Nội",
+    "url": "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/shops/2e1c1517-693c-48af-bb27-3d223ac46a18.jpg",
+    "kind": "pexels"
+  },
+  {
+    "shop_id": "c66d5163-7deb-4691-9b02-fa990973c12d",
+    "shop_name": "Cháo Lòng Bà Hoa",
+    "url": "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/shops/c66d5163-7deb-4691-9b02-fa990973c12d.jpg",
+    "kind": "pexels"
+  },
+  {
+    "shop_id": "33d9d28f-0327-4b75-9e53-6966c56c8ff1",
+    "shop_name": "Chè Thái Lan",
+    "url": "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/shops/33d9d28f-0327-4b75-9e53-6966c56c8ff1.jpg",
+    "kind": "pexels"
+  },
+  {
+    "shop_id": "05afc127-54de-46db-8adf-432f96e5c6e9",
+    "shop_name": "Cà Phê Cộng",
+    "url": "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/shops/05afc127-54de-46db-8adf-432f96e5c6e9.png",
+    "kind": "logo.dev"
+  },
+  {
+    "shop_id": "d2548035-bd51-405c-a276-e8636e3875ad",
+    "shop_name": "Cơm Gà Xối Mỡ Hội An",
+    "url": "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/shops/d2548035-bd51-405c-a276-e8636e3875ad.jpg",
+    "kind": "pexels"
+  },
+  {
+    "shop_id": "d8fb384f-b624-468d-b39f-4117cc88e6e2",
+    "shop_name": "Cơm Niêu Singapore",
+    "url": "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/shops/d8fb384f-b624-468d-b39f-4117cc88e6e2.jpg",
+    "kind": "pexels"
+  },
+  {
+    "shop_id": "587d74f1-22dc-4c2a-a4bb-ddf59abb60d8",
+    "shop_name": "Cơm Tấm Sài Gòn",
+    "url": "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/shops/587d74f1-22dc-4c2a-a4bb-ddf59abb60d8.jpg",
+    "kind": "pexels"
+  },
+  {
+    "shop_id": "2c3ff69c-6f52-4ba0-9c6e-8b7c5c72af5b",
+    "shop_name": "Ding Tea",
+    "url": "https://pub-db7036086154479380d282adb29af0a4.r2.dev/brand/springfood-logo-512.png",
+    "kind": "springfood-fallback"
+  },
+  {
+    "shop_id": "104b1828-abdd-4afe-a2fa-ac5c93f455f4",
+    "shop_name": "Gong Cha",
+    "url": "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/shops/104b1828-abdd-4afe-a2fa-ac5c93f455f4.png",
+    "kind": "logo.dev"
+  },
+  {
+    "shop_id": "adad75ee-46ea-47b8-9b5b-e23c41955ac9",
+    "shop_name": "Highlands Coffee",
+    "url": "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/shops/adad75ee-46ea-47b8-9b5b-e23c41955ac9.png",
+    "kind": "logo.dev"
+  },
+  {
+    "shop_id": "cb89c02c-45ed-4740-a458-ae02185cb721",
+    "shop_name": "Hải Sản Nướng Biển Đông",
+    "url": "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/shops/cb89c02c-45ed-4740-a458-ae02185cb721.jpg",
+    "kind": "pexels"
+  },
+  {
+    "shop_id": "24f31fb5-ace1-4299-86aa-3e35daa47acc",
+    "shop_name": "Kem Tràng Tiền",
+    "url": "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/shops/24f31fb5-ace1-4299-86aa-3e35daa47acc.png",
+    "kind": "logo.dev"
+  },
+  {
+    "shop_id": "6e9e9b71-d8bc-4597-8390-5b9974a17e52",
+    "shop_name": "Lẩu Thái Hải Sản",
+    "url": "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/shops/6e9e9b71-d8bc-4597-8390-5b9974a17e52.jpg",
+    "kind": "pexels"
+  },
+  {
+    "shop_id": "331c1df5-1eb3-44d1-8260-08b779fab0b1",
+    "shop_name": "Mixue",
+    "url": "https://pub-db7036086154479380d282adb29af0a4.r2.dev/brand/springfood-logo-512.png",
+    "kind": "springfood-fallback"
+  },
+  {
+    "shop_id": "9bc4f37f-a219-4059-b953-5d9c2498fb0c",
+    "shop_name": "Nem Nướng Nha Trang",
+    "url": "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/shops/9bc4f37f-a219-4059-b953-5d9c2498fb0c.jpg",
+    "kind": "pexels"
+  },
+  {
+    "shop_id": "5e31a1d0-9ec4-4a0b-bb7d-603946a079bb",
+    "shop_name": "Phúc Long Coffee & Tea",
+    "url": "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/shops/5e31a1d0-9ec4-4a0b-bb7d-603946a079bb.png",
+    "kind": "logo.dev"
+  },
+  {
+    "shop_id": "849cfa0d-a45d-426a-bf42-f529b1299232",
+    "shop_name": "Phở Bò Tái Lăn",
+    "url": "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/shops/849cfa0d-a45d-426a-bf42-f529b1299232.jpg",
+    "kind": "pexels"
+  },
+  {
+    "shop_id": "ff3c8f63-5837-44e3-b22b-bb66f0b2a317",
+    "shop_name": "Phở Gà Tân Định",
+    "url": "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/shops/ff3c8f63-5837-44e3-b22b-bb66f0b2a317.jpg",
+    "kind": "pexels"
+  },
+  {
+    "shop_id": "1af4c735-438e-49db-9876-d6dd8bc41970",
+    "shop_name": "Phở Hà Nội 24h",
+    "url": "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/shops/1af4c735-438e-49db-9876-d6dd8bc41970.jpg",
+    "kind": "pexels"
+  },
+  {
+    "shop_id": "a8fb25f3-40a1-4997-bef8-6ab21d087cae",
+    "shop_name": "Quán Nướng Sài Gòn",
+    "url": "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/shops/a8fb25f3-40a1-4997-bef8-6ab21d087cae.jpg",
+    "kind": "pexels"
+  },
+  {
+    "shop_id": "27797bf3-017e-4416-9f8f-846311a7759a",
+    "shop_name": "The Coffee House",
+    "url": "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/shops/27797bf3-017e-4416-9f8f-846311a7759a.png",
+    "kind": "logo.dev"
+  },
+  {
+    "shop_id": "057d20ff-7724-45b8-ac1a-625f3899fcb2",
+    "shop_name": "TocoToco",
+    "url": "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/shops/057d20ff-7724-45b8-ac1a-625f3899fcb2.png",
+    "kind": "logo.dev"
+  },
+  {
+    "shop_id": "df973716-c557-4c45-83c4-288015967e76",
+    "shop_name": "Xôi Xéo Hà Nội",
+    "url": "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/shops/df973716-c557-4c45-83c4-288015967e76.jpg",
+    "kind": "pexels"
+  }
+]

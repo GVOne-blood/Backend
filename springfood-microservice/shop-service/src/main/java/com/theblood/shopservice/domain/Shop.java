@@ -11,6 +11,7 @@ import org.hibernate.annotations.UuidGenerator;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -18,12 +19,12 @@ import java.time.Instant;
 @AllArgsConstructor
 @Entity
 @Table(name = "shops")
-public class Shop extends AbstractAuditingEntity<String> implements Serializable {
+public class Shop extends AbstractAuditingEntity<UUID> implements Serializable {
 
     @Id
     @UuidGenerator
-    @Column(name = "shop_id", length = 50, nullable = false)
-    private String shopId;
+    @Column(name = "shop_id", nullable = false)
+    private UUID shopId;
 
     @Column(name = "ownerId")
     private String ownerId;
@@ -47,11 +48,11 @@ public class Shop extends AbstractAuditingEntity<String> implements Serializable
     @Column(name = "total_sold")
     private Integer totalSold;
 
-    @Column(name = "created_at")
-    private Instant createdAt;
-
-    @Column(name = "updated_at")
-    private Instant updatedAt;
+//    @Column(name = "created_at")
+//    private Instant createdAt;
+//
+//    @Column(name = "updated_at")
+//    private Instant updatedAt;
 
     @Column(name = "shop_type", length = 50)
     private String shopType;
@@ -116,8 +117,28 @@ public class Shop extends AbstractAuditingEntity<String> implements Serializable
     @Column(name = "shop_level")
     private Integer shopLevel;
 
+    // ----- Admin moderation fields ------------------------------------
+    // Hibernate ddl-auto=update sẽ tự ALTER TABLE thêm 3 cột này khi service
+    // restart lần đầu. Không có Liquibase changelog vì project hiện tại đang
+    // dùng auto-migration cho convenience trong dev.
+
+    /**
+     * Lý do ban gần nhất nếu shop từng bị admin ban. Null khi chưa từng bị ban
+     * (kể cả sau khi unban thì giữ lại lịch sử cuối cùng).
+     */
+    @Column(name = "banned_reason", length = 1000)
+    private String bannedReason;
+
+    /** Thời điểm shop bị ban gần nhất, null nếu chưa từng. */
+    @Column(name = "banned_at")
+    private Instant bannedAt;
+
+    /** Username của admin thực hiện ban gần nhất. */
+    @Column(name = "banned_by", length = 100)
+    private String bannedBy;
+
     @Override
-    public String getId() {
+    public UUID getId() {
         return this.shopId;
     }
 }

@@ -43,3 +43,11 @@ build/
 .md
 .sql
 .csv
+
+# Kafka SSL Certs (DO NOT COMMIT)
+deploy/messaging/certs/*.jks
+deploy/messaging/certs/*.key
+deploy/messaging/certs/*.cert
+deploy/messaging/certs/*.pem
+deploy/messaging/certs/*.p12
+

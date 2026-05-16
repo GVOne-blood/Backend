@@ -1,0 +1,705 @@
+{
+  "burger": {
+    "query": "cheeseburger",
+    "pool": [
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/burger/1.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/burger/2.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/burger/3.jpg"
+    ],
+    "productCount": 3,
+    "products": [
+      "Burger Bò",
+      "Burger Gà",
+      "Burger Phô Mai"
+    ]
+  },
+  "banh-bao": {
+    "query": "chinese steamed bun bao",
+    "pool": [
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/banh-bao/1.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/banh-bao/2.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/banh-bao/3.jpg"
+    ],
+    "productCount": 3,
+    "products": [
+      "Bánh Bao Kim Sa",
+      "Bánh Bao Nhân Thịt",
+      "Bánh Bao Nhân Đậu Xanh"
+    ]
+  },
+  "banh-mi": {
+    "query": "vietnamese banh mi sandwich",
+    "pool": [
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/banh-mi/1.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/banh-mi/2.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/banh-mi/3.jpg"
+    ],
+    "productCount": 8,
+    "products": [
+      "Bánh Mì Bò Kho",
+      "Bánh Mì Chả Lụa",
+      "Bánh Mì Gà",
+      "Bánh Mì Pate",
+      "Bánh Mì Thịt",
+      "Bánh Mì Trứng",
+      "Bánh Mì Xíu Mại",
+      "Bánh Mì Đặc Biệt"
+    ]
+  },
+  "banh-trang": {
+    "query": "vietnamese rice paper salad",
+    "pool": [
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/banh-trang/1.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/banh-trang/2.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/banh-trang/3.jpg"
+    ],
+    "productCount": 2,
+    "products": [
+      "Bánh Tráng Trộn Khô Bò",
+      "Bánh Tráng Trộn Tôm"
+    ]
+  },
+  "bun-bo-hue": {
+    "query": "bun bo hue vietnamese spicy noodle",
+    "pool": [
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/bun-bo-hue/1.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/bun-bo-hue/2.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/bun-bo-hue/3.jpg"
+    ],
+    "productCount": 1,
+    "products": [
+      "Bún Bò Huế"
+    ]
+  },
+  "bun": {
+    "query": "vietnamese rice vermicelli noodle bowl",
+    "pool": [
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/bun/1.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/bun/2.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/bun/3.jpg"
+    ],
+    "productCount": 6,
+    "products": [
+      "Bún Bò Nam Bộ",
+      "Bún Cá",
+      "Bún Măng Vịt",
+      "Bún Mọc",
+      "Bún Riêu",
+      "Bún Ốc"
+    ]
+  },
+  "bun-cha": {
+    "query": "bun cha hanoi grilled pork",
+    "pool": [
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/bun-cha/1.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/bun-cha/2.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/bun-cha/3.jpg"
+    ],
+    "productCount": 1,
+    "products": [
+      "Bún Chả"
+    ]
+  },
+  "bun-thit-nuong": {
+    "query": "vietnamese grilled pork vermicelli",
+    "pool": [
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/bun-thit-nuong/1.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/bun-thit-nuong/2.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/bun-thit-nuong/3.jpg"
+    ],
+    "productCount": 1,
+    "products": [
+      "Bún Thịt Nướng"
+    ]
+  },
+  "bun-dau": {
+    "query": "bun dau mam tom vietnamese",
+    "pool": [
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/bun-dau/1.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/bun-dau/2.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/bun-dau/3.jpg"
+    ],
+    "productCount": 1,
+    "products": [
+      "Bún Đậu Mắm Tôm"
+    ]
+  },
+  "cf-sua-da": {
+    "query": "vietnamese iced milk coffee",
+    "pool": [
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/cf-sua-da/1.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/cf-sua-da/2.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/cf-sua-da/3.jpg"
+    ],
+    "productCount": 3,
+    "products": [
+      "Bạc Xỉu",
+      "Cà Phê Sữa Đá",
+      "Cà Phê Đen Đá"
+    ]
+  },
+  "bach-tuoc": {
+    "query": "grilled octopus seafood",
+    "pool": [
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/bach-tuoc/1.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/bach-tuoc/2.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/bach-tuoc/3.jpg"
+    ],
+    "productCount": 2,
+    "products": [
+      "Bạch Tuộc Nướng",
+      "Bạch Tuộc Xào"
+    ]
+  },
+  "cappuccino": {
+    "query": "cappuccino latte art",
+    "pool": [
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/cappuccino/1.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/cappuccino/2.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/cappuccino/3.jpg"
+    ],
+    "productCount": 1,
+    "products": [
+      "Cappuccino"
+    ]
+  },
+  "chao": {
+    "query": "congee rice porridge vietnamese",
+    "pool": [
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/chao/1.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/chao/2.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/chao/3.jpg"
+    ],
+    "productCount": 5,
+    "products": [
+      "Cháo Cá",
+      "Cháo Gà",
+      "Cháo Hải Sản",
+      "Cháo Lòng",
+      "Cháo Thịt Bằm"
+    ]
+  },
+  "che": {
+    "query": "vietnamese sweet dessert che",
+    "pool": [
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/che/1.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/che/2.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/che/3.jpg"
+    ],
+    "productCount": 8,
+    "products": [
+      "Chè Bà Ba",
+      "Chè Bưởi",
+      "Chè Khúc Bạch",
+      "Chè Sương Sa Hột Lựu",
+      "Chè Thái",
+      "Chè Thập Cẩm",
+      "Chè Trôi Nước",
+      "Chè Đậu Đỏ"
+    ]
+  },
+  "cha": {
+    "query": "vietnamese pork sausage cha lua",
+    "pool": [
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/cha/1.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/cha/2.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/cha/3.jpg"
+    ],
+    "productCount": 2,
+    "products": [
+      "Chả Cá",
+      "Chả Lụa"
+    ]
+  },
+  "cha-gio": {
+    "query": "fried spring roll vietnamese",
+    "pool": [
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/cha-gio/1.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/cha-gio/2.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/cha-gio/3.jpg"
+    ],
+    "productCount": 6,
+    "products": [
+      "Chả Giò",
+      "Chả Giò Hải Sản",
+      "Chả Giò Rế",
+      "Chả Ram",
+      "Nem Chua Rán",
+      "Nem Rán"
+    ]
+  },
+  "cua-ghe": {
+    "query": "crab seafood vietnamese",
+    "pool": [
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/cua-ghe/1.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/cua-ghe/2.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/cua-ghe/3.jpg"
+    ],
+    "productCount": 2,
+    "products": [
+      "Cua Rang Me",
+      "Ghẹ Rang Muối"
+    ]
+  },
+  "cf-dua": {
+    "query": "coconut coffee",
+    "pool": [
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/cf-dua/1.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/cf-dua/2.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/cf-dua/3.jpg"
+    ],
+    "productCount": 1,
+    "products": [
+      "Cà Phê Dừa"
+    ]
+  },
+  "cf-trung": {
+    "query": "vietnamese egg coffee",
+    "pool": [
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/cf-trung/1.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/cf-trung/2.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/cf-trung/3.jpg"
+    ],
+    "productCount": 1,
+    "products": [
+      "Cà Phê Trứng"
+    ]
+  },
+  "ca": {
+    "query": "grilled fish seafood vietnamese",
+    "pool": [
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/ca/1.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/ca/2.jpg"
+    ],
+    "productCount": 3,
+    "products": [
+      "Cá Diêu Hồng Chiên",
+      "Cá Lóc Kho Tộ",
+      "Cá Nướng Muối Ớt"
+    ]
+  },
+  "com": {
+    "query": "vietnamese rice plate",
+    "pool": [
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/com/1.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/com/2.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/com/3.jpg"
+    ],
+    "productCount": 5,
+    "products": [
+      "Cơm Bò Lúc Lắc",
+      "Cơm Cá Kho",
+      "Cơm Hải Sản",
+      "Cơm Hến",
+      "Cơm Niêu"
+    ]
+  },
+  "com-chien": {
+    "query": "fried rice asian",
+    "pool": [
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/com-chien/1.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/com-chien/2.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/com-chien/3.jpg"
+    ],
+    "productCount": 3,
+    "products": [
+      "Cơm Chiên Dương Châu",
+      "Cơm Chiên Hải Sản",
+      "Cơm Rang Thập Cẩm"
+    ]
+  },
+  "com-ga": {
+    "query": "vietnamese chicken rice",
+    "pool": [
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/com-ga/1.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/com-ga/2.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/com-ga/3.jpg"
+    ],
+    "productCount": 2,
+    "products": [
+      "Cơm Gà Teriyaki",
+      "Cơm Gà Xối Mỡ"
+    ]
+  },
+  "com-tam": {
+    "query": "com tam broken rice vietnamese",
+    "pool": [
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/com-tam/1.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/com-tam/2.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/com-tam/3.jpg"
+    ],
+    "productCount": 2,
+    "products": [
+      "Cơm Sườn Bì Chả",
+      "Cơm Tấm Sườn"
+    ]
+  },
+  "espresso": {
+    "query": "espresso coffee shot",
+    "pool": [
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/espresso/1.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/espresso/2.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/espresso/3.jpg"
+    ],
+    "productCount": 1,
+    "products": [
+      "Espresso"
+    ]
+  },
+  "ga-ran": {
+    "query": "fried chicken crispy",
+    "pool": [
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/ga-ran/1.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/ga-ran/2.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/ga-ran/3.jpg"
+    ],
+    "productCount": 3,
+    "products": [
+      "Gà Rán Cay",
+      "Gà Rán Giòn",
+      "Gà Rán Phô Mai"
+    ]
+  },
+  "ha-cao": {
+    "query": "dim sum dumpling",
+    "pool": [
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/ha-cao/1.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/ha-cao/2.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/ha-cao/3.jpg"
+    ],
+    "productCount": 1,
+    "products": [
+      "Há Cảo"
+    ]
+  },
+  "khoai-tay": {
+    "query": "french fries",
+    "pool": [
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/khoai-tay/1.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/khoai-tay/2.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/khoai-tay/3.jpg"
+    ],
+    "productCount": 1,
+    "products": [
+      "Khoai Tây Chiên"
+    ]
+  },
+  "latte": {
+    "query": "caffe latte coffee",
+    "pool": [
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/latte/1.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/latte/2.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/latte/3.jpg"
+    ],
+    "productCount": 1,
+    "products": [
+      "Latte"
+    ]
+  },
+  "lau": {
+    "query": "vietnamese hotpot",
+    "pool": [
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/lau/1.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/lau/2.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/lau/3.jpg"
+    ],
+    "productCount": 10,
+    "products": [
+      "Lẩu Bò Mỹ",
+      "Lẩu Bò Nhúng Dấm",
+      "Lẩu Bò Nấm",
+      "Lẩu Cá Kèo",
+      "Lẩu Gà Lá É",
+      "Lẩu Hải Sản Chua Cay",
+      "Lẩu Hải Sản Nấm",
+      "Lẩu Thái Bò",
+      "Lẩu Thái Gà",
+      "Lẩu Thái Hải Sản"
+    ]
+  },
+  "muc": {
+    "query": "grilled squid",
+    "pool": [
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/muc/1.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/muc/2.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/muc/3.jpg"
+    ],
+    "productCount": 2,
+    "products": [
+      "Mực Nướng Sa Tế",
+      "Mực Xào Sa Tế"
+    ]
+  },
+  "nem-cuon": {
+    "query": "fresh spring roll vietnamese",
+    "pool": [
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/nem-cuon/1.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/nem-cuon/2.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/nem-cuon/3.jpg"
+    ],
+    "productCount": 1,
+    "products": [
+      "Nem Cuốn"
+    ]
+  },
+  "nem-lui": {
+    "query": "vietnamese skewered pork",
+    "pool": [
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/nem-lui/1.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/nem-lui/2.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/nem-lui/3.jpg"
+    ],
+    "productCount": 1,
+    "products": [
+      "Nem Lui"
+    ]
+  },
+  "nem-nuong": {
+    "query": "nem nuong vietnamese grilled pork",
+    "pool": [
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/nem-nuong/1.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/nem-nuong/2.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/nem-nuong/3.jpg"
+    ],
+    "productCount": 1,
+    "products": [
+      "Nem Nướng Nha Trang"
+    ]
+  },
+  "ngheu": {
+    "query": "steamed clam seafood",
+    "pool": [
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/ngheu/1.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/ngheu/2.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/ngheu/3.jpg"
+    ],
+    "productCount": 2,
+    "products": [
+      "Nghêu Hấp Xả",
+      "Nghêu Nướng Phô Mai"
+    ]
+  },
+  "nuoc-ep": {
+    "query": "fresh fruit juice glass",
+    "pool": [
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/nuoc-ep/1.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/nuoc-ep/2.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/nuoc-ep/3.jpg"
+    ],
+    "productCount": 10,
+    "products": [
+      "Nước Ép Bưởi",
+      "Nước Ép Cam",
+      "Nước Ép Chanh",
+      "Nước Ép Cà Rốt",
+      "Nước Ép Dâu",
+      "Nước Ép Dưa Hấu",
+      "Nước Ép Dứa",
+      "Nước Ép Thập Cẩm",
+      "Nước Ép Táo",
+      "Nước Ép Ổi"
+    ]
+  },
+  "pho": {
+    "query": "pho vietnamese beef noodle soup",
+    "pool": [
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/pho/1.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/pho/2.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/pho/3.jpg"
+    ],
+    "productCount": 8,
+    "products": [
+      "Phở Bò Chín",
+      "Phở Bò Kho",
+      "Phở Bò Tái",
+      "Phở Bò Viên",
+      "Phở Gà",
+      "Phở Gà Quay",
+      "Phở Sốt Vang",
+      "Phở Đặc Biệt"
+    ]
+  },
+  "pho-cuon": {
+    "query": "vietnamese fresh spring rolls",
+    "pool": [
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/pho-cuon/1.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/pho-cuon/2.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/pho-cuon/3.jpg"
+    ],
+    "productCount": 1,
+    "products": [
+      "Phở Cuốn"
+    ]
+  },
+  "pho-xao": {
+    "query": "stir fried vietnamese noodles",
+    "pool": [
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/pho-xao/1.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/pho-xao/2.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/pho-xao/3.jpg"
+    ],
+    "productCount": 1,
+    "products": [
+      "Phở Xào"
+    ]
+  },
+  "pizza": {
+    "query": "pizza",
+    "pool": [
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/pizza/1.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/pizza/2.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/pizza/3.jpg"
+    ],
+    "productCount": 3,
+    "products": [
+      "Pizza Hải Sản",
+      "Pizza Thập Cẩm",
+      "Pizza Xúc Xích"
+    ]
+  },
+  "sinh-to": {
+    "query": "fruit smoothie tropical",
+    "pool": [
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/sinh-to/1.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/sinh-to/2.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/sinh-to/3.jpg"
+    ],
+    "productCount": 10,
+    "products": [
+      "Sinh Tố Bơ",
+      "Sinh Tố Bơ Sữa Chua",
+      "Sinh Tố Chuối",
+      "Sinh Tố Dâu",
+      "Sinh Tố Dưa Hấu",
+      "Sinh Tố Dừa",
+      "Sinh Tố Mãng Cầu",
+      "Sinh Tố Sapoche",
+      "Sinh Tố Thập Cẩm",
+      "Sinh Tố Xoài"
+    ]
+  },
+  "so-diep": {
+    "query": "grilled scallop cheese",
+    "pool": [
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/so-diep/1.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/so-diep/2.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/so-diep/3.jpg"
+    ],
+    "productCount": 2,
+    "products": [
+      "Sò Điệp Hấp",
+      "Sò Điệp Nướng Mỡ Hành"
+    ]
+  },
+  "bbq": {
+    "query": "grilled bbq pork ribs",
+    "pool": [
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/bbq/1.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/bbq/2.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/bbq/3.jpg"
+    ],
+    "productCount": 4,
+    "products": [
+      "Sườn Non Nướng Mật Ong",
+      "Sườn Nướng BBQ",
+      "Thịt Ba Chỉ Nướng",
+      "Thịt Xiên Nướng"
+    ]
+  },
+  "tra": {
+    "query": "iced fruit tea drink",
+    "pool": [
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/tra/1.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/tra/2.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/tra/3.jpg"
+    ],
+    "productCount": 8,
+    "products": [
+      "Trà Chanh Leo",
+      "Trà Dâu",
+      "Trà Dứa",
+      "Trà Thanh Long",
+      "Trà Thập Cẩm",
+      "Trà Vải",
+      "Trà Xoài",
+      "Trà Đào Cam Sả"
+    ]
+  },
+  "tra-sua": {
+    "query": "bubble milk tea boba",
+    "pool": [
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/tra-sua/1.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/tra-sua/2.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/tra-sua/3.jpg"
+    ],
+    "productCount": 12,
+    "products": [
+      "Trà Sữa Caramel",
+      "Trà Sữa Dâu",
+      "Trà Sữa Hokkaido",
+      "Trà Sữa Khoai Môn",
+      "Trà Sữa Matcha",
+      "Trà Sữa Phô Mai",
+      "Trà Sữa Socola",
+      "Trà Sữa Thái Xanh",
+      "Trà Sữa Truyền Thống",
+      "Trà Sữa Trân Châu Đường Đen",
+      "Trà Sữa Ô Long",
+      "Trà Sữa Đào"
+    ]
+  },
+  "tom": {
+    "query": "grilled shrimp seafood",
+    "pool": [
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/tom/1.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/tom/2.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/tom/3.jpg"
+    ],
+    "productCount": 2,
+    "products": [
+      "Tôm Hấp Bia",
+      "Tôm Nướng Muối Ớt"
+    ]
+  },
+  "xiu-mai": {
+    "query": "siu mai dim sum",
+    "pool": [
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/xiu-mai/1.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/xiu-mai/2.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/xiu-mai/3.jpg"
+    ],
+    "productCount": 1,
+    "products": [
+      "Xíu Mại"
+    ]
+  },
+  "xoi": {
+    "query": "sticky rice xoi vietnamese",
+    "pool": [
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/xoi/1.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/xoi/2.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/xoi/3.jpg"
+    ],
+    "productCount": 6,
+    "products": [
+      "Xôi Chả",
+      "Xôi Gà",
+      "Xôi Lạc",
+      "Xôi Thập Cẩm",
+      "Xôi Xéo",
+      "Xôi Đậu Xanh"
+    ]
+  },
+  "oc": {
+    "query": "vietnamese snail dish",
+    "pool": [
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/oc/1.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/oc/2.jpg",
+      "https://pub-db7036086154479380d282adb29af0a4.r2.dev/seed/products/oc/3.jpg"
+    ],
+    "productCount": 1,
+    "products": [
+      "Ốc Hương Xào Bơ Tỏi"
+    ]
+  }
+}

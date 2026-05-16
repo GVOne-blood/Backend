@@ -3,19 +3,16 @@ package com.theblood.paymentservice.grpc.client_role;
 import com.theblood.springfood.common.grpc.OrderServiceGrpc;
 import com.theblood.springfood.common.grpc.OrderUpdateRequest;
 import com.theblood.springfood.common.grpc.OrderUpdateResponse;
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
-@RequiredArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class OrderUpdateService {
 
-    OrderServiceGrpc.OrderServiceBlockingStub stub;
+    @GrpcClient("order-service")
+    private OrderServiceGrpc.OrderServiceBlockingStub stub;
 
     public boolean updateOrder(OrderUpdateRequest orderUpdateRequest) {
         try {

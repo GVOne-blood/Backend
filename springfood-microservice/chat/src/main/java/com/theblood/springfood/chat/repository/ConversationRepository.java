@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.*;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 /**
  * Spring Data JPA repository for the Conversation entity.
  */
@@ -42,5 +44,19 @@ public interface ConversationRepository extends JpaRepository<Conversation, Stri
         @Param("userId") String userId, 
         @Param("keyword") String keyword, 
         Pageable pageable
+    );
+
+    /**
+     * Find existing DIRECT conversation between two users using the optimized participant fields.
+     */
+    @Query("""
+        SELECT c FROM Conversation c
+        WHERE c.conversationType = 'DIRECT'
+          AND ((c.participant1Id = :user1 AND c.participant2Id = :user2)
+               OR (c.participant1Id = :user2 AND c.participant2Id = :user1))
+        """)
+    Optional<Conversation> findDirectConversation(
+        @Param("user1") String user1,
+        @Param("user2") String user2
     );
 }

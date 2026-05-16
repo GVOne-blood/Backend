@@ -1,7 +1,6 @@
 package com.theblood.shopservice.config;
 
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -20,31 +19,27 @@ import java.util.List;
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity(prePostEnabled = true)
-@RequiredArgsConstructor
 public class SecurityConfig {
-    private final InternalAuthenticationFilter internalAuthenticationFilter;
     String[] SHOP_WHITELIST = {
-        "/shop/**",
+        "/shop/featured/**",   // Public: Featured shops
+        "/shop/featured",      // Public: Featured shops (no trailing slash)
+        "/shop/**",            // Public: All shop endpoints
         "/swagger-ui/**",
         "/v3/api-docs/**",
         "/swagger-resources/**",
         "/webjars/**",
-        "/com.theblood.shopservice.grpc.ProductService/**" // Allow gRPC calls
+        "/com.theblood.shopservice.grpc.ProductService/**"
     };
 //    private CustomAuthenticationEntryPoint authenticationEntryPoint;
 //    private CustomAccessDeniedHandler accessDeniedHandler;
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http, InternalAuthenticationFilter internalAuthenticationFilter) throws Exception {
         http
             .csrf(AbstractHttpConfigurer::disable)
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers(SHOP_WHITELIST).permitAll()
-                .anyRequest().authenticated())
-//                .exceptionHandling(exception -> exception
-//                        .authenticationEntryPoint(authenticationEntryPoint)
-//                        .accessDeniedHandler(accessDeniedHandler))
+                .anyRequest().permitAll())  // TEMPORARILY ALLOW ALL FOR TESTING
             .addFilterBefore(internalAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }

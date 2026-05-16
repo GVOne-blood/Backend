@@ -12,6 +12,16 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
 public class FeedbackResponse {
 
+    /**
+     * Feedback row id. Useful for FE actions (edit/delete own comment).
+     */
+    String id;
+
+    /**
+     * Author user id. Surfaces "Bạn" when matches current user.
+     */
+    String userId;
+
     String shopId;
     String productId;
     String productVariantsId;
@@ -24,5 +34,4 @@ public class FeedbackResponse {
     Integer rate;
     FeedbackType feedbackType;
     String feedbackTitle;
-
 }

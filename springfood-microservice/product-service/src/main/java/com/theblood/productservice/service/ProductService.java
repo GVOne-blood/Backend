@@ -18,9 +18,25 @@ public interface ProductService {
 
     Page<ProductDetail> getAllProductDetails(Pageable pageable);
 
+    Page<ProductDetail> getRecommendedProducts(Pageable pageable);
+
+    Page<ProductDetail> searchProductsByKeyword(String keyword, Pageable pageable);
+
+    java.util.List<java.util.Map<String, Object>> listCategoryOptions();
+
     List<ProductDetail> getAllProductDetails();
 
     List<ProductDetail> getAllLastUpdatedProducts(LocalDateTime lastModifyAt);
+
+    Page<ProductDetail> getProductsByShopId(UUID shopId, Pageable pageable);
+
+    /**
+     * Build the storefront menu for a shop: every product the shop sells,
+     * grouped by the categories linked through {@code product_categories}.
+     * Products with no category are placed under a synthetic "OTHER" bucket
+     * so the FE can still render them in their own section.
+     */
+    java.util.List<com.theblood.productservice.service.dto.response.ShopMenuCategoryResponse> getShopMenu(UUID shopId);
 
     Product updateProduct(UUID productId, ProductRequest productRequest);
 

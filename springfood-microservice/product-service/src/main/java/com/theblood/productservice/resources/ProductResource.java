@@ -45,6 +45,45 @@ public class ProductResource {
                 new ResponseData<>(200, "Get all products successfully", productService.getAllProductDetails(pageable)), HttpStatus.OK);
     }
 
+    /**
+     * Recommended products for the homepage "featured products" section.
+     * Returns AVAILABLE products in random order so each visit feels fresh.
+     */
+    @GetMapping("/recommended")
+    public ResponseEntity<ResponseData<Page<ProductDetail>>> getRecommendedProducts(
+            @PageableDefault(size = 20, page = 0) Pageable pageable) {
+        return new ResponseEntity<>(
+                new ResponseData<>(200, "Get recommended products successfully",
+                        productService.getRecommendedProducts(pageable)),
+                HttpStatus.OK);
+    }
+
+    /**
+     * Public keyword search by product name/description (case-insensitive contains).
+     * Falls back to listing all products when keyword is empty.
+     */
+    @GetMapping("/search")
+    public ResponseEntity<ResponseData<Page<ProductDetail>>> searchProducts(
+            @RequestParam(value = "keyword", required = false) String keyword,
+            @PageableDefault(size = 10, page = 0) Pageable pageable) {
+        return new ResponseEntity<>(
+                new ResponseData<>(200, "Search products successfully",
+                        productService.searchProductsByKeyword(keyword, pageable)),
+                HttpStatus.OK);
+    }
+
+    /**
+     * Public list of all categories — used by the shop owner UI when picking
+     * categories for a product. Returns only id+name+slug to keep payload small.
+     */
+    @GetMapping("/categories")
+    public ResponseEntity<ResponseData<List<java.util.Map<String, Object>>>> listCategories() {
+        List<java.util.Map<String, Object>> rows = productService.listCategoryOptions();
+        return new ResponseEntity<>(
+                new ResponseData<>(200, "Get categories successfully", rows),
+                HttpStatus.OK);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<ResponseData<ProductDetail>> getProductById(@PathVariable("id") UUID id) {
         return new ResponseEntity<>(
@@ -61,7 +100,7 @@ public class ProductResource {
         return new ResponseEntity<>(new ResponseData<>(200, "Get related products successfully", productService.getListProductsRelated(id, 20)), HttpStatus.OK);
     }
 
-    //@PostAuthorize(value = "ADMIN")
+    @PreAuthorize("hasRole('SHOP_OWNER')")
     @PostMapping("/")
     public ResponseEntity<ResponseData<Product>> createProduct(@RequestBody @Valid ProductRequest productRequest) {
         try {
@@ -74,7 +113,7 @@ public class ProductResource {
         }
     }
 
-    @PreAuthorize("hasAnyRole('SHOP_OWNER', 'ADMIN')")
+    @PreAuthorize("hasRole('SHOP_OWNER')")
     @PostMapping("/batch")
     public ResponseEntity<ResponseData<List<ProductDetail>>> createProducts(
             @RequestBody MultipartFile file
@@ -87,7 +126,7 @@ public class ProductResource {
         }
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN', 'CUSTOMER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'CUSTOMER', 'SHOP_OWNER')")
     @PostMapping("/img")
     public ResponseData<ProductImageResponse> uploadProductImages(
             @AuthenticationPrincipal CustomUserPrincipal user,
@@ -103,6 +142,7 @@ public class ProductResource {
         }
     }
 
+    @PreAuthorize("hasRole('SHOP_OWNER')")
     @PutMapping("/{id}")
     public ResponseEntity<ResponseData<Product>> updateProduct(@PathVariable("id") UUID id, @RequestBody @Valid ProductRequest productRequest) {
         try {
@@ -115,6 +155,7 @@ public class ProductResource {
         }
     }
 
+    @PreAuthorize("hasRole('SHOP_OWNER')")
     @DeleteMapping("/{id}")
     public ResponseEntity<ResponseData<Void>> deleteProduct(@PathVariable("id") UUID id) {
         try {
@@ -125,6 +166,54 @@ public class ProductResource {
             return new ResponseEntity<>(
                     new ResponseData<>(400, "Delete product failed: " + e.getMessage(), null), HttpStatus.BAD_REQUEST);
         }
+    }
+
+    @PreAuthorize("hasRole('SHOP_OWNER')")
+    @GetMapping("/shop")
+    public ResponseEntity<ResponseData<Page<ProductDetail>>> getShopProducts(
+            @AuthenticationPrincipal CustomUserPrincipal user,
+            @PageableDefault(size = 10, page = 0) Pageable pageable) {
+        if (user.getShopId() == null) {
+            return new ResponseEntity<>(
+                    new ResponseData<>(400, "Shop not found", null), HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>(
+                new ResponseData<>(200, "Get shop products successfully",
+                        productService.getProductsByShopId(UUID.fromString(user.getShopId()), pageable)), HttpStatus.OK);
+    }
+
+    /**
+     * Public endpoint — returns products belonging to a specific shop.
+     *
+     * <p>Used by the storefront's shop detail page to render the menu when a
+     * customer taps a shop card on the homepage. Anonymous users can browse
+     * the menu without logging in, mirroring the shop detail endpoint at
+     * {@code GET /shop/{shopId}}.</p>
+     */
+    @GetMapping("/by-shop/{shopId}")
+    public ResponseEntity<ResponseData<Page<ProductDetail>>> getProductsByShopPublic(
+            @PathVariable("shopId") UUID shopId,
+            @PageableDefault(size = 100, page = 0) Pageable pageable) {
+        return new ResponseEntity<>(
+                new ResponseData<>(200, "Get shop products successfully",
+                        productService.getProductsByShopId(shopId, pageable)), HttpStatus.OK);
+    }
+
+    /**
+     * Public endpoint — returns the full storefront menu for a shop, grouped
+     * by category. Each bucket carries an id (stable scroll anchor for the
+     * FE), display name, slug, count, and the matching products.
+     *
+     * <p>Single round-trip alternative to combining {@code /by-shop} with the
+     * categories endpoint. Used by the shop detail page so the chip row
+     * always shows the real category names + counts.</p>
+     */
+    @GetMapping("/by-shop/{shopId}/menu")
+    public ResponseEntity<ResponseData<List<com.theblood.productservice.service.dto.response.ShopMenuCategoryResponse>>>
+    getShopMenu(@PathVariable("shopId") UUID shopId) {
+        return new ResponseEntity<>(
+                new ResponseData<>(200, "Get shop menu successfully",
+                        productService.getShopMenu(shopId)), HttpStatus.OK);
     }
 //
 //    @GetMapping("/search/price")

@@ -67,6 +67,9 @@ public class WebSocketAuthInterceptor implements ChannelInterceptor {
             LoggingMDCUtil.setSessionId(sessionId);
 
             try {
+                // Log để debug
+                log.info("WebSocket CONNECT headers: {}", accessor.toNativeHeaderMap());
+                
                 String authHeader = accessor.getFirstNativeHeader("Authorization");
 
                 if (authHeader != null && authHeader.startsWith("Bearer ")) {
@@ -101,9 +104,9 @@ public class WebSocketAuthInterceptor implements ChannelInterceptor {
                         log.info("WebSocket connection authenticated - username: {}", username);
 
                     } catch (Exception e) {
-                        log.error("WebSocket authentication failed - reason: {}", e.getMessage());
+                        log.error("WebSocket authentication failed - reason: {} - exception: {}", e.getMessage(), e.getClass().getName(), e);
                         metricsService.incrementAuthFailures();
-                        throw new IllegalArgumentException("Authentication failed: Invalid or expired token");
+                        throw new IllegalArgumentException("Authentication failed: " + e.getMessage());
                     }
                 } else {
                     log.error("WebSocket connection attempt without valid Authorization header");

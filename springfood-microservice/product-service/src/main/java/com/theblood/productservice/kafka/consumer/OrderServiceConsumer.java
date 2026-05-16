@@ -7,8 +7,8 @@ import com.theblood.productservice.domain.Product;
 import com.theblood.productservice.kafka.model.OutboxMessage;
 import com.theblood.productservice.kafka.repository.OutboxMessageRepository;
 import com.theblood.productservice.repository.ProductRepository;
-import com.theblood.productservice.service.dto.request.ItemRequest;
 import com.theblood.springfood.common.dto.kafka.Event;
+import com.theblood.springfood.common.dto.request.ItemRequest;
 import com.theblood.springfood.common.dto.kafka.OrderCreationEvent;
 import com.theblood.springfood.common.enums.MessageStatus;
 import com.theblood.springfood.common.enums.kafka.SagaOrderEventType;
@@ -25,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @Slf4j
@@ -46,13 +47,14 @@ public class OrderServiceConsumer {
 
         if (!event.getEventType().equals(SagaOrderEventType.ORDER_CREATED.name()))
             throw new InvalidDataException("Invalid event type : Only accept order-created event");
-        List<ItemRequest> products = (List<ItemRequest>) objectMapper.convertValue(event.getPayload(), OrderCreationEvent.class);
+        OrderCreationEvent orderCreationEvent = objectMapper.convertValue(event.getPayload(), OrderCreationEvent.class);
+        List<ItemRequest> products = orderCreationEvent.getProducts();
 
         BigDecimal totalPrice = new BigDecimal(0);
 
         try {
             for (ItemRequest product : products) {
-                Optional<Product> optionalProduct = productRepository.findById(product.getProductId());
+                Optional<Product> optionalProduct = productRepository.findById(UUID.fromString(product.getProductId()));
                 if (optionalProduct.isEmpty())
                     throw new InvalidDataException("Product not found");
                 if (!optionalProduct.get().getProductStatus().equals(ProductStatus.AVAILABLE))
@@ -64,11 +66,13 @@ public class OrderServiceConsumer {
 
                 BigDecimal itemPrice = optionalProduct.get().getPrice().multiply(BigDecimal.valueOf(product.getQuantity()));
 
-                totalPrice.add(itemPrice);
+                totalPrice = totalPrice.add(itemPrice);
 
             }
-            OrderCreationEvent response = (OrderCreationEvent) event.getPayload();
-            response.builder()
+            OrderCreationEvent response = OrderCreationEvent.builder()
+                    .orderId(orderCreationEvent.getOrderId())
+                    .userId(orderCreationEvent.getUserId())
+                    .products(orderCreationEvent.getProducts())
                     .totalPrice(totalPrice)
                     .build();
 
@@ -110,10 +114,10 @@ public class OrderServiceConsumer {
         if (!event.getEventType().equals(SagaOrderEventType.PRODUCT_PROCESSED_FAILED.name()))
             throw new InvalidDataException("Invalid event type : Only accept product-process-fail event");
         OrderCreationEvent orderCreationEvent = (OrderCreationEvent) event.getPayload();
-        List<ItemRequest> products = (List<ItemRequest>) objectMapper.convertValue(event.getPayload(), OrderCreationEvent.class);
+        List<ItemRequest> products = objectMapper.convertValue(event.getPayload(), OrderCreationEvent.class).getProducts();
         try {
             for (ItemRequest product : products) {
-                Optional<Product> optionalProduct = productRepository.findById(product.getProductId());
+                Optional<Product> optionalProduct = productRepository.findById(UUID.fromString(product.getProductId()));
                 //rollback
                 optionalProduct.get().setQuantity(optionalProduct.get().getQuantity() + product.getQuantity());
             }

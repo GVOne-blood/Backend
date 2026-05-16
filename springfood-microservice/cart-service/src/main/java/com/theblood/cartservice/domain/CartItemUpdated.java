@@ -4,8 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.mongodb.core.mapping.Field;
-import org.springframework.data.mongodb.core.mapping.FieldType;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -24,27 +22,21 @@ public class CartItemUpdated {
 
     // ========== Product Identity ==========
     private String sku;              // Mã SKU của variant
-    @Field(targetType = FieldType.STRING)
     private UUID productId;          // ID sản phẩm gốc
     private String productName;      // Snapshot tên sản phẩm
     private String productImage;     // Snapshot ảnh thumbnail
 
     // ========== Shop Information (CRITICAL) ==========
-    @Field(targetType = FieldType.STRING)
     private UUID shopId;             // ID shop bán sản phẩm
     private String shopName;         // Snapshot tên shop
 
     // ========== Pricing & Promotions ==========
-    @Field(targetType = FieldType.DECIMAL128)
     private BigDecimal originalPrice;    // Giá gốc
     
-    @Field(targetType = FieldType.DECIMAL128)
     private BigDecimal price;            // Giá hiện tại (có thể đã giảm)
     
-    @Field(targetType = FieldType.DECIMAL128)
     private BigDecimal discountAmount;   // Số tiền giảm cho 1 item
     
-    @Field(targetType = FieldType.DECIMAL128)
     private BigDecimal finalPrice;       // Giá cuối = (price * quantity) - (discountAmount * quantity)
     
     private String promotionId;          // ID chương trình khuyến mãi

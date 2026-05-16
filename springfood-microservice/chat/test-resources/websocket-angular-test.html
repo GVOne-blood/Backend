@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SpringFood WebSocket Test - Angular Compatible</title>
+  <script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@7.0.0/bundles/stomp.umd.min.js"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    
+    .container {
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    h1 {
+      color: #ff6b35;
+      margin-bottom: 10px;
+    }
+    
+    .subtitle {
+      color: #666;
+      margin-bottom: 30px;
+    }
+    
+    .section {
+      margin-bottom: 20px;
+    }
+    
+    label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 5px;
+      color: #333;
+    }
+    
+    input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+    
+    button {
+      padding: 10px 20px;
+      margin-right: 10px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: bold;
+      transition: background 0.3s;
+    }
+    
+    button.primary {
+      background: #ff6b35;
+      color: white;
+    }
+    
+    button.primary:hover {
+      background: #e55a2b;
+    }
+    
+    button.secondary {
+      background: #6c757d;
+      color: white;
+    }
+    
+    button.secondary:hover {
+      background: #5a6268;
+    }
+    
+    button.success {
+      background: #28a745;
+      color: white;
+    }
+    
+    button.success:hover {
+      background: #218838;
+    }
+    
+    button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+    
+    .status {
+      display: inline-block;
+      padding: 5px 15px;
+      border-radius: 20px;
+      font-weight: bold;
+      margin-left: 10px;
+    }
+    
+    .status.connected {
+      background: #d4edda;
+      color: #155724;
+    }
+    
+    .status.disconnected {
+      background: #f8d7da;
+      color: #721c24;
+    }
+    
+    .status.connecting {
+      background: #fff3cd;
+      color: #856404;
+    }
+    
+    #messages {
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      height: 400px;
+      overflow-y: auto;
+      padding: 15px;
+      background: #fafafa;
+      margin-top: 10px;
+    }
+    
+    .message {
+      margin-bottom: 15px;
+      padding: 10px;
+      border-radius: 4px;
+      animation: fadeIn 0.3s;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .message.user {
+      background: #e3f2fd;
+      border-left: 4px solid #2196f3;
+    }
+    
+    .message.ai {
+      background: #f3e5f5;
+      border-left: 4px solid #9c27b0;
+    }
+    
+    .message.system {
+      background: #fff3e0;
+      border-left: 4px solid #ff9800;
+    }
+    
+    .message.error {
+      background: #ffebee;
+      border-left: 4px solid #f44336;
+    }
+    
+    .message-sender {
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+    
+    .message-content {
+      color: #333;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+    
+    .message-time {
+      font-size: 11px;
+      color: #999;
+      margin-top: 5px;
+    }
+    
+    .input-group {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    
+    .input-group input {
+      flex: 1;
+    }
+    
+    .info-box {
+      background: #e7f3ff;
+      border-left: 4px solid #2196f3;
+      padding: 15px;
+      margin-bottom: 20px;
+      border-radius: 4px;
+    }
+    
+    .info-box h3 {
+      margin-top: 0;
+      color: #1976d2;
+    }
+    
+    .info-box code {
+      background: #fff;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-family: 'Courier New', monospace;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🍜 SpringFood WebSocket Test</h1>
+    <p class="subtitle">Test WebSocket connection with AI Assistant (Angular Compatible)</p>
+    
+    <div class="info-box">
+      <h3>📋 How to Get JWT Token</h3>
+      <p>1. Login to SpringFood app at <code>http://localhost:4200</code></p>
+      <p>2. Open Browser DevTools (F12) → Application/Storage → Cookies</p>
+      <p>3. Copy value of <code>access_token</code> or <code>jwt_token</code></p>
+      <p>4. Paste it below and click Connect</p>
+    </div>
+    
+    <div class="section">
+      <label>JWT Token:</label>
+      <input id="token" type="text" placeholder="Paste your JWT token here (from cookies or localStorage)" />
+    </div>
+    
+    <div class="section">
+      <button class="primary" onclick="connect()">🔌 Connect</button>
+      <button class="secondary" onclick="disconnect()">🔌 Disconnect</button>
+      <span id="status" class="status disconnected">Disconnected</span>
+    </div>
+    
+    <div class="section">
+      <label>Message to AI:</label>
+      <div class="input-group">
+        <input id="message" type="text" placeholder="Type your message here..." onkeypress="if(event.key==='Enter') sendMessage()" />
+        <button class="success" onclick="sendMessage()">📤 Send</button>
+      </div>
+    </div>
+    
+    <div class="section">
+      <label>Chat Messages:</label>
+      <div id="messages"></div>
+    </div>
+  </div>
+  
+  <script>
+    let stompClient = null;
+    let currentAIMessage = '';
+    
+    function connect() {
+      const token = document.getElementById('token').value.trim();
+      if (!token) {
+        alert('⚠️ Please enter JWT token first!');
+        return;
+      }
+      
+      updateStatus('connecting', 'Connecting...');
+      
+      // Same configuration as Angular WebSocketService
+      stompClient = new StompJs.Client({
+        brokerURL: 'ws://localhost:9098/ws',
+        connectHeaders: {
+          Authorization: `Bearer ${token}`
+        },
+        debug: (str) => {
+          console.log('[STOMP]', str);
+        },
+        reconnectDelay: 5000,
+        heartbeatIncoming: 10000,
+        heartbeatOutgoing: 10000,
+        connectionTimeout: 10000
+      });
+      
+      stompClient.onConnect = (frame) => {
+        console.log('[WebSocket] ✅ Connected:', frame);
+        updateStatus('connected', 'Connected');
+        appendSystemMessage('Connected to SpringFood AI Assistant');
+        
+        // Subscribe to AI response chunks (streaming)
+        stompClient.subscribe('/user/queue/ai-assistant/response', (message) => {
+          const chunk = message.body;
+          console.log('[Chat] 📨 Received AI chunk:', chunk.substring(0, 50) + '...');
+          currentAIMessage += chunk;
+          updateLastAIMessage(currentAIMessage);
+        });
+        
+        // Subscribe to AI completion signal
+        stompClient.subscribe('/user/queue/ai-assistant/complete', (message) => {
+          console.log('[Chat] ✅ AI response complete');
+          appendSystemMessage('AI response complete');
+          currentAIMessage = '';
+        });
+        
+        // Subscribe to AI errors
+        stompClient.subscribe('/user/queue/ai-assistant/error', (message) => {
+          console.error('[Chat] ❌ AI error:', message.body);
+          appendErrorMessage('AI Error: ' + message.body);
+          currentAIMessage = '';
+        });
+      };
+      
+      stompClient.onStompError = (frame) => {
+        console.error('[WebSocket] ❌ STOMP error:', frame);
+        updateStatus('disconnected', 'Error');
+        
+        let errorMsg = 'Connection error';
+        if (frame.headers && frame.headers.message) {
+          errorMsg = frame.headers.message;
+          if (errorMsg.includes('Authentication failed') || errorMsg.includes('TOKEN_EXPIRED')) {
+            errorMsg = 'Authentication failed - please login again and get a fresh token';
+          }
+        }
+        
+        appendErrorMessage(errorMsg);
+      };
+      
+      stompClient.onWebSocketError = (event) => {
+        console.error('[WebSocket] ❌ Connection error:', event);
+        updateStatus('disconnected', 'Connection Error');
+        appendErrorMessage('WebSocket connection error - is chat service running on port 9098?');
+      };
+      
+      stompClient.activate();
+    }
+    
+    function disconnect() {
+      if (stompClient) {
+        stompClient.deactivate();
+        updateStatus('disconnected', 'Disconnected');
+        appendSystemMessage('Disconnected from server');
+      }
+    }
+    
+    function sendMessage() {
+      const message = document.getElementById('message').value.trim();
+      
+      if (!message) {
+        alert('⚠️ Please enter a message');
+        return;
+      }
+      
+      if (!stompClient || !stompClient.connected) {
+        alert('⚠️ Not connected to server. Please connect first.');
+        return;
+      }
+      
+      console.log('[Chat] 📤 Sending message:', message);
+      
+      // Send to same endpoint as Angular app
+      stompClient.publish({
+        destination: '/app/ai-assistant/chat',
+        body: JSON.stringify({
+          message: message
+        })
+      });
+      
+      appendUserMessage(message);
+      document.getElementById('message').value = '';
+      
+      // Prepare for AI response
+      currentAIMessage = '';
+      appendAIMessage('');
+    }
+    
+    function updateStatus(state, text) {
+      const statusEl = document.getElementById('status');
+      statusEl.textContent = text;
+      statusEl.className = 'status ' + state;
+    }
+    
+    function appendUserMessage(content) {
+      appendMessage('You', content, 'user');
+    }
+    
+    function appendAIMessage(content) {
+      appendMessage('AI Assistant', content, 'ai');
+    }
+    
+    function updateLastAIMessage(content) {
+      const messagesDiv = document.getElementById('messages');
+      const lastMessage = messagesDiv.lastElementChild;
+      
+      if (lastMessage && lastMessage.classList.contains('ai')) {
+        const contentDiv = lastMessage.querySelector('.message-content');
+        contentDiv.textContent = content || 'Typing...';
+      } else {
+        appendAIMessage(content);
+      }
+    }
+    
+    function appendSystemMessage(content) {
+      appendMessage('System', content, 'system');
+    }
+    
+    function appendErrorMessage(content) {
+      appendMessage('Error', content, 'error');
+    }
+    
+    function appendMessage(sender, content, type) {
+      const messagesDiv = document.getElementById('messages');
+      const messageDiv = document.createElement('div');
+      messageDiv.className = 'message ' + type;
+      
+      const now = new Date();
+      const timeStr = now.toLocaleTimeString();
+      
+      messageDiv.innerHTML = `
+        <div class="message-sender">${sender}</div>
+        <div class="message-content">${content || 'Typing...'}</div>
+        <div class="message-time">${timeStr}</div>
+      `;
+      
+      messagesDiv.appendChild(messageDiv);
+      messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    }
+    
+    // Auto-focus message input
+    document.getElementById('message').focus();
+  </script>
+</body>
+</html>
